@@ -1,7 +1,6 @@
 <script setup>
 import TrafficView from "@/components/TrafficView.vue";
-import statusOk from "@/assets/status-ok.svg"
-import statusFail from "@/assets/status-fail.svg"
+import onlineIcon from "@/assets/static/imgs/tray-proxy-online.png"
 import {ref} from "vue";
 import DivLine from "@/components/DivLine.vue";
 import {useRoute, useRouter} from 'vue-router'
@@ -37,24 +36,23 @@ const clickItem = (index, item) => {
   router.push(`/${item}`)
 }
 
-const statusSrc = ref(statusOk)
 
 </script>
 
 <template>
-  <div class="menu-bar grey-bg">
+  <div class="container grey-bg">
     <div class="traffic">
-      <traffic-view type="⬆"
+      <traffic-view type="arrow_upward"
                     :speed="uploadSpeed"
                     unit="B/s"
       />
-      <traffic-view type="⬇"
+      <traffic-view type="arrow_downward"
                     :speed="downloadSpeed"
                     unit="B/s"
       />
     </div>
+    <DivLine/>
     <div class="menu">
-      <div-line/>
       <div class="menu-item grey-bg"
            :class="[{active: activeIndex === index},{topRadius: activeIndex === index - 1},{bottomRadius: activeIndex === index + 1 }]"
            @click="clickItem(index,item)"
@@ -67,12 +65,9 @@ const statusSrc = ref(statusOk)
            class="grey-bg"></div>
     </div>
     <div class="connected-time">
-
       <div class="time">{{ time }}</div>
       <div class="status">
-        <img :src="statusSrc"
-             style="height: 1.2em"
-             alt="status">
+        <span class="material-symbols-outlined">circle</span>
         <span style="font-size: 0.7em">Connected</span>
       </div>
     </div>
@@ -81,13 +76,21 @@ const statusSrc = ref(statusOk)
 
 <style scoped>
 
-.menu-bar {
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+    color: #41b883;
+    font-size: 16px;
+}
+
+.container {
     display: flex;
     flex-direction: column;
+    /*width: 100%;*/
 }
 
 .traffic {
-    height: 11%;
+    height: 79px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -124,9 +127,7 @@ const statusSrc = ref(statusOk)
 }
 
 
-/*198*/
 .connected-time {
-    //height: 20%;
     flex-grow: 1;
     display: flex;
     flex-direction: column;

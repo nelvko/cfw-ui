@@ -1,17 +1,13 @@
 <script setup>
 import SwitchOption from "@/components/SwitchOption.vue";
-import ToolTip from "@/components/ToolTip.vue";
-import {ref, useTemplateRef} from "vue";
+import {useTemplateRef} from "vue";
 
 const tip = useTemplateRef("toolTip");
-const isShowTip=ref(false)
 defineProps({
   label: String,
   stringValue: String,
-  switchValue: Boolean,
   isSwitch: Boolean,
-  iconInfoTip: String,
-  iconSettingsTip: String
+  switchValue: Boolean,
 })
 
 </script>
@@ -20,13 +16,10 @@ defineProps({
   <div class="option">
     <div class="left">
       <div class="label">{{ label }}</div>
-      <img src="@/assets/info.svg"
-           @mouseover="isShowTip = true"
-           style="height: 1em"
-           v-if="iconInfoTip"
-           alt="info"/>
+      <slot name="left-icon"/>
     </div>
     <div class="right">
+      <slot name="right-icon"/>
       <div v-if="stringValue"
            class="string-value">
         {{ stringValue }}
@@ -37,13 +30,6 @@ defineProps({
       </div>
     </div>
   </div>
-  <ToolTip 
-          ref="toolTip"
-          :show="isShowTip"
-  
-  />
-
-
 </template>
 
 <style scoped>
@@ -57,7 +43,6 @@ defineProps({
     .left {
         display: flex;
         align-items: center;
-        justify-content: flex-start;
 
         .label {
             display: flex;
@@ -67,7 +52,7 @@ defineProps({
 
     .right {
         display: flex;
-
+        align-items: center;
         .string-value {
             border-bottom: 1px dashed #D6D6D6;
         }
@@ -80,6 +65,4 @@ defineProps({
     background-color: #F1F1F1;
     border-radius: 4px;
 }
-
-
 </style>

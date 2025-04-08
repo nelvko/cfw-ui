@@ -10,9 +10,9 @@ defineProps({
 <template>
   <div>
     <div style="display: flex;justify-content: space-around;">
-      <span>{{type}}</span>
+      <span class="material-symbols-outlined">{{ type }}</span>
       <span>{{ speed }}</span>
-      <span>{{unit}}</span>
+      <span style="font-size: 12px">{{unit}}</span>
     </div>
   </div>
 </template>

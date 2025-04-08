@@ -35,7 +35,7 @@ defineProps({
     right: 0;
     bottom: 0;
     background-color: #C7BFBF; /* 默认填充灰色 */
-    transition: .1s;
+    transition: 0.1s;
     border-radius: 24px;
 }
 

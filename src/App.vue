@@ -1,16 +1,28 @@
 <script setup>
-import MenuBar from "/src/components/MenuBar.vue";
+import SideMenu from "/src/components/SideMenu.vue";
 import WindowBar from "@/components/WindowBar.vue";
+import {onMounted} from "vue";
+import {getProviders, getProxies} from "@/api/proxies.js";
+import {useProxiesStore} from "@/stores/proxies.js";
+import {storeToRefs} from "pinia";
 
-
+const {proxies, providers} = storeToRefs(useProxiesStore());
+onMounted(() => {
+  getProxies().then(res => {
+    proxies.value = res.data.proxies;
+  })
+  getProviders().then(res => {
+    providers.value = res.data.providers;
+  })
+})
 </script>
 
 <template>
   <div class="container">
-    <window-bar class="window-bar"/>
-    <div class="view">
-      <menu-bar class="menu-bar"></menu-bar>
-      <div class="content">
+    <WindowBar class="window-bar"/>
+    <div class="content">
+      <SideMenu class="side-menu"/>
+      <div class="router-view">
         <RouterView/>
       </div>
     </div>
@@ -21,25 +33,22 @@ import WindowBar from "@/components/WindowBar.vue";
 .container {
     display: flex;
     flex-direction: column;
-    /*height: 100vh;*/
-    /*width: 100vw;*/
     height: 100%;
     width: 100%;
-
     .window-bar {
-        height: 3.2%;
+        height: 24px;
     }
 
-    .view {
+    .content {
         display: flex;
-        flex-grow: 1;
+        height: 100%;
 
-        .menu-bar {
+        .side-menu {
             width: 11.8%;
         }
 
-        .content {
-            flex-grow: 1;
+        .router-view {
+            flex: 1;
         }
     }
 }
