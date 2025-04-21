@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { testLogin } from '@/api/common.js'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const login = ref({})
 
 function submit() {
@@ -11,6 +12,7 @@ function submit() {
   testLogin(login.value)
     .then((res) => {
       console.log(res)
+      router.push('/')
     })
     .catch((err) => {
       console.log(err)

@@ -9,8 +9,8 @@ import Feedback from '@/pages/Feedback.vue'
 import Login from '@/pages/Login.vue'
 
 const routes = [
-  { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
+  { path: '/', redirect: '/general' },
   { path: '/general', component: General },
   { path: '/proxies', component: Proxies },
   { path: '/profiles', component: Profiles },
