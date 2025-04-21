@@ -7,10 +7,11 @@ import Connections from '@/pages/Connections.vue'
 import Settings from '@/pages/Settings.vue'
 import Feedback from '@/pages/Feedback.vue'
 import Login from '@/pages/Login.vue'
+import AppView from '@/pages/AppView.vue'
 
 const routes = [
   { path: '/login', component: Login },
-  { path: '/', redirect: '/general' },
+  { path: '/', component: AppView },
   { path: '/general', component: General },
   { path: '/proxies', component: Proxies },
   { path: '/profiles', component: Profiles },
