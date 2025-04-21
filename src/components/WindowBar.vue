@@ -24,7 +24,14 @@ const fullState = computed(() => {
 </template>
 
 <style scoped>
-
+.window-bar {
+    background-color: #EBEBEB;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    height: 24px;
+    /*flex-shrink: 0;*/
+} 
 
 .material-symbols-outlined {
     font-variation-settings:
@@ -33,15 +40,6 @@ const fullState = computed(() => {
             'GRAD' 0,
             'opsz' 20
 }
-
-
-.window-bar {
-    background-color: #EBEBEB;
-    display: flex;
-    align-items: center;
-    flex-direction: row-reverse;
-}
-
 
 .light-blue-grey {
     display: flex;

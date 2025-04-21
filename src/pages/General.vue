@@ -6,6 +6,7 @@
 import {computed, ref, onMounted} from "vue";
 import OptionItem from "@/components/OptionItem.vue";
 import {getTraffic, getVersion} from "@/api/common.js";
+import ToolTip from "@/components/ToolTip.vue";
 
 onMounted(() => {
   getTraffic().then(res => {
@@ -74,8 +75,9 @@ const name = computed(() => {
               string-value="7890"
       >
         <template #right-icon>
+          <ToolTip :top="true" light="true" msg="terminal" >
           <span class="material-symbols-outlined">terminal</span>
-
+          </ToolTip>
           <span :class="[{lightBlueGrey: !isRandomPort},{sync: isRandomPort}]"
                 class="material-symbols-outlined grey"
                 @click="switchRandomPort">{{ name }}</span>

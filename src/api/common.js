@@ -1,37 +1,32 @@
-import axios from "@/config/http.js";
+import http from '@/config/http.js'
+import axios from 'axios'
 
-export const getLogs = () =>
-    axios.get('/logs')
+export const getLogs = () => http.get('/logs')
 
+export const getVersion = () => http.get('/version')
 
+export const getTraffic = () => http.get('/traffic')
 
-export const getVersion = () =>
-    axios.get('/version')
+export const getMemory = () => http.get('/memory')
 
-export const getTraffic = () =>
-    axios.get('/traffic')
+export const clearCache = () => http.post('/cache/fakeip/flush')
 
-export const getMemory = () =>
-    axios.get('/memory')
+export const getConfig = () => http.get('/configs')
 
+export const reloadConfig = () => http.put('/configs?force=true')
 
-export const clearCache = () =>
-    axios.post('/cache/fakeip/flush')
+export const updateConfig = (data) => http.patch('/configs', data)
 
+export const updateGeo = (data) => http.post('/geo')
 
-export const getConfig = () =>
-    axios.get('/configs')
+export const restartKernel = (data) => http.patch('/restart', data)
 
-export const reloadConfig = () =>
-    axios.put('/configs?force=true')
+export const testLogin = (login) => {
+  console.log(login)
 
-export const updateConfig = (data) =>
-    axios.patch('/configs', data)
-
-
-export const updateGeo = (data) =>
-    axios.post('/geo')
-
-export const restartKernel = (data) =>
-    axios.patch('/restart', data)
-
+  return axios({
+    baseURL: `http://${login.host}`,
+    timeout: 1000,
+    headers: { Authorization: `Bearer ${login.secret}` },
+  })
+}

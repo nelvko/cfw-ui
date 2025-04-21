@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios from 'axios'
+import storage from '@/hooks/storage.js'
 
-const secret = '666'
+const { baseurl, secret } = storage.getLogin()
 export default axios.create({
-  baseURL: 'http://120.46.87.172:9090',
+  baseURL: `http://${baseurl}`,
   timeout: 10000,
-  headers: {'Authorization': `Bearer ${secret}`}
-});
+  headers: { Authorization: `Bearer ${secret}` },
+})
