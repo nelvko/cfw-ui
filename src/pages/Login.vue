@@ -18,8 +18,10 @@ function submit() {
       router.push('/')
     })
     .catch((err) => {
+      console.log(err)
+
       storage.removeLogin()
-      failMsg.value = err.response.data.message
+      failMsg.value = 'Failed to connect'
     })
 }
 </script>
@@ -31,8 +33,10 @@ function submit() {
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
           主机：
-          <input type="text" v-model.trim="loginData.host" autocomplete />
-          <span>{{ failMsg }}</span>
+          <input v-model.trim="loginData.host"
+                 type="text"
+                 @focus="failMsg=''" />
+          <span class="text-[#f56363]">{{ failMsg }}</span>
         </label>
         <label>
           密码：

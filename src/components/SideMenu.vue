@@ -18,7 +18,8 @@ const menuList = ref([
   'settings',
   'feedback',
 ])
-const activeMenu = ref(0)
+const activeMenu = ref(storage.get('activeMenu') ?? 0)
+
 let updateTime = () => {
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -30,7 +31,7 @@ setInterval(updateTime, 1000)
 
 const clickItem = (index, item) => {
   activeMenu.value = index
-  storage.set('activeMenu', activeMenu)
+  storage.set('activeMenu', activeMenu.value)
   router.push(`/${item}`)
 }
 </script>

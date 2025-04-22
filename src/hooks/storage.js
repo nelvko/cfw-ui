@@ -4,29 +4,29 @@ const CURRENT_LOGIN_KEY = 'CURRENT_LOGIN_KEY'
 // const defaultLogin = {
 //   host: '127.0.0.1:9090',
 // }
-
+const get = (key) => {
+  return JSON.parse(localStorage.getItem(key))
+}
+const set = (key, val) => {
+  localStorage.setItem(key, JSON.stringify(val))
+}
 const storage = {
-  get: (key) => {
-    return JSON.parse(localStorage.getItem(key))
+  get, set,
+  removeLogin: () => {
+    localStorage.removeItem(CURRENT_LOGIN_KEY)
   },
-  set: (key, val) => {
-    localStorage.setItem(key, JSON.stringify(val))
-  },
-  remove: (key) => {
-    localStorage.removeItem(key)
-  },
-  clear: () => {
-    localStorage.clear()
-  },
-  getLoginList: () => {
-    const loginDataList = localStorage.getItem(LOGIN_LIST_KEY)
-    return JSON.parse(loginDataList)
-  },
+  // clear: () => {
+  //   localStorage.clear()
+  // },
+  // getLoginList: () => {
+  //   const loginDataList = localStorage.getItem(LOGIN_LIST_KEY)
+  //   return JSON.parse(loginDataList)
+  // },
   getLogin: () => {
-    return this.get(CURRENT_LOGIN_KEY)
+    return get(CURRENT_LOGIN_KEY)
   },
   setLogin: (val) => {
-    this.set(CURRENT_LOGIN_KEY, val)
+    set(CURRENT_LOGIN_KEY, val)
   },
 }
 
