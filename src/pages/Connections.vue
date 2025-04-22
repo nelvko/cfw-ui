@@ -12,7 +12,7 @@ const uploadTotal = ref(0)
 onMounted(() => {
   connections.onmessage = (event) => {
     const data = JSON.parse(event.data)
-    console.log('📩 收到消息：', data)
+    // console.log('📩 收到消息：', data)
     downloadTotal.value = data.downloadTotal
     uploadTotal.value = data.uploadTotal
     connectionList.value = data.connections

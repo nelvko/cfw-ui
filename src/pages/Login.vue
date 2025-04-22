@@ -1,23 +1,25 @@
 <script setup>
 import { ref } from 'vue'
-import { testLogin } from '@/api/common.js'
+import { login } from '@/api/common.js'
 import { useRouter } from 'vue-router'
-const router = useRouter()
-const login = ref({})
+import storage from '@/hooks/storage.js'
 
+const router = useRouter()
+const failMsg = ref('')
+const loginData = ref({})
 function submit() {
-  if (!login.value.host) {
-    alert('no')
+  if (!loginData.value.host) {
+    alert('请填写host')
   }
-  testLogin(login.value)
+  storage.setLogin(loginData.value)
+  login(loginData.value)
     .then((res) => {
       console.log(res)
-      storage.set()
       router.push('/')
     })
     .catch((err) => {
-      console.log(err)
-      alert(err.response.data.message)
+      storage.removeLogin()
+      failMsg.value = err.response.data.message
     })
 }
 </script>
@@ -29,11 +31,12 @@ function submit() {
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
           主机：
-          <input type="text" v-model.trim="login.host" autocomplete />
+          <input type="text" v-model.trim="loginData.host" autocomplete />
+          <span>{{ failMsg }}</span>
         </label>
         <label>
           密码：
-          <input type="password" v-model.trim="login.secret" />
+          <input type="password" v-model.trim="loginData.secret" />
         </label>
         <button type="submit" class="bg-cyan-600 text-white">提交</button>
       </form>

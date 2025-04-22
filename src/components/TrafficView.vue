@@ -1,16 +1,13 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
+import { traffic } from '@/api/ws.js'
 
 const up = ref(null)
 const down = ref(null)
 
 onMounted(() => {
-  const ws = new WebSocket('ws://localhost:9090/traffic')
-  ws.onopen = () => {
-    console.log('✅ WebSocket 连接成功')
-  }
-  ws.onmessage = (event) => {
+  traffic.onmessage = (event) => {
     // console.log('📩 收到消息：', event)
     const data = JSON.parse(event.data)
     up.value = data.up

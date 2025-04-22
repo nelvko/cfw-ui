@@ -1,31 +1,37 @@
 import { createMemoryHistory, createRouter } from 'vue-router'
-import General from '@/pages/General.vue'
-import Proxies from '@/pages/Proxies.vue'
-import Profiles from '@/pages/Profiles.vue'
-import Logs from '@/pages/Logs.vue'
-import Connections from '@/pages/Connections.vue'
-import Settings from '@/pages/Settings.vue'
-import Feedback from '@/pages/Feedback.vue'
-import AppView from '@/pages/AppView.vue'
+import storage from '@/hooks/storage.js'
 
 const routes = [
   {
     path: '/',
     redirect: '/general',
-    component: AppView,
+    component: () => import('@/pages/AppView.vue'),
     children: [
-      { path: '/general', component: General },
-      { path: '/proxies', component: Proxies },
-      { path: '/profiles', component: Profiles },
-      { path: '/logs', component: Logs },
-      { path: '/connections', component: Connections },
-      { path: '/settings', component: Settings },
-      { path: '/feedback', component: Feedback }],
-  }
+      { path: '/general', component: () => import('@/pages/General.vue') },
+      { path: '/proxies', component: () => import('@/pages/Proxies.vue') },
+      { path: '/profiles', component: () => import('@/pages/Profiles.vue') },
+      { path: '/logs', component: () => import('@/pages/Logs.vue') },
+      { path: '/connections', component: () => import('@/pages/Connections.vue') },
+      { path: '/settings', component: () => import('@/pages/Settings.vue') },
+      { path: '/feedback', component: () => import('@/pages/Feedback.vue') },
+    ],
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/pages/Login.vue'),
+  },
 ]
 
 const router = createRouter({
   history: createMemoryHistory(),
   routes,
 })
+
+router.beforeEach(async (to) => {
+  if (!storage.getLogin() && to.name !== 'Login') {
+    return { name: 'Login' }
+  }
+})
+
 export default router

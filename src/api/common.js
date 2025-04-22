@@ -21,9 +21,7 @@ export const updateGeo = (data) => http.post('/geo')
 
 export const restartKernel = (data) => http.patch('/restart', data)
 
-export const testLogin = (login) => {
-  console.log(login)
-
+export const login = (login) => {
   return axios({
     baseURL: `http://${login.host}`,
     timeout: 1000,

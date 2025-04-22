@@ -1,19 +1,9 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-  <div class="container">All traffic will go directly</div>
+  <div class="flex h-full w-full items-center justify-center text-[#a6a6a6]">
+    All traffic will go directly
+  </div>
 </template>
 
-<style scoped>
-.container {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #a6a6a6;
-}
-
-</style>
+<style scoped></style>

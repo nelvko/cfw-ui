@@ -3,12 +3,13 @@ import TrafficView from '@/components/TrafficView.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
+import storage from '@/hooks/storage.js'
 
 const router = useRouter()
 
-let time = ref(null)
+const time = ref(null)
 
-let menuItem = ref([
+const menuList = ref([
   'general',
   'proxies',
   'profiles',
@@ -17,6 +18,7 @@ let menuItem = ref([
   'settings',
   'feedback',
 ])
+const activeMenu = ref(0)
 let updateTime = () => {
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -26,9 +28,9 @@ let updateTime = () => {
 }
 setInterval(updateTime, 1000)
 
-const activeIndex = ref(0)
 const clickItem = (index, item) => {
-  activeIndex.value = index
+  activeMenu.value = index
+  storage.set('activeMenu', activeMenu)
   router.push(`/${item}`)
 }
 </script>
@@ -36,24 +38,23 @@ const clickItem = (index, item) => {
 <template>
   <div class="side-menu grey-bg">
     <TopInfo>
-      <traffic-view :up :down />
+      <traffic-view />
     </TopInfo>
 
     <div class="menu">
       <div
         class="menu-item grey-bg"
         :class="[
-          { active: activeIndex === index },
-          { topRadius: activeIndex === index - 1 },
-          { bottomRadius: activeIndex === index + 1 },
+          { active: activeMenu === index },
+          { topRadius: activeMenu === index - 1 },
+          { bottomRadius: activeMenu === index + 1 },
         ]"
         @click="clickItem(index, item)"
-        v-for="(item, index) in menuItem"
+        v-for="(item, index) in menuList"
         :key="index"
       >
         {{ item }}
       </div>
-      <div-line />
     </div>
     <div class="connected-time">
       <div class="time">{{ time }}</div>

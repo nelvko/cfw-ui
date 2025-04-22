@@ -1,11 +1,7 @@
 import storage from '@/hooks/storage.js'
 
-let baseurl = storage.getLogin().baseurl
-console.log(111, baseurl)
+const { host, secret } = storage.getLogin()
 
-if (!baseurl) {
-  baseurl = 'localhost:9090'
-}
-
-export const connections = new WebSocket(`ws://${baseurl}/connections`)
-export const logs = new WebSocket(`ws://${baseurl}/logs`)
+export const connections = new WebSocket(`ws://${host}/connections?token=${secret}`)
+export const logs = new WebSocket(`ws://${host}/logs?token=${secret}`)
+export const traffic = new WebSocket(`ws://${host}/traffic?token=${secret}`)

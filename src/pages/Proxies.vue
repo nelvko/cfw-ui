@@ -21,9 +21,8 @@ function switchMode(index) {
 </script>
 
 <template>
-  <div class="proxies">
-    <TopInfo class="mode">
-      <!--      <div class="mode">-->
+  <div class="h-full overflow-hidden">
+    <TopInfo class="flex items-center justify-center">
       <div
         v-for="(item, index) in modeList"
         :key="index"
@@ -34,11 +33,10 @@ function switchMode(index) {
         <div>{{ item.name }}</div>
         <span class="material-symbols-outlined">{{ item.icon }}</span>
       </div>
-      <!--      </div>-->
     </TopInfo>
-    <div style="height: 100%; display: flex; flex-direction: column">
-      <div style="height: 8px; background-color: white" />
-      <div class="view">
+    <div class="flex h-full flex-1 flex-col">
+      <div class="h-2 bg-white" />
+      <div class="relative flex-1 overflow-y-auto">
         <GlobalMode v-if="modeIndex === 0" />
         <RuleMode v-if="modeIndex === 1" />
         <DirectMode v-if="modeIndex === 2" />
@@ -55,22 +53,9 @@ function switchMode(index) {
   right: 0;
 }
 
-.proxies {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .material-symbols-outlined {
   transform: rotate(90deg);
   margin-left: 7px;
-}
-
-.mode {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /*height: 100%;*/
 }
 
 .mode-item {
@@ -96,11 +81,11 @@ function switchMode(index) {
   color: #fff;
 }
 
-.view {
-  flex-grow: 1;
-  /*height: 100%;*/
-  overflow-y: auto;
-  position: relative;
-  /*padding-bottom: 70px*/
-}
+/*.view {*/
+/*  flex-grow: 1;*/
+/*  !*height: 100%;*!*/
+/*  overflow-y: auto;*/
+/*  position: relative;*/
+/*  !*padding-bottom: 70px*!*/
+/*}*/
 </style>

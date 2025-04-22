@@ -9,42 +9,24 @@ import { storeToRefs } from 'pinia'
 const { proxies, providers } = storeToRefs(useProxiesStore())
 onMounted(() => {
   getProxies().then((res) => {
-    proxies.value = res.data.proxies
+    proxies.value = res.proxies
   })
   getProviders().then((res) => {
-    providers.value = res.data.providers
+    providers.value = res.providers
   })
 })
 </script>
 
 <template>
-  <div class="container1">
+  <div class="flex h-screen w-screen flex-col">
     <WindowBar />
-    <div class="content">
+    <div class="flex flex-1">
       <SideMenu />
-      <div class="router-view">
+      <div class="h-full w-full flex-1">
         <RouterView />
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.container1 {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  .content {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-
-    .router-view {
-      flex: 1;
-      /*height: 100%;*/
-      /*width: 100%;*/
-    }
-  }
-}
-</style>
+<style scoped></style>

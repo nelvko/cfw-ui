@@ -43,7 +43,7 @@ onMounted(() => {
   }
   logs.onmessage = (event) => {
     const data = JSON.parse(event.data)
-    console.log('📩 收到消息：', data)
+    // console.log('📩 收到消息：', data)
     logList.value.push(parseLogLine(data.payload))
   }
 })
