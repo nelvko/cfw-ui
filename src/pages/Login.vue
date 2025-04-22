@@ -12,6 +12,7 @@ function submit() {
   testLogin(login.value)
     .then((res) => {
       console.log(res)
+      storage.set()
       router.push('/')
     })
     .catch((err) => {
