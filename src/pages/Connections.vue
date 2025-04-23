@@ -4,6 +4,7 @@ import GreyButton from '@/components/GreyButton.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
 import { connections } from '@/api/ws.js'
+import ToolTip from '@/components/ToolTip.vue'
 
 const pause = ref(true)
 const connectionList = ref([])
@@ -31,44 +32,62 @@ function switchPause() {
 </script>
 
 <template>
-  <TopInfo style="display: flex; flex-direction: column; padding: 0 20px 0 16px">
-    <div style="display: flex; margin: 8px 0">
-      <div style="font-size: 18px">Connections</div>
+  <!--  padding: 0 20px 0 16px -->
+  <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
+    <div class="my-[8px] flex">
+      <div class="text-[18px]">Connections</div>
       <input type="text" placeholder="Search" />
-      <div style="display: flex; align-items: center">
+      <div class="flex items-center">
         <span>Total:</span>
-        <span class="material-symbols-outlined up">straight</span>
+        <span class="material-icons up">straight</span>
         <span>{{ `${upload.num} ${upload.unit}` }}</span>
-        <span class="material-symbols-outlined down">straight</span>
+        <span class="material-icons down">straight</span>
         <span>{{ `${download.num} ${download.unit}` }}</span>
       </div>
     </div>
-    <div class="buttons">
-      <div style="display: flex">
-        <GreyButton>
-          <span class="material-symbols-outlined">upload_2</span>
-          <span class="material-symbols-outlined">speed</span>
-        </GreyButton>
-        <GreyButton>
-          <span class="material-symbols-outlined">download_2</span>
-          <span class="material-symbols-outlined">speed</span>
-        </GreyButton>
-        <GreyButton>
-          <span class="material-symbols-outlined">upload_2</span>
-          <span class="material-symbols-outlined">signal_cellular_alt</span>
-        </GreyButton>
-        <GreyButton>
-          <span class="material-symbols-outlined">download_2</span>
-          <span class="material-symbols-outlined">signal_cellular_alt</span>
-        </GreyButton>
-        <GreyButton>
-          <span class="material-symbols-outlined">schedule</span>
-        </GreyButton>
-        <GreyButton>
-          <span class="material-symbols-outlined">laptop_windows</span>
-        </GreyButton>
+    <div class="flex justify-between">
+      <div class="flex">
+        <ToolTip dark tip="Upload Speed" top>
+          <GreyButton>
+            <span class="material-icons">upload</span>
+            <span class="material-icons">speed</span>
+          </GreyButton>
+        </ToolTip>
+
+        <ToolTip dark tip="Download Speed" top>
+          <GreyButton>
+            <span class="material-icons">download</span>
+            <span class="material-icons">speed</span>
+          </GreyButton>
+        </ToolTip>
+
+        <ToolTip dark tip="Upload Traffic" top>
+          <GreyButton>
+            <span class="material-icons">upload</span>
+            <span class="material-icons">signal_cellular_alt</span>
+          </GreyButton>
+        </ToolTip>
+
+        <ToolTip dark tip="Download Traffic" top>
+          <GreyButton>
+            <span class="material-icons">download</span>
+            <span class="material-icons">signal_cellular_alt</span>
+          </GreyButton>
+        </ToolTip>
+
+        <ToolTip dark tip="Start Time" top>
+          <GreyButton>
+            <span class="material-icons">schedule</span>
+          </GreyButton>
+        </ToolTip>
+
+        <ToolTip dark tip="Destination" top>
+          <GreyButton>
+            <span class="material-icons">laptop_windows</span>
+          </GreyButton>
+        </ToolTip>
       </div>
-      <div style="display: flex">
+      <div class="flex">
         <div @click="switchPause" :class="{ pause, resume: !pause }">
           {{ pause ? 'Pause' : 'Resume' }}
         </div>
@@ -76,7 +95,7 @@ function switchPause() {
       </div>
     </div>
   </TopInfo>
-  <div style="display: flex; flex-direction: column">
+  <div class="flex flex-col">
     <div v-for="item in connectionList" :key="item.id" class="connection">
       <div class="left">
         <div>{{ item.metadata.host }}:{{ item.metadata.destinationPort }}</div>
@@ -88,7 +107,7 @@ function switchPause() {
         </div>
       </div>
       <span
-        class="material-symbols-outlined"
+        class="material-icons"
         style="margin-right: 23px; color: #333333; transform: rotateY(180deg)"
       >
         block
@@ -131,6 +150,7 @@ function switchPause() {
   color: white;
   text-align: center;
   line-height: 28px;
+  cursor: pointer;
 }
 
 .up,
@@ -150,11 +170,6 @@ function switchPause() {
 
 .resume {
   background-color: #179bbb;
-}
-
-.buttons {
-  display: flex;
-  justify-content: space-between;
 }
 
 input {

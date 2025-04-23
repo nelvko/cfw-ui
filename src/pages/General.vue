@@ -64,12 +64,12 @@ const name = computed(() => {
       <OptionItem label="Port" string-value="7890">
         <template #right-icon>
           <ToolTip :top="true" :dark="true" tip="terminal">
-            <span class="material-symbols-outlined">terminal</span>
+            <span class="material-icons">terminal</span>
           </ToolTip>
           <ToolTip top dark tip="random mixed port">
             <span
               :class="[{ lightBlueGrey: !isRandomPort }, { sync: isRandomPort }]"
-              class="material-symbols-outlined grey"
+              class="material-icons grey"
               @click="switchRandomPort"
               >{{ name }}</span
             >
@@ -79,11 +79,11 @@ const name = computed(() => {
 
       <OptionItem :is-switch="true" :switch-value="true" label="Allow LAN" string-value="Bind: *">
         <template #left-icon>
-          <ToolTip>
-            <span class="material-symbols-outlined light-blue-grey near">info</span>
+          <ToolTip :tip="allowLanInfo" light right>
+            <span class="material-icons light-blue-grey near">info</span>
           </ToolTip>
           <ToolTip tip="network interfaces" right dark>
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">device_hub</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg">device_hub</span>
           </ToolTip>
         </template>
       </OptionItem>
@@ -94,20 +94,20 @@ const name = computed(() => {
       <OptionItem label="Clash Core" string-value="2023.08.17-13-gdcc8d87 Premium(49776)">
         <template #left-icon>
           <ToolTip tip="add firewall rules(for Allow LAN and system stack)" right dark>
-            <span class="material-symbols-outlined grey icon-grey-bg">gpp_maybe</span>
+            <span class="material-icons grey icon-grey-bg">gpp_maybe</span>
           </ToolTip>
           <ToolTip
             tip="Preview the final configuration file that was submitted to Clash Core"
             right
             dark
           >
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">memory</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg">memory</span>
           </ToolTip>
           <ToolTip tip="Resolve a host using Clash core" right dark>
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">dns</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg"> dns </span>
           </ToolTip>
           <ToolTip tip="Test script using by Script mode" dark right>
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">play_arrow</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg">play_arrow</span>
           </ToolTip>
         </template>
       </OptionItem>
@@ -120,24 +120,29 @@ const name = computed(() => {
 
       <OptionItem label="Service Mode" string-value="Manage">
         <template #left-icon>
-          <span class="material-symbols-outlined grey near">public</span>
+          <span class="material-icons grey near">public</span>
         </template>
       </OptionItem>
 
       <OptionItem :is-switch="true" :switch-value="true" label="Tun Mode">
         <template #left-icon>
-          <span class="material-symbols-outlined light-blue-grey near">info</span>
+          <ToolTip :tip="tunInfo" light right>
+            <span class="material-icons light-blue-grey near">info</span>
+          </ToolTip>
           <ToolTip tip="Settings" right dark>
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">settings</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg">settings</span>
           </ToolTip>
         </template>
       </OptionItem>
 
       <OptionItem :is-switch="true" :switch-value="true" label="Mixin">
         <template #left-icon>
-          <span class="material-symbols-outlined light-blue-grey near">info</span>
+          <ToolTip :tip="mixinInfo" light right>
+            <span class="material-icons light-blue-grey near">info</span>
+          </ToolTip>
+
           <ToolTip tip="Edit Mixin content" right dark>
-            <span class="material-symbols-outlined dark-blue-grey icon-grey-bg">settings</span>
+            <span class="material-icons dark-blue-grey icon-grey-bg">settings</span>
           </ToolTip>
         </template>
       </OptionItem>
@@ -149,7 +154,7 @@ const name = computed(() => {
 </template>
 
 <style scoped>
-.material-symbols-outlined {
+.material-icons {
   box-sizing: border-box;
   border-radius: 6px;
   padding: 3px;

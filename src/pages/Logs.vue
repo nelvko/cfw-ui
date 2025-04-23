@@ -109,7 +109,7 @@ switchLogType
           <span style="color: #666666">18:57:57</span>
         </div>
         <div>
-          <span class="material-symbols-outlined"> arrow_right </span>
+          <span class="material-icons"> arrow_right </span>
           <span>{{ item.rAddr }}</span>
           <div>FROM</div>
         </div>

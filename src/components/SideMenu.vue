@@ -60,7 +60,7 @@ const clickItem = (index, item) => {
     <div class="connected-time">
       <div class="time">{{ time }}</div>
       <div class="status">
-        <span class="material-symbols-outlined">circle</span>
+        <span class="material-icons">circle</span>
         <span style="font-size: 0.7em">Connected</span>
       </div>
     </div>
@@ -74,7 +74,8 @@ const clickItem = (index, item) => {
   width: 170px;
   height: 100%;
 }
-.material-symbols-outlined {
+
+.material-icons {
   font-variation-settings: 'FILL' 1;
   color: #41b883;
   font-size: 16px;

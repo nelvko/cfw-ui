@@ -26,13 +26,13 @@ const downSpeed = computed(() => {
 <template>
   <div class="traffic-view">
     <div class="traffic">
-      <span class="material-symbols-outlined up">straight</span>
+      <span class="material-icons up">straight</span>
       <span class="num">{{ upSpeed.num }}</span>
       <span class="unit">{{ upSpeed.unit }}/s</span>
     </div>
 
     <div class="traffic">
-      <span class="material-symbols-outlined down">straight</span>
+      <span class="material-icons down">straight</span>
       <span class="num">{{ downSpeed.num }}</span>
       <span class="unit">{{ downSpeed.unit }}/s</span>
     </div>

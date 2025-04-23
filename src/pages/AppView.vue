@@ -22,7 +22,7 @@ onMounted(() => {
     <WindowBar />
     <div class="flex flex-1">
       <SideMenu />
-      <div class="h-full w-full flex-1">
+      <div class="h-full w-full">
         <RouterView />
       </div>
     </div>

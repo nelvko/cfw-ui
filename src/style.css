@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "@material-design-icons/font/filled.css";
+
+span.material-icons {
+    cursor: pointer;
+}
 body {
     margin: 0;
     padding: 0;

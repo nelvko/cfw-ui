@@ -2,13 +2,12 @@
 import TopInfo from '@/components/TopInfo.vue'
 import SettingItem from '@/components/SettingItem.vue'
 import OptionItem from '@/components/OptionItem.vue'
+import ToolTip from '@/components/ToolTip.vue'
 </script>
 
 <template>
-  <TopInfo
-    style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px"
-  >
-    <div style="font-size: 20px">Settings</div>
+  <TopInfo class="flex items-center justify-between px-[20px]">
+    <div class="text-[20px]">Settings</div>
     <div class="btn">
       <span>Reset All Settings</span>
       <span>Force Quit</span>
@@ -17,7 +16,13 @@ import OptionItem from '@/components/OptionItem.vue'
   </TopInfo>
   <div class="mx-6">
     <SettingItem title="Security">
-      <OptionItem label="Core Secret" string-value="Update"> </OptionItem>
+      <OptionItem label="Core Secret" string-value="Update">
+        <template #left-icon>
+          <ToolTip>
+            <span class="material-icons light-blue-grey near">info</span>
+          </ToolTip>
+        </template>
+      </OptionItem>
     </SettingItem>
   </div>
 </template>
@@ -25,9 +30,6 @@ import OptionItem from '@/components/OptionItem.vue'
 <style scoped>
 :root {
   --spacing: 0.25rem;
-}
-.btn {
-  display: flex;
 }
 
 .btn > span {

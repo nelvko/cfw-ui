@@ -6,8 +6,7 @@ import TopInfo from '@/components/TopInfo.vue'
   <TopInfo style="display: flex; align-items: center">
     <div class="relative flex grow-1 items-center">
       <input placeholder="Download from a URL" />
-      <span
-        class="material-symbols-outlined absolute right-[12px] rotate-x-180 text-[#7f7f7f] hover:cursor-pointer"
+      <span class="material-icons absolute right-[12px] text-[#7f7f7f] hover:cursor-pointer"
         >content_copy</span
       >
     </div>

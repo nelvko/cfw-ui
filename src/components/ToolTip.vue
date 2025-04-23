@@ -50,10 +50,16 @@ defineProps({
   bottom: calc((100% - 19px) / 2);
 }
 
+.left {
+  right: calc(100% + 5px);
+  bottom: calc((100% - 19px) / 2);
+}
+
 .light {
-  /*background-color: #fff;*/
-  background-color: pink;
+  background-color: #fff;
   color: #17224f;
+  width: 225px;
+  box-shadow: 3px 3px white;
 }
 .dark {
   background-color: #242424;

@@ -21,29 +21,27 @@ function switchMode(index) {
 </script>
 
 <template>
-  <div class="h-full overflow-hidden">
-    <TopInfo class="flex items-center justify-center">
-      <div
-        v-for="(item, index) in modeList"
-        :key="index"
-        @click="switchMode(index)"
-        :class="{ modeActive: modeIndex === index }"
-        class="mode-item"
-      >
-        <div>{{ item.name }}</div>
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-      </div>
-    </TopInfo>
-    <div class="flex h-full flex-1 flex-col">
-      <div class="h-2 bg-white" />
-      <div class="relative flex-1 overflow-y-auto">
-        <GlobalMode v-if="modeIndex === 0" />
-        <RuleMode v-if="modeIndex === 1" />
-        <DirectMode v-if="modeIndex === 2" />
-        <div v-if="modeIndex === 3">script</div>
-      </div>
-      <div style="height: 70px; background-color: white" />
+  <TopInfo class="flex items-center justify-center">
+    <div
+      v-for="(item, index) in modeList"
+      :key="index"
+      :class="{ modeActive: modeIndex === index }"
+      class="mode-item"
+      @click="switchMode(index)"
+    >
+      <div>{{ item.name }}</div>
+      <span class="material-icons">{{ item.icon }}</span>
     </div>
+  </TopInfo>
+  <div class="flex h-full flex-col">
+    <div class="h-2 bg-white" />
+    <div class="relative flex-1 overflow-y-auto">
+      <GlobalMode v-if="modeIndex === 0" />
+      <RuleMode v-if="modeIndex === 1" />
+      <DirectMode v-if="modeIndex === 2" />
+      <div v-if="modeIndex === 3">script</div>
+    </div>
+    <div style="height: 70px; background-color: white" />
   </div>
 </template>
 
@@ -53,7 +51,7 @@ function switchMode(index) {
   right: 0;
 }
 
-.material-symbols-outlined {
+.material-icons {
   transform: rotate(90deg);
   margin-left: 7px;
 }

@@ -10,22 +10,20 @@ const fullState = computed(() => {
 
 <template>
   <div class="flex h-6 flex-none flex-row-reverse items-center bg-[#ebebeb]">
-    <span class="material-symbols-outlined light-blue-grey close">close</span>
-    <span class="material-symbols-outlined light-blue-grey" @click="isFull = !isFull"
-      >{{ fullState }}
-    </span>
-    <span class="material-symbols-outlined light-blue-grey">remove</span>
+    <span class="material-icons light-blue-grey close">close</span>
+    <span class="material-icons light-blue-grey" @click="isFull = !isFull">{{ fullState }} </span>
+    <span class="material-icons light-blue-grey">remove</span>
     <span
-      class="material-symbols-outlined light-blue-grey"
+      class="material-icons light-blue-grey"
       @click="isKeep = !isKeep"
       :class="{ keepActive: isKeep }"
-      >keep</span
+      >push_pin</span
     >
   </div>
 </template>
 
 <style scoped>
-.material-symbols-outlined {
+.material-icons {
   font-variation-settings:
     'FILL' 1,
     'wght' 400,

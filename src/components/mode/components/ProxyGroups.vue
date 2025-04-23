@@ -27,12 +27,20 @@ function selectProxy(proxy) {
         <div>香港 03</div>
       </div>
       <div class="icon">
-        <ToolTip msg="Show/Hide timed-out proxies" :dark="true" :top="true">
-          <span class="material-symbols-outlined a">travel_explore</span>
+        <ToolTip dark msg="Scroll to selected proxy" top>
+          <span class="material-icons a">travel_explore</span>
         </ToolTip>
-        <span class="material-symbols-outlined a">report</span>
-        <ToolTip msg="Test latency" dark top>
-          <span class="material-symbols-outlined a">network_check</span>
+        <ToolTip dark tip="Show/Hide timed-out proxies" top>
+          <span class="material-icons a">report</span>
+        </ToolTip>
+        <ToolTip dark tip="Test latency" top>
+          <span class="material-icons a">network_check</span>
+        </ToolTip>
+        <ToolTip dark left tip="Show/hide proxies">
+          <span class="material-icons a">visibility_off</span>
+        </ToolTip>
+        <ToolTip dark left tip="Show/hide proxies">
+          <span class="material-icons a">visibility</span>
         </ToolTip>
       </div>
     </div>
@@ -68,7 +76,8 @@ function selectProxy(proxy) {
   background: #fff;
   position: relative;
 }
-.material-symbols-outlined {
+
+.material-icons {
   font-variation-settings: 'FILL' 1;
   font-size: 16px;
 }
