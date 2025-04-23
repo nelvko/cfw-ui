@@ -1,15 +1,18 @@
 <template>
-  <div class="tool-tip">
-    <slot/>
-    <div class="msg"
-         :class="{light,dark,top,bottom,left,right}">{{ msg }}
+  <div class="group relative">
+    <slot />
+    <div
+      class="invisible absolute z-50 h-[19] rounded-[3px] px-1 text-[12px] opacity-0 group-hover:visible group-hover:opacity-100 group-hover:delay-1000"
+      :class="{ light, dark, top, bottom, left, right }"
+    >
+      {{ tip }}
     </div>
   </div>
 </template>
 
 <script setup>
 defineProps({
-  msg: String,
+  tip: String,
   light: Boolean,
   dark: Boolean,
   top: Boolean,
@@ -17,47 +20,44 @@ defineProps({
   left: Boolean,
   right: Boolean,
 })
-
-
 </script>
 
 <style scoped>
-.tool-tip {
-    position: relative;
-    z-index: 9999;
-}
-
 .msg {
-    visibility: hidden;
-    opacity: 0;
+  z-index: 99999;
+  visibility: hidden;
+  opacity: 0;
+  font-size: 12px;
+  border-radius: 3px;
+  position: absolute;
+  height: 19px;
+}
 
-    /*visibility: visible;*/
-    /*opacity: 1;*/
-    /*background-color: pink;*/
-    position: absolute;
-    z-index: 999;
+/*.a:hover .msg {*/
+/*  visibility: visible;*/
+/*  pointer-events: none; !* 防止隐藏时被误点 *!*/
+/*  opacity: 1;*/
+/*}*/
+
+/*✅*/
+.top {
+  bottom: calc(100% + 5px);
 }
-.top{
-    top: calc(-100% + 5px);
-    bottom: calc(100% + 5px);
-}
+
+/*✅*/
 .right {
-    top: calc(-100% + 5px);
-    left: calc(100% + 5px);
-}
-
-.tool-tip1:hover .msg {
-    visibility: visible;
-    /*pointer-events: none; !* 防止隐藏时被误点 *!*/
-    opacity: 1;
+  left: calc(100% + 5px);
+  bottom: calc((100% - 19px) / 2);
 }
 
 .light {
-    /*background-color: #fff;*/
-    background-color: pink;
+  /*background-color: #fff;*/
+  background-color: pink;
+  color: #17224f;
 }
-
 .dark {
-    background-color: #242424;
+  background-color: #242424;
+  color: white;
+  text-wrap: nowrap;
 }
 </style>

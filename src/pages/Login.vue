@@ -6,7 +6,7 @@ import storage from '@/hooks/storage.js'
 
 const router = useRouter()
 const failMsg = ref('')
-const loginData = ref({})
+const loginData = ref({ host: '120.46.87.172:9090' })
 function submit() {
   if (!loginData.value.host) {
     alert('请填写host')
@@ -33,9 +33,7 @@ function submit() {
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
           主机：
-          <input v-model.trim="loginData.host"
-                 type="text"
-                 @focus="failMsg=''" />
+          <input v-model.trim="loginData.host" placeholder="" type="text" @focus="failMsg = ''" />
           <span class="text-[#f56363]">{{ failMsg }}</span>
         </label>
         <label>
