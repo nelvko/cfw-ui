@@ -2,9 +2,9 @@
 //Loading...
 // 00:00:00
 // Disconnected
-import { computed, ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
-import { getTraffic, getVersion } from '@/api/common.js'
+import { getConfig, getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
 
 onMounted(() => {
@@ -12,13 +12,15 @@ onMounted(() => {
     console.log(res)
   })
   getVersion().then((res) => {
-    version.value = res.version
+    version.value = res
+  })
+  getConfig().then((res) => {
+    config.value = res
   })
 })
 
-const version = ref('')
-version.value = 'v0.20.39'
-
+const version = ref({})
+const config = ref({})
 const allowLanInfo = ref(
   `Turn on to listen on all interfaces by\n
     default,or else only listen on 127.0.0.1.\n
@@ -48,6 +50,17 @@ function switchRandomPort() {
 const name = computed(() => {
   return isRandomPort.value ? 'sync' : 'sync_disabled'
 })
+const clashCore = computed(() => {
+  let clash = 'clash'
+  const versionNo = version.value.version
+  if (version.value.premium) {
+    clash = 'Premium'
+  }
+  if (version.value.meta) {
+    clash = 'mihomo'
+  }
+  return `${versionNo} ${clash} (9090)`
+})
 </script>
 
 <template>
@@ -57,12 +70,12 @@ const name = computed(() => {
       <div style="display: flex; align-items: baseline">
         <!--        快速重启软件-->
         <div class="cfw" @dblclick="reloadPage">Clash for Windows</div>
-        <div class="version" @click="checkUpdate">{{ version }}</div>
+        <div class="version" @click="checkUpdate">{{ version.version }}</div>
       </div>
     </div>
     <div class="options">
-      <OptionItem label="Port" string-value="7890">
-        <template #right-icon>
+      <OptionItem :label="$t('Port')" :value="config.port">
+        <template #right>
           <ToolTip :top="true" :dark="true" tip="terminal">
             <span class="material-icons">terminal</span>
           </ToolTip>
@@ -76,9 +89,8 @@ const name = computed(() => {
           </ToolTip>
         </template>
       </OptionItem>
-
-      <OptionItem :is-switch="true" :switch-value="true" label="Allow LAN" string-value="Bind: *">
-        <template #left-icon>
+      <OptionItem :label="$t('Allow LAN')" :value="config['allow-lan']">
+        <template #left>
           <ToolTip :tip="allowLanInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
           </ToolTip>
@@ -86,13 +98,16 @@ const name = computed(() => {
             <span class="material-icons dark-blue-grey icon-grey-bg">device_hub</span>
           </ToolTip>
         </template>
+        <template #right>
+          <div class="border-b border-dashed border-[#cbcbcb]">
+            Bind {{ config['bind-address'] }}
+          </div>
+        </template>
       </OptionItem>
-      <OptionItem label="Log Level" string-value="Info" />
-
-      <OptionItem :is-switch="true" :switch-value="false" label="IPv6" />
-
-      <OptionItem label="Clash Core" string-value="2023.08.17-13-gdcc8d87 Premium(49776)">
-        <template #left-icon>
+      <OptionItem label="Log Level" :value="config['allow-lan']" />
+      <OptionItem label="IPv6" :value="config.ipv6" />
+      <OptionItem :label="$t('Clash Core')" :value="clashCore">
+        <template #left>
           <ToolTip tip="add firewall rules(for Allow LAN and system stack)" right dark>
             <span class="material-icons grey icon-grey-bg">gpp_maybe</span>
           </ToolTip>
@@ -112,20 +127,20 @@ const name = computed(() => {
         </template>
       </OptionItem>
 
-      <OptionItem label="Home Directory" string-value="Open Folder" />
+      <OptionItem :label="$t('Home Directory')" :value="$t('Open Folder')" />
 
-      <OptionItem label="UWP Loopback" string-value="Launch Helper" />
+      <OptionItem :label="$t('UWP Loopback')" :value="$t('Launch Helper')" />
 
-      <OptionItem label="TAP Device" string-value="Manage" />
+      <OptionItem :label="$t('TAP Device')" :value="$t('Manage')" />
 
-      <OptionItem label="Service Mode" string-value="Manage">
-        <template #left-icon>
+      <OptionItem :label="$t('Service Mode')" :value="$t('Manage')">
+        <template #left>
           <span class="material-icons grey near">public</span>
         </template>
       </OptionItem>
 
-      <OptionItem :is-switch="true" :switch-value="true" label="Tun Mode">
-        <template #left-icon>
+      <OptionItem :value="config?.tun?.enable" label="Tun Mode">
+        <template #left>
           <ToolTip :tip="tunInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
           </ToolTip>
@@ -135,8 +150,8 @@ const name = computed(() => {
         </template>
       </OptionItem>
 
-      <OptionItem :is-switch="true" :switch-value="true" label="Mixin">
-        <template #left-icon>
+      <OptionItem :label="$t('Mixin')" :value="true">
+        <template #left>
           <ToolTip :tip="mixinInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
           </ToolTip>
@@ -147,8 +162,8 @@ const name = computed(() => {
         </template>
       </OptionItem>
 
-      <OptionItem :is-switch="true" :switch-value="true" label="System Proxy" />
-      <OptionItem :is-switch="true" label="Start with Windows" :switch-value="true" />
+      <OptionItem :label="$t('System Proxy')" :value="true" />
+      <OptionItem :label="$t('Start with Windows')" :value="true" />
     </div>
   </div>
 </template>

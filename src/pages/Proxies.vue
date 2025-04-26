@@ -1,10 +1,19 @@
 <script setup>
-import { ref } from 'vue'
-import GlobalMode from '@/components/mode/GlobalMode.vue'
-import RuleMode from '@/components/mode/RuleMode.vue'
+import { onActivated, onDeactivated, onUnmounted, ref } from 'vue'
 import DirectMode from '@/components/mode/DirectMode.vue'
 import TopInfo from '@/components/TopInfo.vue'
+import ProxyMode from '@/components/mode/ProxyMode.vue'
 
+onUnmounted(() => {
+  console.log('unmounted')
+})
+onActivated(() => {
+  console.log('onActivated')
+})
+onDeactivated(() => {
+  console.log('onDeactivated')
+})
+const activeMode = ref('')
 const modeList = [
   { name: 'Global', icon: 'merge' },
   { name: 'Rule', icon: 'alt_route' },
@@ -21,27 +30,26 @@ function switchMode(index) {
 </script>
 
 <template>
-  <TopInfo class="flex items-center justify-center">
+  <div class="flex h-full flex-col overflow-hidden">
+    <TopInfo class="flex items-center justify-center">
+      <div
+        v-for="(item, index) in modeList"
+        :key="index"
+        :class="{ modeActive: modeIndex === index }"
+        class="mode-item"
+        @click="switchMode(index)"
+      >
+        <div>{{ item.name }}</div>
+        <span class="material-icons">{{ item.icon }}</span>
+      </div>
+    </TopInfo>
     <div
-      v-for="(item, index) in modeList"
-      :key="index"
-      :class="{ modeActive: modeIndex === index }"
-      class="mode-item"
-      @click="switchMode(index)"
+      class="mt-[8px] flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]"
+      id="proxies"
     >
-      <div>{{ item.name }}</div>
-      <span class="material-icons">{{ item.icon }}</span>
-    </div>
-  </TopInfo>
-  <div class="flex h-full flex-col">
-    <div class="h-2 bg-white" />
-    <div class="relative flex-1 overflow-y-auto">
-      <GlobalMode v-if="modeIndex === 0" />
-      <RuleMode v-if="modeIndex === 1" />
+      <ProxyMode v-if="[0, 1, 3].includes(modeIndex)" />
       <DirectMode v-if="modeIndex === 2" />
-      <div v-if="modeIndex === 3">script</div>
     </div>
-    <div style="height: 70px; background-color: white" />
   </div>
 </template>
 

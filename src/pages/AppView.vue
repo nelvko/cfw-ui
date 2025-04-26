@@ -20,10 +20,14 @@ onMounted(() => {
 <template>
   <div class="flex h-screen w-screen flex-col">
     <WindowBar />
-    <div class="flex flex-1">
+    <div class="flex flex-1 overflow-y-hidden">
       <SideMenu />
-      <div class="h-full w-full">
-        <RouterView />
+      <div class="flex-1">
+        <RouterView v-slot="{ Component }">
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
+        </RouterView>
       </div>
     </div>
   </div>

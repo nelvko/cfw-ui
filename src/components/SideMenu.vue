@@ -4,19 +4,22 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
 import storage from '@/hooks/storage.js'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
 
 const router = useRouter()
 
 const time = ref(null)
 
 const menuList = ref([
-  'general',
-  'proxies',
-  'profiles',
-  'logs',
-  'connections',
-  'settings',
-  'feedback',
+  'General',
+  'Proxies',
+  'Profiles',
+  'Logs',
+  'Connections',
+  'Settings',
+  'Feedback',
 ])
 const activeMenu = ref(storage.get('activeMenu') ?? 0)
 
@@ -33,6 +36,12 @@ const clickItem = (index, item) => {
   activeMenu.value = index
   storage.set('activeMenu', activeMenu.value)
   router.push(`/${item}`)
+}
+
+function switchLanguage() {
+  if (locale.value === 'cn') {
+    locale.value = 'en'
+  } else locale.value = 'cn'
 }
 </script>
 
@@ -54,8 +63,9 @@ const clickItem = (index, item) => {
         v-for="(item, index) in menuList"
         :key="index"
       >
-        {{ item }}
+        {{ $t(item) }}
       </div>
+      <div class="menu-item grey-bg" @click="switchLanguage">language</div>
     </div>
     <div class="connected-time">
       <div class="time">{{ time }}</div>

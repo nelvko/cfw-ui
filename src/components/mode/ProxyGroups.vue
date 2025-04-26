@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia'
 import { useProxiesStore } from '@/stores/proxies.js'
 import { updateSelectedProxy } from '@/api/proxies.js'
-import { obj } from '@/api/demo.js'
+import { obj } from '@/mock/demo.js'
 import { ref } from 'vue'
 import ToolTip from '@/components/ToolTip.vue'
 defineProps({
@@ -19,15 +19,22 @@ function selectProxy(proxy) {
 </script>
 
 <template>
-  <div class="proxy-groups">
-    <div class="top-info" @click="isShow = !isShow">
-      <div class="proxy">
+  <div class="relative flex flex-col bg-white">
+    <div
+      class="sticky top-0 mx-[30px] mb-[4px] flex h-[44px] items-center justify-between rounded-[5px] bg-white p-[15px] hover:bg-[#f1f1f1]"
+      @click="isShow = !isShow"
+    >
+      <div class="flex items-center">
         <div>GLOBAL</div>
-        <div class="type">S</div>
+        <div
+          class="flex h-[15px] w-[14px] items-center justify-center rounded-[2px] bg-[#41b883] text-white"
+        >
+          S
+        </div>
         <div>香港 03</div>
       </div>
-      <div class="icon">
-        <ToolTip dark msg="Scroll to selected proxy" top>
+      <div class="flex items-center">
+        <ToolTip dark tip="Scroll to selected proxy" top>
           <span class="material-icons a">travel_explore</span>
         </ToolTip>
         <ToolTip dark tip="Show/Hide timed-out proxies" top>
@@ -44,9 +51,10 @@ function selectProxy(proxy) {
         </ToolTip>
       </div>
     </div>
-    <div class="proxies-view" v-if="isShow">
+    <div class="ml-[36px] flex flex-1 flex-wrap overflow-y-auto" v-if="isShow">
       <div
         v-for="item in obj.providers[groupName].proxies"
+        :key="item.id"
         class="proxies-item"
         @click="selectProxy(item.name)"
       >
@@ -65,52 +73,47 @@ function selectProxy(proxy) {
           <div class="right">check</div>
         </div>
       </div>
+      <div class="h-[30px] bg-pink-500"></div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.proxy-groups {
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  position: relative;
-}
-
 .material-icons {
-  font-variation-settings: 'FILL' 1;
   font-size: 16px;
 }
-.top-info {
-  height: 44px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 30px 4px;
-  position: sticky;
-  top: 0;
-  padding: 15px;
-  border-radius: 5px;
-  background-color: #fff;
 
-  .proxy {
-    display: flex;
-    align-items: center;
+/*.top-info {*/
+/*  height: 44px;*/
+/*  box-sizing: border-box;*/
+/*  display: flex;*/
+/*  justify-content: space-between;*/
+/*  align-items: center;*/
+/*  margin: 0 30px 4px;*/
+/*  position: sticky;*/
+/*  top: 0;*/
+/*  padding: 15px;*/
+/*  border-radius: 5px;*/
+/*  background-color: #fff;*/
 
-    .type {
-      background-color: #41b883;
-      color: #fff;
-      width: 14px;
-      height: 15px;
-      box-sizing: border-box;
-      border-radius: 2px;
-      justify-content: center;
-      align-items: center;
-      display: flex;
-      /*padding: 4px;*/
-    }
-  }
+.proxy {
+  /*display: flex;*/
+  /*align-items: center;*/
+
+  /*.type {*/
+  /*  background-color: #41b883;*/
+  /*  color: #fff;*/
+  /*  width: 14px;*/
+  /*  height: 15px;*/
+  /*  box-sizing: border-box;*/
+  /*  border-radius: 2px;*/
+  /*  justify-content: center;*/
+  /*  align-items: center;*/
+  /*  display: flex;*/
+  /*  !*padding: 4px;*!*/
+  /*}*/
+
+  /*}*/
 
   .proxy > div {
     margin: 0 5px;

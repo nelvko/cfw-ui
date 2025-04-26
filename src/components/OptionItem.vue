@@ -1,10 +1,9 @@
 <script setup>
 import SwitchOption from '@/components/SwitchOption.vue'
+
 defineProps({
   label: String,
-  stringValue: String,
-  isSwitch: Boolean,
-  switchValue: Boolean,
+  value: [String, Boolean],
 })
 </script>
 
@@ -12,15 +11,15 @@ defineProps({
   <div class="option">
     <div class="left">
       <div class="label">{{ label }}</div>
-      <slot name="left-icon" />
+      <slot name="left" />
     </div>
     <div class="right">
-      <slot name="right-icon" />
-      <div v-if="stringValue" class="string-value">
-        {{ stringValue }}
+      <slot name="right" />
+      <div v-if="typeof value !== 'boolean'" class="string-value">
+        {{ value }}
       </div>
-      <div v-if="isSwitch" style="margin-left: 7px">
-        <switch-option :status="switchValue" />
+      <div v-if="typeof value === 'boolean'" style="margin-left: 7px">
+        <switch-option :status="value" />
       </div>
     </div>
   </div>

@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@material-design-icons/font/filled.css";
 
+* {
+    cursor: default;
+}
 span.material-icons {
     cursor: pointer;
 }

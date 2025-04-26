@@ -1,4 +1,5 @@
 <template>
+  <!--  <Teleport to="slot">-->
   <div class="group relative">
     <slot />
     <div
@@ -8,6 +9,7 @@
       {{ tip }}
     </div>
   </div>
+  <!--  </Teleport>-->
 </template>
 
 <script setup>

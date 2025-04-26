@@ -5,13 +5,24 @@ const CURRENT_LOGIN_KEY = 'CURRENT_LOGIN_KEY'
 //   host: '127.0.0.1:9090',
 // }
 const get = (key) => {
-  return JSON.parse(localStorage.getItem(key))
+  const item = localStorage.getItem(key)
+  if (item) {
+    try {
+      return JSON.parse(item)
+    } catch (e) {
+      console.warn('Failed to parse JSON for key:', key, e)
+      return item
+    }
+  }
+  return null
 }
+
 const set = (key, val) => {
   localStorage.setItem(key, JSON.stringify(val))
 }
 const storage = {
-  get, set,
+  get,
+  set,
   removeLogin: () => {
     localStorage.removeItem(CURRENT_LOGIN_KEY)
   },

@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <div class="box-border h-[80px] flex-none border-b border-[#dcdcdc]">
+  <div class="h-[80px] flex-none border-b border-[#dcdcdc]">
     <slot />
   </div>
 </template>

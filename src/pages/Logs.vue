@@ -1,16 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onActivated, ref, useTemplateRef } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
 import { logs } from '@/api/ws.js'
 
 const isSimple = ref(true)
 const isInfo = ref(true)
+// import log from '@/mock/logs.js'
 
 const logList = ref([])
 
 function parseLogLine(log) {
   const result = {}
-
   // 匹配基本字段
   const patterns = {
     type: /\[(.*?)\]/,
@@ -37,22 +37,19 @@ function parseLogLine(log) {
   return result
 }
 
-onMounted(() => {
-  logs.onopen = () => {
-    console.log('logs WebSocket 连接成功')
+onActivated(() => {
+  console.log('onActivated')
+
+  logs.onmessage = ({ data, timeStamp }) => {
+    logList.value.push({
+      ...parseLogLine(JSON.parse(data).payload),
+      timeStamp,
+    })
   }
-  logs.onmessage = (event) => {
-    const data = JSON.parse(event.data)
-    // console.log('📩 收到消息：', data)
-    logList.value.push(parseLogLine(data.payload))
+  if (logList.value.length > 0) {
+    logsBox.value.scrollTop = logsBox.value.scrollHeight
   }
 })
-logList.value.push(
-  parseLogLine(
-    '[TCP] connected lAddr=127.0.0.1:57656 rAddr=geo.cookie-script.com:443 mode=rule rule=Match() proxy=☁️ Others[香港 01]'
-  )
-)
-
 function switchLogLevel() {
   isSimple.value = !isSimple.value
 }
@@ -61,12 +58,37 @@ function switchLogType() {
   isInfo.value = !isInfo.value
 }
 
+const logsBox = useTemplateRef('logsBox')
+
+function formatTimeStamp(timeStamp) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+  return formatter.format(timeStamp)
+}
+
+const showLAddrList = ref([])
+
+function changeShowLAddrList(index) {
+  const number = showLAddrList.value.indexOf(index)
+  console.log('click index', index)
+  console.log('indexof', number)
+
+  if (number === -1) {
+    showLAddrList.value.push(index)
+  } else {
+    showLAddrList.value.splice(number, 1)
+  }
+}
 switchLogType
 </script>
 
 <template>
-  <div class="logs">
-    <TopInfo style="display: flex; align-items: center">
+  <div class="flex h-full flex-col overflow-hidden">
+    <TopInfo class="flex items-center">
       <div style="margin-left: 21px">
         <div style="font-size: 20px">Request Logs</div>
         <div>mode: rule</div>
@@ -87,51 +109,54 @@ switchLogType
             </div>
           </div>
         </div>
-        <div class="clear">Clear</div>
+        <div class="clear" @click="logList.length = 0">Clear</div>
         <div class="stop">Stop</div>
       </div>
     </TopInfo>
-    <div class="view">
+    <div
+      v-if="logList.length !== 0"
+      ref="logsBox"
+      class="flex flex-1 flex-col overflow-y-auto"
+      id="logs"
+    >
       <div
         v-for="(item, index) in logList"
         :key="index"
-        style="
-          border-bottom: 1px solid #eaeaea;
-          padding-left: 20px;
-          margin-top: 2px;
-          height: 47px;
-          box-sizing: border-box;
-        "
-        @click="show = !show"
+        class="height-[47px] mt-[2px] border-b-[1px] border-b-[#eaeaea] pl-[20px]"
+        @click="changeShowLAddrList(item.timeStamp)"
       >
-        <div style="color: #13af42; font-size: 13px; display: flex; justify-content: space-between">
-          <span>{{ true ? '✅ [TCP] connected' : '❌' }}</span>
-          <span style="color: #666666">18:57:57</span>
+        <div class="flex justify-between" style="font-size: 12px">
+          <span class="flex items-center justify-center">
+            <span class="material-icons text-[#77b255]"> check_box </span>
+            <span class="text-[#13af42]">[TCP] connected</span>
+          </span>
+
+          <span style="color: #666666">{{ formatTimeStamp(item.timeStamp) }}</span>
         </div>
-        <div>
-          <span class="material-icons"> arrow_right </span>
+        <div class="flex items-center justify-start">
+          <span class="material-icons text-[13px] text-[#999]" style="font-size: 13px">
+            play_arrow
+          </span>
           <span>{{ item.rAddr }}</span>
-          <div>FROM</div>
+        </div>
+        <div v-if="showLAddrList.includes(item.timeStamp)">
+          <span class="text-[#045c85]">FROM</span>
+          <span>--></span>
+          <span class="text-[#333]">{{ item.lAddr }}</span>
         </div>
       </div>
+    </div>
+    <div
+      v-if="logList.length === 0"
+      class="flex flex-1 flex-col items-center justify-center text-[#808080]"
+    >
+      <span>Empty log list</span>
+      <span>Refresh your browser to make requests.</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-.view {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.logs {
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 input {
   padding-left: 12px;
   border-radius: 5px;
@@ -210,6 +235,7 @@ input::placeholder {
 
 .clear,
 .stop {
+  cursor: pointer;
   height: 30px;
   width: 70px;
   line-height: 30px;
