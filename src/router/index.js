@@ -29,7 +29,12 @@ const routes = [
         component: () => import('@/pages/Profiles.vue'),
         meta: { title: 'Profiles' },
       },
-      { path: 'logs', component: () => import('@/pages/Logs.vue'), meta: { title: 'Logs' } },
+      {
+        path: 'logs',
+        name: 'Logs',
+        component: () => import('@/pages/Logs.vue'),
+        meta: { title: 'Logs' },
+      },
       {
         path: 'connections',
         name: 'Connections',

@@ -1,23 +1,28 @@
 <script setup>
 import TopInfo from '@/components/TopInfo.vue'
 import GreyButton from '@/components/GreyButton.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onActivated, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
 import { connections } from '@/api/ws.js'
 import ToolTip from '@/components/ToolTip.vue'
-
+import connectionss from '@/mock/connections.js'
 const pause = ref(true)
 const connectionList = ref([])
 const downloadTotal = ref(0)
 const uploadTotal = ref(0)
-onMounted(() => {
-  connections.onmessage = (event) => {
-    const data = JSON.parse(event.data)
-    // console.log('📩 收到消息：', data)
-    downloadTotal.value = data.downloadTotal
-    uploadTotal.value = data.uploadTotal
-    connectionList.value = data.connections
-  }
+connections
+onActivated(() => {
+  connectionss
+  downloadTotal.value = connectionss.downloadTotal
+  uploadTotal.value = connectionss.uploadTotal
+  connectionList.value = connectionss.connections
+  // connections.onmessage = (event) => {
+  //   const data = JSON.parse(event.data)
+  //   console.log('📩 收到消息：', data)
+  //   downloadTotal.value = data.downloadTotal
+  //   uploadTotal.value = data.uploadTotal
+  //   connectionList.value = data.connections
+  // }
 })
 const upload = computed(() => {
   return useFormatSpeed(uploadTotal.value)
@@ -33,85 +38,87 @@ function switchPause() {
 
 <template>
   <!--  padding: 0 20px 0 16px -->
-  <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
-    <div class="my-[8px] flex">
-      <div class="text-[18px]">Connections</div>
-      <input type="text" placeholder="Search" />
-      <div class="flex items-center">
-        <span>Total:</span>
-        <span class="material-icons up">straight</span>
-        <span>{{ `${upload.num} ${upload.unit}` }}</span>
-        <span class="material-icons down">straight</span>
-        <span>{{ `${download.num} ${download.unit}` }}</span>
-      </div>
-    </div>
-    <div class="flex justify-between">
-      <div class="flex">
-        <ToolTip dark tip="Upload Speed" top>
-          <GreyButton>
-            <span class="material-icons">upload</span>
-            <span class="material-icons">speed</span>
-          </GreyButton>
-        </ToolTip>
-
-        <ToolTip dark tip="Download Speed" top>
-          <GreyButton>
-            <span class="material-icons">download</span>
-            <span class="material-icons">speed</span>
-          </GreyButton>
-        </ToolTip>
-
-        <ToolTip dark tip="Upload Traffic" top>
-          <GreyButton>
-            <span class="material-icons">upload</span>
-            <span class="material-icons">signal_cellular_alt</span>
-          </GreyButton>
-        </ToolTip>
-
-        <ToolTip dark tip="Download Traffic" top>
-          <GreyButton>
-            <span class="material-icons">download</span>
-            <span class="material-icons">signal_cellular_alt</span>
-          </GreyButton>
-        </ToolTip>
-
-        <ToolTip dark tip="Start Time" top>
-          <GreyButton>
-            <span class="material-icons">schedule</span>
-          </GreyButton>
-        </ToolTip>
-
-        <ToolTip dark tip="Destination" top>
-          <GreyButton>
-            <span class="material-icons">laptop_windows</span>
-          </GreyButton>
-        </ToolTip>
-      </div>
-      <div class="flex">
-        <div @click="switchPause" :class="{ pause, resume: !pause }">
-          {{ pause ? 'Pause' : 'Resume' }}
-        </div>
-        <div class="close-all">Close All（{{ connectionList.length }}）</div>
-      </div>
-    </div>
-  </TopInfo>
-  <div class="flex flex-col">
-    <div v-for="item in connectionList" :key="item.id" class="connection">
-      <div class="left">
-        <div>{{ item.metadata.host }}:{{ item.metadata.destinationPort }}</div>
-        <div class="metadata">
-          <span style="background-color: #ce8647">{{ item.metadata.network.toUpperCase() }}</span>
-          <span style="background-color: #cf9f46">{{ item.metadata.type }}</span>
-          <span style="background-color: #75ab5b">{{ item.chains[0] }}</span>
-          <span style="background-color: #428ee4">A few minutes ago</span>
+  <div class="flex h-full flex-col overflow-y-hidden">
+    <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
+      <div class="my-[8px] flex">
+        <div class="text-[18px]">Connections</div>
+        <input placeholder="Search" type="text" />
+        <div class="flex items-center">
+          <span>Total:</span>
+          <span class="material-icons up">straight</span>
+          <span>{{ `${upload.num} ${upload.unit}` }}</span>
+          <span class="material-icons down">straight</span>
+          <span>{{ `${download.num} ${download.unit}` }}</span>
         </div>
       </div>
-      <span
-        class="material-icons"
-        style="margin-right: 23px; color: #333333; transform: rotateY(180deg)"
-      >
-        block
-      </span>
+      <div class="flex justify-between">
+        <div class="flex">
+          <ToolTip dark tip="Upload Speed" top>
+            <GreyButton>
+              <span class="material-icons">upload</span>
+              <span class="material-icons">speed</span>
+            </GreyButton>
+          </ToolTip>
+
+          <ToolTip dark tip="Download Speed" top>
+            <GreyButton>
+              <span class="material-icons">download</span>
+              <span class="material-icons">speed</span>
+            </GreyButton>
+          </ToolTip>
+
+          <ToolTip dark tip="Upload Traffic" top>
+            <GreyButton>
+              <span class="material-icons">upload</span>
+              <span class="material-icons">signal_cellular_alt</span>
+            </GreyButton>
+          </ToolTip>
+
+          <ToolTip dark tip="Download Traffic" top>
+            <GreyButton>
+              <span class="material-icons">download</span>
+              <span class="material-icons">signal_cellular_alt</span>
+            </GreyButton>
+          </ToolTip>
+
+          <ToolTip dark tip="Start Time" top>
+            <GreyButton>
+              <span class="material-icons">schedule</span>
+            </GreyButton>
+          </ToolTip>
+
+          <ToolTip dark tip="Destination" top>
+            <GreyButton>
+              <span class="material-icons">laptop_windows</span>
+            </GreyButton>
+          </ToolTip>
+        </div>
+        <div class="flex">
+          <div :class="{ pause, resume: !pause }" @click="switchPause">
+            {{ pause ? 'Pause' : 'Resume' }}
+          </div>
+          <div class="close-all">Close All（{{ connectionList.length }}）</div>
+        </div>
+      </div>
+    </TopInfo>
+    <div class="mr-[2px] flex flex-1 flex-col overflow-y-auto">
+      <div v-for="item in connectionList" :key="item.id" class="connection">
+        <div class="left">
+          <div>{{ item.metadata.host }}:{{ item.metadata.destinationPort }}</div>
+          <div class="metadata">
+            <span style="background-color: #ce8647">{{ item.metadata.network.toUpperCase() }}</span>
+            <span style="background-color: #cf9f46">{{ item.metadata.type }}</span>
+            <span style="background-color: #75ab5b">{{ item.chains[0] }}</span>
+            <span style="background-color: #428ee4">A few minutes ago</span>
+          </div>
+        </div>
+        <span
+          class="material-icons"
+          style="margin-right: 23px; color: #333333; transform: rotateY(180deg)"
+        >
+          block
+        </span>
+      </div>
     </div>
   </div>
 </template>

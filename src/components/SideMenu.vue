@@ -35,7 +35,7 @@ setInterval(updateTime, 1000)
 const clickItem = (index, item) => {
   activeMenu.value = index
   storage.set('activeMenu', activeMenu.value)
-  router.push(`/${item}`)
+  router.push({ name: item })
 }
 
 function switchLanguage() {
