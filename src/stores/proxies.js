@@ -1,9 +1,14 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export const useProxiesStore = defineStore('proxies', () => {
   const proxies = ref(null)
   const providers = ref(null)
   const selectedProxy = ref(null)
-  return {proxies, providers, selectedProxy}
+  return { proxies, providers, selectedProxy }
 })
+
+export const useConfigs = () => {
+  const configs = ref({})
+  return { configs }
+}

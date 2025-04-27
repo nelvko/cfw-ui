@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "@material-design-icons/font/filled.css";
 
-* {
-    cursor: default;
+*{
+    user-select: none;
 }
 span.material-icons {
     cursor: pointer;
@@ -10,6 +10,7 @@ span.material-icons {
 body {
     margin: 0;
     padding: 0;
+    
 }
 
 input {

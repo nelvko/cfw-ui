@@ -1,60 +1,72 @@
 <script setup>
-import { onActivated, ref, useTemplateRef } from 'vue'
+import { computed, onActivated, ref, useTemplateRef, watch, watchEffect } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
 import { logs } from '@/api/ws.js'
+import { getConfig } from '@/api/common.js'
 
 const isSimple = ref(true)
 const isInfo = ref(true)
-// import log from '@/mock/logs.js'
-
 const logList = ref([])
 
 function parseLogLine(log) {
   const result = {}
   // 匹配基本字段
   const patterns = {
-    type: /\[(.*?)\]/,
-    status: /connected/,
+    type: /\[(.*?)]/,
+    status: / (\w*) /,
     lAddr: /lAddr=([\d.]+:\d+)/,
     rAddr: /rAddr=([\w.-]+:\d+)/,
     mode: /mode=(\w+)/,
-    rule: /rule=(\w+)\(([^)]+)\)/,
+    rule: /rule=(\S+)/,
     proxy: /proxy=(.+)$/,
   }
-
   for (const key in patterns) {
     const match = log.match(patterns[key])
     if (match) {
-      if (key === 'rule') {
-        result.ruleType = match[1]
-        result.ruleValue = match[2]
-      } else {
-        result[key] = match[1]
-      }
+      result[key] = match[1]
     }
   }
-
   return result
+}
+
+const mode = ref(null)
+
+function onMessage({ data, timeStamp }) {
+  const { payload, type } = JSON.parse(data)
+  logList.value.push({
+    id: crypto.randomUUID(),
+    raw: payload,
+    type: type, //info
+    data: parseLogLine(payload),
+    timeStamp,
+  })
 }
 
 onActivated(() => {
   console.log('onActivated')
+  getConfig().then((config) => {
+    mode.value = config.mode
+  })
+  isStop.value = false
 
-  logs.onmessage = ({ data, timeStamp }) => {
-    logList.value.push({
-      ...parseLogLine(JSON.parse(data).payload),
-      timeStamp,
-    })
-  }
+  logs.onmessage = onMessage
   if (logList.value.length > 0) {
     logsBox.value.scrollTop = logsBox.value.scrollHeight
   }
 })
-function switchLogLevel() {
+
+function switchLogSimple() {
   isSimple.value = !isSimple.value
+  if (isSimple.value) {
+    showLAddrList.value.length = 0
+  } else {
+    logList.value.forEach((item) => {
+      showLAddrList.value.push(item.id)
+    })
+  }
 }
 
-function switchLogType() {
+function switchLogInfo() {
   isInfo.value = !isInfo.value
 }
 
@@ -71,87 +83,126 @@ function formatTimeStamp(timeStamp) {
 }
 
 const showLAddrList = ref([])
+const isStop = ref(false)
 
-function changeShowLAddrList(index) {
-  const number = showLAddrList.value.indexOf(index)
-  console.log('click index', index)
-  console.log('indexof', number)
-
-  if (number === -1) {
-    showLAddrList.value.push(index)
+function stopLog() {
+  isStop.value = !isStop.value
+  if (isStop.value) {
+    logs.onmessage = null
   } else {
-    showLAddrList.value.splice(number, 1)
+    logs.onmessage = onMessage
   }
 }
-switchLogType
+
+function changeShowLAddrList(id) {
+  const index = showLAddrList.value.indexOf(id)
+  if (index === -1) {
+    showLAddrList.value.push(id)
+  } else {
+    showLAddrList.value.splice(index, 1)
+  }
+}
+
+const keyword = ref('')
+
+// watch(keyword.value, (newVal) => {})
+const filterLogList = computed(() => {
+  const a = logList.value.filter(
+    (item) => item.type === 'info' && isInfo.value && item.raw.match(keyword.value)
+  )
+  console.log(a)
+
+  return a
+})
 </script>
 
 <template>
   <div class="flex h-full flex-col overflow-hidden">
     <TopInfo class="flex items-center">
-      <div style="margin-left: 21px">
-        <div style="font-size: 20px">Request Logs</div>
-        <div>mode: rule</div>
+      <div class="ml-[21px] whitespace-nowrap">
+        <div class="text-[20px]">Request Logs</div>
+        <div>mode: {{ mode }}</div>
       </div>
-      <input type="text" placeholder="Search" />
+      <input type="text" placeholder="Search" v-model="keyword" class="cursor-default" />
       <div class="button">
         <div class="level-group">
-          <div class="level" @click="switchLogLevel">
+          <div class="level" @click="switchLogSimple">
             <div class="simple" :class="{ blue: isSimple }" style="width: 46%">Simple</div>
             <div class="detailed" :class="{ blue: isSimple === false }" style="width: 54%">
               Detailed
             </div>
           </div>
-          <div class="level" @click="switchLogType">
-            <div class="info" :class="{ blue: isInfo, long: isInfo }">info</div>
-            <div class="debug" :class="{ blue: isInfo === false, long: isInfo === false }">
+          <div class="level" @click="switchLogInfo">
+            <div class="info duration-150 ease-linear" :class="{ blue: isInfo, infoLong: isInfo }">
+              info
+            </div>
+            <div
+              class="debug duration-150 ease-linear"
+              :class="{ blue: isInfo === false, debugLong: isInfo === false }"
+            >
               debug
             </div>
           </div>
         </div>
         <div class="clear" @click="logList.length = 0">Clear</div>
-        <div class="stop">Stop</div>
+        <div :class="{ stop: !isStop, start: isStop }" @click="stopLog">
+          {{ isStop ? 'Start' : 'Stop' }}
+        </div>
       </div>
     </TopInfo>
     <div
       v-if="logList.length !== 0"
       ref="logsBox"
-      class="flex flex-1 flex-col overflow-y-auto"
+      class="mr-[2px] flex flex-1 flex-col overflow-y-auto"
       id="logs"
     >
       <div
-        v-for="(item, index) in logList"
-        :key="index"
-        class="height-[47px] mt-[2px] border-b-[1px] border-b-[#eaeaea] pl-[20px]"
-        @click="changeShowLAddrList(item.timeStamp)"
+        v-for="item in filterLogList"
+        :key="item.id"
+        class="height-[47px] mt-[2px] mr-[3px] !cursor-pointer border-b-[1px] border-b-[#eaeaea] pl-[20px]"
+        @click="changeShowLAddrList(item.id)"
       >
         <div class="flex justify-between" style="font-size: 12px">
           <span class="flex items-center justify-center">
-            <span class="material-icons text-[#77b255]"> check_box </span>
+            <span class="material-icons text-[#77b255]" style="font-size: 18px"> check_box </span>
             <span class="text-[#13af42]">[TCP] connected</span>
           </span>
 
-          <span style="color: #666666">{{ formatTimeStamp(item.timeStamp) }}</span>
+          <span style="color: #666666; margin-right: 10px" class="">{{
+            formatTimeStamp(item.timeStamp)
+          }}</span>
         </div>
         <div class="flex items-center justify-start">
           <span class="material-icons text-[13px] text-[#999]" style="font-size: 13px">
             play_arrow
           </span>
-          <span>{{ item.rAddr }}</span>
+          <span class="text-[14px]">{{ item.data.rAddr }}</span>
         </div>
-        <div v-if="showLAddrList.includes(item.timeStamp)">
-          <span class="text-[#045c85]">FROM</span>
-          <span>--></span>
-          <span class="text-[#333]">{{ item.lAddr }}</span>
+        <div v-if="showLAddrList.includes(item.id)" class="flex">
+          <div>
+            <span class="text-[12px] text-[#045c85]">FROM</span>
+            <span>-></span>
+            <span class="text-[12px] text-[#333]">{{ item.data.lAddr }}</span>
+          </div>
+          <div class="ml-[12px]">
+            <span class="text-[12px] text-[#045c85]">RULE</span>
+            <span>-></span>
+            <span class="text-[12px] text-[#333]">{{ item.data.rule }}</span>
+          </div>
+          <div class="ml-[12px]">
+            <span class="text-[12px] text-[#045c85]">PROXY</span>
+            <span>-></span>
+            <span class="text-[12px] text-[#333]">{{ item.data.proxy }}</span>
+          </div>
         </div>
       </div>
     </div>
     <div
       v-if="logList.length === 0"
-      class="flex flex-1 flex-col items-center justify-center text-[#808080]"
+      class="flex flex-1 cursor-default flex-col items-center justify-center text-[#808080]"
     >
-      <span>Empty log list</span>
-      <span>Refresh your browser to make requests.</span>
+      <span class="text-[18px]">Empty log list</span>
+      <span class="text-[14px]">Refresh your browser to make requests.</span>
     </div>
   </div>
 </template>
@@ -175,11 +226,19 @@ input::placeholder {
 
 .blue {
   background-color: #179bbb;
+  flex: auto;
 }
 
-.long {
-  width: 60%;
-  flex: 1;
+.infoLong {
+  width: 65px;
+
+  transition-timing-function: linear;
+}
+
+.debugLong {
+  width: 67px;
+
+  transition-timing-function: linear;
 }
 
 .button {
@@ -209,7 +268,7 @@ input::placeholder {
         text-align: center;
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
-        /*width: 46%;*/
+        width: 50px;
       }
 
       .detailed,
@@ -217,8 +276,7 @@ input::placeholder {
         text-align: center;
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
-
-        /*width: 54%;*/
+        width: 52px;
       }
     }
   }
@@ -233,8 +291,14 @@ input::placeholder {
   background-color: #f56363;
 }
 
+.start {
+  background-color: #179bbb;
+}
+
 .clear,
-.stop {
+.stop,
+.start {
+  user-select: none;
   cursor: pointer;
   height: 30px;
   width: 70px;
