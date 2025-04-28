@@ -28,3 +28,6 @@ export const login = (login) => {
     headers: { Authorization: `Bearer ${login.secret}` },
   })
 }
+
+export const closeAllConnections = () => http.delete('/connections')
+export const closeConnection = (id) => http.delete(`/connections/${id}`)

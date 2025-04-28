@@ -1,9 +1,9 @@
-function useFormatSpeed(val) {
+function useFormatSpeed(val, fractionDigits) {
   const B = 1
   const KB = B << 10
   const MB = KB << 10
   const GB = MB << 10
-  const fractionDigits = 2
+
   let num
   let unit
   if (val < KB) {

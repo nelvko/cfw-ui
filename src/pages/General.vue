@@ -2,7 +2,7 @@
 //Loading...
 // 00:00:00
 // Disconnected
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getConfig, getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
@@ -61,6 +61,26 @@ const clashCore = computed(() => {
   }
   return `${versionNo} ${clash} (9090)`
 })
+// 0关闭 1开启中 2 开启
+const addRule = ref(0)
+
+function addRules() {
+  switch (addRule.value) {
+    case 0:
+      addRule.value = 1
+      setTimeout(() => {
+        addRule.value = 2
+      }, 5000)
+
+      break
+    case 2:
+      addRule.value = 1
+      setTimeout(() => {
+        addRule.value = 0
+      }, 5000)
+      break
+  }
+}
 </script>
 
 <template>
@@ -74,7 +94,7 @@ const clashCore = computed(() => {
       </div>
     </div>
     <div class="options">
-      <OptionItem :label="$t('Port')" :value="config.port">
+      <OptionItem :label="$t('Port')" :value="config['mixed-port']">
         <template #right>
           <ToolTip :top="true" :dark="true" tip="terminal">
             <span class="material-icons">terminal</span>
@@ -109,7 +129,22 @@ const clashCore = computed(() => {
       <OptionItem :label="$t('Clash Core')" :value="clashCore">
         <template #left>
           <ToolTip tip="add firewall rules(for Allow LAN and system stack)" right dark>
-            <span class="material-icons grey icon-grey-bg">gpp_maybe</span>
+            <span v-if="addRule === 0" class="material-icons grey icon-grey-bg" @click="addRules"
+              >gpp_maybe</span
+            >
+            <span
+              v-if="addRule === 1"
+              class="material-icons icon-grey-bg animate-bounce text-[#2c3e50]"
+            >
+              edit
+            </span>
+            <span
+              @click="addRules"
+              v-if="addRule === 2"
+              class="material-icons icon-grey-bg text-[#41b883]"
+            >
+              gpp_good
+            </span>
           </ToolTip>
           <ToolTip
             tip="Preview the final configuration file that was submitted to Clash Core"

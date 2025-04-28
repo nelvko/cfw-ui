@@ -5,34 +5,40 @@ import { computed, onActivated, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
 import { connections } from '@/api/ws.js'
 import ToolTip from '@/components/ToolTip.vue'
-import connectionss from '@/mock/connections.js'
-const pause = ref(true)
+import { closeAllConnections, closeConnection } from '@/api/common.js'
+
+const isPause = ref(false)
 const connectionList = ref([])
 const downloadTotal = ref(0)
 const uploadTotal = ref(0)
-connections
+
+function onMessage(event) {
+  const data = JSON.parse(event.data)
+  console.log('📩 收到消息：', data)
+  downloadTotal.value = data.downloadTotal
+  uploadTotal.value = data.uploadTotal
+  connectionList.value = data.connections
+}
 onActivated(() => {
-  connectionss
-  downloadTotal.value = connectionss.downloadTotal
-  uploadTotal.value = connectionss.uploadTotal
-  connectionList.value = connectionss.connections
-  // connections.onmessage = (event) => {
-  //   const data = JSON.parse(event.data)
-  //   console.log('📩 收到消息：', data)
-  //   downloadTotal.value = data.downloadTotal
-  //   uploadTotal.value = data.uploadTotal
-  //   connectionList.value = data.connections
-  // }
+  connections.onmessage = onMessage
 })
+
 const upload = computed(() => {
-  return useFormatSpeed(uploadTotal.value)
+  return useFormatSpeed(uploadTotal.value, 1)
 })
 const download = computed(() => {
-  return useFormatSpeed(downloadTotal.value)
+  return useFormatSpeed(downloadTotal.value, 1)
 })
 
 function switchPause() {
-  pause.value = !pause.value
+  isPause.value = !isPause.value
+  console.log(123, isPause.value)
+
+  if (isPause.value) {
+    connections.onmessage = null
+  } else {
+    connections.onmessage = onMessage
+  }
 }
 </script>
 
@@ -41,8 +47,8 @@ function switchPause() {
   <div class="flex h-full flex-col overflow-y-hidden">
     <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
       <div class="my-[8px] flex">
-        <div class="text-[18px]">Connections</div>
-        <input placeholder="Search" type="text" />
+        <div class="mr-[5px] text-[18px]">Connections</div>
+        <input placeholder="Search" type="text" class="cursor-default" />
         <div class="flex items-center">
           <span>Total:</span>
           <span class="material-icons up">straight</span>
@@ -94,10 +100,12 @@ function switchPause() {
           </ToolTip>
         </div>
         <div class="flex">
-          <div :class="{ pause, resume: !pause }" @click="switchPause">
-            {{ pause ? 'Pause' : 'Resume' }}
+          <div :class="{ pause: !isPause, resume: isPause }" @click="switchPause">
+            {{ isPause ? 'Resume' : 'Pause' }}
           </div>
-          <div class="close-all">Close All（{{ connectionList.length }}）</div>
+          <div class="close-all ml-[10px]" @click="closeAllConnections()">
+            Close All（{{ connectionList.length }}）
+          </div>
         </div>
       </div>
     </TopInfo>
@@ -106,15 +114,16 @@ function switchPause() {
         <div class="left">
           <div>{{ item.metadata.host }}:{{ item.metadata.destinationPort }}</div>
           <div class="metadata">
-            <span style="background-color: #ce8647">{{ item.metadata.network.toUpperCase() }}</span>
-            <span style="background-color: #cf9f46">{{ item.metadata.type }}</span>
-            <span style="background-color: #75ab5b">{{ item.chains[0] }}</span>
-            <span style="background-color: #428ee4">A few minutes ago</span>
+            <span class="bg-[#ce8647]">{{ item.metadata.network.toUpperCase() }}</span>
+            <span class="bg-[#cf9f46]">{{ item.metadata.type }}</span>
+            <span class="bg-[#75ab5b]">{{ item.chains[0] }}</span>
+            <span class="bg-[#428ee4]">A few minutes ago</span>
           </div>
         </div>
         <span
           class="material-icons"
-          style="margin-right: 23px; color: #333333; transform: rotateY(180deg)"
+          style="margin-right: 23px; color: #333333"
+          @click="closeConnection(item.id)"
         >
           block
         </span>
@@ -124,9 +133,12 @@ function switchPause() {
 </template>
 
 <style scoped>
+.metadata {
+  padding-bottom: 3px;
+}
 .metadata > span {
   color: white;
-  height: 21px;
+  height: 20.5px;
   margin-right: 5px;
   font-size: 12px;
   line-height: 21px;
@@ -159,7 +171,6 @@ function switchPause() {
   line-height: 28px;
   cursor: pointer;
 }
-
 .up,
 .down {
   font-size: 18px;
@@ -168,11 +179,6 @@ function switchPause() {
 
 .down {
   transform: rotate(180deg);
-}
-
-.pause {
-  /*width: 59px;*/
-  margin-right: 10px;
 }
 
 .resume {

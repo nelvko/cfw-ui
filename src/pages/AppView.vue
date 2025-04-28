@@ -22,7 +22,7 @@ onMounted(() => {
     <WindowBar />
     <div class="flex flex-1 overflow-y-hidden">
       <SideMenu />
-      <div class="flex-1">
+      <div class="relative flex-1" id="app-view">
         <RouterView v-slot="{ Component }">
           <KeepAlive>
             <component :is="Component" />

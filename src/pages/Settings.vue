@@ -3,6 +3,8 @@ import TopInfo from '@/components/TopInfo.vue'
 import SettingItem from '@/components/SettingItem.vue'
 import OptionItem from '@/components/OptionItem.vue'
 import ToolTip from '@/components/ToolTip.vue'
+
+const titleBarText
 </script>
 
 <template>
