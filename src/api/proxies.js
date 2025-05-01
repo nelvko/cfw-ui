@@ -1,14 +1,10 @@
-import axios from "@/config/http.js";
+import axios from '@/plugins/axios/index.js'
 
-export const getProxies = () =>
-    axios.get('/proxies')
+export const getProxies = () => axios.get('/proxies')
 
+export const getProxy = (proxiesName) => axios.get(`/proxies/${proxiesName}`)
 
-export const getProxy = (proxiesName) =>
-    axios.get(`/proxies/${proxiesName}`)
-
-export const getProviders = () =>
-    axios.get(`/providers/proxies`)
+export const getProviders = () => axios.get(`/providers/proxies`)
 
 export const updateSelectedProxy = (name) => axios.put(`/proxies/${name}`)
 

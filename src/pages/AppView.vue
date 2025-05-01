@@ -3,7 +3,7 @@ import SideMenu from '/src/components/SideMenu.vue'
 import WindowBar from '@/components/WindowBar.vue'
 import { onMounted } from 'vue'
 import { getProviders, getProxies } from '@/api/proxies.js'
-import { useProxiesStore } from '@/stores/proxies.js'
+import { useProxiesStore } from '@/stores/proxies/proxies.js'
 import { storeToRefs } from 'pinia'
 
 const { proxies, providers } = storeToRefs(useProxiesStore())

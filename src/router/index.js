@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { i18n } from '@/plugins/i18n/index.js'
-import storage from '@/hooks/storage.js'
 import { watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useLoginStore } from '@/stores/login/index.js'
 
 const { t, locale } = i18n.global
+
 const routes = [
   {
     path: '/',
@@ -72,7 +74,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (!storage.getLogin() && to.name !== 'Login') {
+  const { loginInfo } = storeToRefs(useLoginStore())
+  // console.log(999, loginInfo.value)
+
+  if (!loginInfo.value && to.name !== 'Login') {
     return { name: 'Login' }
   }
 })

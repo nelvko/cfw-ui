@@ -13,7 +13,6 @@ onActivated(() => {
 onDeactivated(() => {
   console.log('onDeactivated')
 })
-const activeMode = ref('')
 const modeList = [
   { name: 'Global', icon: 'merge' },
   { name: 'Rule', icon: 'alt_route' },

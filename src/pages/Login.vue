@@ -1,18 +1,22 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { login } from '@/api/common.js'
 import { useRouter } from 'vue-router'
-import storage from '@/hooks/storage.js'
+import { useLoginStore } from '@/stores/login/index.js'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const failMsg = ref('')
-const loginData = ref({ host: '120.46.87.172:9090' })
+const loginStore = useLoginStore()
+onMounted(() => {
+  console.log(111, loginStore.activeMenu)
+  console.log(111, loginStore.loginInfo)
+})
 function submit() {
-  if (!loginData.value.host) {
+  if (!loginInfo.value.host) {
     alert('请填写host')
   }
-  storage.setLogin(loginData.value)
-  login(loginData.value)
+  login(loginInfo.value)
     .then((res) => {
       console.log(res)
       router.push('/')
@@ -20,7 +24,7 @@ function submit() {
     .catch((err) => {
       console.log(err)
 
-      storage.removeLogin()
+      loginInfo.value = null
       failMsg.value = 'Failed to connect'
     })
 }
@@ -33,12 +37,12 @@ function submit() {
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
           主机：
-          <input v-model.trim="loginData.host" placeholder="" type="text" @focus="failMsg = ''" />
+          <!--          <input v-model.trim="loginInfo.host" placeholder="" type="text" @focus="failMsg = ''" />-->
           <span class="text-[#f56363]">{{ failMsg }}</span>
         </label>
         <label>
           密码：
-          <input type="password" v-model.trim="loginData.secret" />
+          <!--          <input type="password" v-model.trim="loginInfo.secret" />-->
         </label>
         <button type="submit" class="bg-cyan-600 text-white">提交</button>
       </form>

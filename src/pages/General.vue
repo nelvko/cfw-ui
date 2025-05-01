@@ -2,7 +2,7 @@
 //Loading...
 // 00:00:00
 // Disconnected
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getConfig, getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
@@ -174,7 +174,7 @@ function addRules() {
         </template>
       </OptionItem>
 
-      <OptionItem :value="config?.tun?.enable" label="Tun Mode">
+      <OptionItem :label="$t('Tun Mode')" :value="config?.tun?.enable ?? false">
         <template #left>
           <ToolTip :tip="tunInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>

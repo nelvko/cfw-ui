@@ -3,8 +3,10 @@ import TrafficView from '@/components/TrafficView.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
-import storage from '@/hooks/storage.js'
 import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
+import { useLoginStore } from '@/stores/login/index.js'
+const { activeMenu } = storeToRefs(useLoginStore())
 
 const { locale } = useI18n()
 
@@ -21,7 +23,6 @@ const menuList = ref([
   'Settings',
   'Feedback',
 ])
-const activeMenu = ref(storage.get('activeMenu') ?? 0)
 
 let updateTime = () => {
   const now = new Date()
@@ -34,7 +35,6 @@ setInterval(updateTime, 1000)
 
 const clickItem = (index, item) => {
   activeMenu.value = index
-  storage.set('activeMenu', activeMenu.value)
   router.push({ name: item })
 }
 

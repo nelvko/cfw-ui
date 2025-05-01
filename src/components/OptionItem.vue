@@ -3,7 +3,10 @@ import SwitchOption from '@/components/SwitchOption.vue'
 
 defineProps({
   label: String,
-  value: [String, Boolean],
+  value: {
+    type: [String, Boolean],
+    default: undefined,
+  },
 })
 </script>
 

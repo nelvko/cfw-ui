@@ -1,10 +1,10 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useProxiesStore } from '@/stores/proxies.js'
 import { updateSelectedProxy } from '@/api/proxies.js'
 import { obj } from '@/mock/demo.js'
 import { ref } from 'vue'
 import ToolTip from '@/components/ToolTip.vue'
+import { useProxiesStore } from '@/stores/proxies/proxies.js'
 defineProps({
   groupName: String,
 })

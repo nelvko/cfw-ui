@@ -1,6 +1,8 @@
-import storage from '@/hooks/storage.js'
+import { useLoginStore } from '@/stores/login/index.js'
+import { storeToRefs } from 'pinia'
 
-const { host, secret } = storage.getLogin()
+const { loginInfo } = storeToRefs(useLoginStore())
+const { host, secret } = loginInfo
 
 export const connections = new WebSocket(`ws://${host}/connections?token=${secret}`)
 export const logs = new WebSocket(`ws://${host}/logs?token=${secret}`)

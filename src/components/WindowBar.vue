@@ -1,24 +1,32 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settings/settings.js'
 
 const isFull = ref(true)
 const isKeep = ref(false)
 const fullState = computed(() => {
   return isFull.value ? 'close_fullscreen' : 'check_box_outline_blank'
 })
+
+const { titleBarText } = storeToRefs(useSettingsStore())
+console.log(123, titleBarText)
 </script>
 
 <template>
-  <div class="flex h-6 flex-none flex-row-reverse items-center bg-[#ebebeb]">
-    <span class="material-icons light-blue-grey close">close</span>
-    <span class="material-icons light-blue-grey" @click="isFull = !isFull">{{ fullState }} </span>
-    <span class="material-icons light-blue-grey">remove</span>
-    <span
-      class="material-icons light-blue-grey"
-      @click="isKeep = !isKeep"
-      :class="{ keepActive: isKeep }"
-      >push_pin</span
-    >
+  <div class="relative flex h-6 flex-none items-center justify-center bg-[#ebebeb]">
+    <div class="text-[12px]">{{ titleBarText }}</div>
+    <div class="absolute right-0 flex h-full items-center justify-center">
+      <span
+        class="material-icons light-blue-grey"
+        @click="isKeep = !isKeep"
+        :class="{ keepActive: isKeep }"
+        >push_pin</span
+      >
+      <span class="material-icons light-blue-grey">remove</span>
+      <span class="material-icons light-blue-grey" @click="isFull = !isFull">{{ fullState }} </span>
+      <span class="material-icons light-blue-grey close">close</span>
+    </div>
   </div>
 </template>
 
@@ -35,7 +43,7 @@ const fullState = computed(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 3%;
+  width: 45px;
   cursor: pointer;
 
   font-size: 0.9em;
