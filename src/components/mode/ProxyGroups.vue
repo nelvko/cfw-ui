@@ -1,76 +1,97 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { updateSelectedProxy } from '@/api/proxies.js'
-import { obj } from '@/mock/demo.js'
+import { getDelay, updateSelectedProxy } from '@/api/proxies.js'
 import { ref } from 'vue'
 import ToolTip from '@/components/ToolTip.vue'
 import { useProxiesStore } from '@/stores/proxies/proxies.js'
 defineProps({
   groupName: String,
+  providers: Object,
 })
 const { selectedProxy } = storeToRefs(useProxiesStore())
 
-const isShow = ref(true)
+const isShow = ref(false)
 
-function selectProxy(proxy) {
-  selectedProxy.value = proxy
-  updateSelectedProxy(proxy)
+function selectProxy(name) {
+  selectedProxy.value = name
+  updateSelectedProxy(name)
+}
+
+function delay(name) {
+  getDelay(name).then((res) => {
+    console.log(111, res.data)
+  })
 }
 </script>
 
 <template>
   <div class="relative flex flex-col bg-white">
     <div
-      class="sticky top-0 mx-[30px] mb-[4px] flex h-[44px] items-center justify-between rounded-[5px] bg-white p-[15px] hover:bg-[#f1f1f1]"
+      class="sticky top-0 mr-[20px] mb-[4px] ml-[30px] flex h-[44px] items-center justify-between rounded-[5px] bg-white pr-[10px] hover:bg-[#f1f1f1]"
       @click="isShow = !isShow"
     >
       <div class="flex items-center">
-        <div>GLOBAL</div>
+        <div class="mr-[9px] ml-[10px] tracking-[1px]">{{ groupName }}</div>
         <div
-          class="flex h-[15px] w-[14px] items-center justify-center rounded-[2px] bg-[#41b883] text-white"
+          class="mr-[3px] flex h-[15px] w-[13.5px] items-center justify-center rounded-[3px] bg-[#41b883] text-[10px] text-white"
         >
           S
         </div>
-        <div>香港 03</div>
+        <div class="ml-[7px] text-[13px]">{{ selectedProxy }}</div>
       </div>
-      <div class="flex items-center">
-        <ToolTip dark tip="Scroll to selected proxy" top>
-          <span class="material-icons a">travel_explore</span>
+      <div class="flex items-center justify-center">
+        <ToolTip dark tip="Scroll to selected proxy" top v-if="isShow">
+          <span class="material-icons">travel_explore</span>
         </ToolTip>
         <ToolTip dark tip="Show/Hide timed-out proxies" top>
-          <span class="material-icons a">report</span>
+          <span class="material-icons">report</span>
         </ToolTip>
         <ToolTip dark tip="Test latency" top>
-          <span class="material-icons a">network_check</span>
+          <span class="material-icons">network_check</span>
         </ToolTip>
-        <ToolTip dark left tip="Show/hide proxies">
-          <span class="material-icons a">visibility_off</span>
-        </ToolTip>
-        <ToolTip dark left tip="Show/hide proxies">
-          <span class="material-icons a">visibility</span>
-        </ToolTip>
+        <div v-if="groupName !== 'GLOBAL'">
+          <ToolTip dark left tip="Show/hide proxies" v-if="!isShow">
+            <span class="material-icons">visibility_off</span>
+          </ToolTip>
+          <ToolTip dark left tip="Show/hide proxies" v-if="isShow">
+            <span class="material-icons">visibility</span>
+          </ToolTip>
+        </div>
       </div>
     </div>
-    <div class="ml-[36px] flex flex-1 flex-wrap overflow-y-auto" v-if="isShow">
+    <div
+      class="ml-[36px] flex flex-1 flex-wrap overflow-y-auto"
+      v-if="isShow || groupName === 'GLOBAL'"
+    >
       <div
-        v-for="item in obj.providers[groupName].proxies"
+        v-for="item in providers?.proxies"
         :key="item.id"
-        class="proxies-item"
+        class="mr-[12px] mb-[8px] flex h-[56px] cursor-pointer items-center justify-center"
         @click="selectProxy(item.name)"
       >
-        <div class="select" :class="{ selected: item.name === selectedProxy }" />
+        <div
+          class="mr-[4px] h-[56px] w-[4px] cursor-pointer bg-[#dedede]"
+          :class="{ selected: item.name === selectedProxy }"
+        />
 
-        <div class="info">
-          <div class="left">
+        <div class="flex h-[56px] w-[382px] cursor-pointer justify-between bg-[#f4f4f4]">
+          <div class="ml-[15px] flex flex-col justify-center">
             <div>{{ item.name }}</div>
-            <div class="protocol" style="display: flex">
-              <div class="type">
+            <div class="flex">
+              <div class="text-[0.6em] text-[#808080]">
                 {{ item.type }}
               </div>
-              <div class="udp" v-if="item.udp">UDP</div>
+              <div
+                class="ml-[6px] flex h-[16px] w-[28px] items-center justify-center rounded-[3px] border-[1px] border-solid border-[#d5d5d5] text-[0.3em] text-[#808080]"
+                v-if="item.udp"
+              >
+                UDP
+              </div>
             </div>
           </div>
-          <div class="right">check</div>
+          <div class="mr-[15px] flex items-center" @click="delay(encodeURIComponent(item.name))">
+            check
+          </div>
         </div>
       </div>
       <div class="h-[30px] bg-pink-500"></div>
@@ -81,141 +102,10 @@ function selectProxy(proxy) {
 <style scoped>
 .material-icons {
   font-size: 16px;
+  @apply flex h-[30px] w-[30px] items-center justify-center rounded-[5px] hover:bg-[#d6d6d6];
 }
 
-/*.top-info {*/
-/*  height: 44px;*/
-/*  box-sizing: border-box;*/
-/*  display: flex;*/
-/*  justify-content: space-between;*/
-/*  align-items: center;*/
-/*  margin: 0 30px 4px;*/
-/*  position: sticky;*/
-/*  top: 0;*/
-/*  padding: 15px;*/
-/*  border-radius: 5px;*/
-/*  background-color: #fff;*/
-
-.proxy {
-  /*display: flex;*/
-  /*align-items: center;*/
-
-  /*.type {*/
-  /*  background-color: #41b883;*/
-  /*  color: #fff;*/
-  /*  width: 14px;*/
-  /*  height: 15px;*/
-  /*  box-sizing: border-box;*/
-  /*  border-radius: 2px;*/
-  /*  justify-content: center;*/
-  /*  align-items: center;*/
-  /*  display: flex;*/
-  /*  !*padding: 4px;*!*/
-  /*}*/
-
-  /*}*/
-
-  .proxy > div {
-    margin: 0 5px;
-  }
-
-  .icon {
-    display: flex;
-    align-items: center;
-  }
-
-  /*.icon > span {*/
-
-  .a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 30px;
-    width: 30px;
-    box-sizing: border-box;
-    border-radius: 5px;
-  }
-
-  /*.icon > span:hover {*/
-
-  .a:hover {
-    background-color: #d6d6d6;
-  }
-}
-
-.top-info:hover {
-  background-color: #f1f1f1;
-}
-
-.proxies-view {
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: 36px;
-  height: 100%;
-  /*position: relative;*/
-}
-
-.proxies-item {
-  margin-bottom: 8px;
-  margin-right: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 56px;
-  cursor: pointer;
-
-  .select {
-    height: 56px;
-    width: 4px;
-    background-color: #dedede;
-    margin-right: 4px;
-    cursor: pointer;
-  }
-
-  .selected {
-    background-color: #41b883;
-  }
-
-  .info {
-    width: 382px;
-    /*min-width: 287px;*/
-    background-color: #f4f4f4;
-    height: 56px;
-    display: flex;
-    justify-content: space-between;
-    /*align-content: center;*/
-    cursor: pointer;
-
-    .left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-left: 15px;
-    }
-
-    .right {
-      display: flex;
-      align-items: center;
-      margin-right: 15px;
-    }
-  }
-}
-.type {
-  color: #808080;
-  font-size: 0.6em;
-}
-
-.udp {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  height: 16px;
-  width: 28px;
-  color: #808080;
-  font-size: 0.3em;
-  border-radius: 3px;
-  border: 1px solid #d5d5d5;
-  margin-left: 6px;
+.selected {
+  background-color: #41b883;
 }
 </style>

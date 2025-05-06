@@ -1,20 +1,6 @@
 <script setup>
 import SideMenu from '/src/components/SideMenu.vue'
 import WindowBar from '@/components/WindowBar.vue'
-import { onMounted } from 'vue'
-import { getProviders, getProxies } from '@/api/proxies.js'
-import { useProxiesStore } from '@/stores/proxies/proxies.js'
-import { storeToRefs } from 'pinia'
-
-const { proxies, providers } = storeToRefs(useProxiesStore())
-onMounted(() => {
-  getProxies().then((res) => {
-    proxies.value = res.proxies
-  })
-  getProviders().then((res) => {
-    providers.value = res.providers
-  })
-})
 </script>
 
 <template>

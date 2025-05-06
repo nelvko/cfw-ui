@@ -10,7 +10,6 @@ const fullState = computed(() => {
 })
 
 const { titleBarText } = storeToRefs(useSettingsStore())
-console.log(123, titleBarText)
 </script>
 
 <template>

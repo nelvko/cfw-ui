@@ -3,6 +3,7 @@ import { onActivated, onDeactivated, onUnmounted, ref } from 'vue'
 import DirectMode from '@/components/mode/DirectMode.vue'
 import TopInfo from '@/components/TopInfo.vue'
 import ProxyMode from '@/components/mode/ProxyMode.vue'
+import { getMode, updateMode } from '@/api/configs.js'
 
 onUnmounted(() => {
   console.log('unmounted')
@@ -14,17 +15,20 @@ onDeactivated(() => {
   console.log('onDeactivated')
 })
 const modeList = [
-  { name: 'Global', icon: 'merge' },
-  { name: 'Rule', icon: 'alt_route' },
-  { name: 'Direct', icon: 'north' },
+  { name: 'Global', value: 'global', icon: 'merge' },
+  { name: 'Rule', value: 'rule', icon: 'alt_route' },
+  { name: 'Direct', value: 'direct', icon: 'north' },
   { name: 'Script', icon: 'alt_route' },
 ]
 
-const modeIndex = ref(0)
+const activeMode = ref(null)
+getMode().then((mode) => {
+  activeMode.value = mode
+})
 
-function switchMode(index) {
-  modeIndex.value = index
-  console.log(modeIndex.value)
+async function switchMode(val) {
+  await updateMode(val)
+  activeMode.value = await getMode()
 }
 </script>
 
@@ -34,9 +38,9 @@ function switchMode(index) {
       <div
         v-for="(item, index) in modeList"
         :key="index"
-        :class="{ modeActive: modeIndex === index }"
-        class="mode-item"
-        @click="switchMode(index)"
+        :class="{ 'active-mode': activeMode === item.value }"
+        class="mx-[20px] flex h-[40px] w-[120px] cursor-pointer items-center justify-center rounded-[5px] text-[16px] text-[#747474] shadow"
+        @click="switchMode(item.name)"
       >
         <div>{{ item.name }}</div>
         <span class="material-icons">{{ item.icon }}</span>
@@ -46,51 +50,20 @@ function switchMode(index) {
       class="mt-[8px] flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]"
       id="proxies"
     >
-      <ProxyMode v-if="[0, 1, 3].includes(modeIndex)" />
-      <DirectMode v-if="modeIndex === 2" />
+      <DirectMode v-if="activeMode === 'direct'" />
+      <ProxyMode v-else :mode="activeMode" />
     </div>
   </div>
 </template>
 
 <style scoped>
-.side {
-  position: absolute;
-  right: 0;
-}
-
 .material-icons {
   transform: rotate(90deg);
   margin-left: 7px;
 }
 
-.mode-item {
-  margin: 0 20px;
-  border-radius: 5px;
-  font-size: 16px;
-  box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 120px;
-  color: #747474;
-  cursor: pointer;
-}
-
-.mode-item * {
-  cursor: pointer;
-}
-
-.modeActive {
+.active-mode {
   background-color: #4c4b4b;
   color: #fff;
 }
-
-/*.view {*/
-/*  flex-grow: 1;*/
-/*  !*height: 100%;*!*/
-/*  overflow-y: auto;*/
-/*  position: relative;*/
-/*  !*padding-bottom: 70px*!*/
-/*}*/
 </style>

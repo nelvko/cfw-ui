@@ -1,12 +1,5 @@
 <script setup>
 import TopInfo from '@/components/TopInfo.vue'
-import SettingItem from '@/components/SettingItem.vue'
-import OptionItem from '@/components/OptionItem.vue'
-import ToolTip from '@/components/ToolTip.vue'
-import { ref } from 'vue'
-import SwitchOption from '@/components/SwitchOption.vue'
-import GeneralItem from '@/components/settings/GeneralItem.vue'
-import SecurityItem from '@/components/settings/SecurityItem.vue'
 import AppearanceItem from '@/components/settings/AppearanceItem.vue'
 </script>
 

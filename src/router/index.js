@@ -77,7 +77,7 @@ router.beforeEach(async (to) => {
   const { loginInfo } = storeToRefs(useLoginStore())
   // console.log(999, loginInfo.value)
 
-  if (!loginInfo.value && to.name !== 'Login') {
+  if (!loginInfo.value?.host && to.name !== 'Login') {
     return { name: 'Login' }
   }
 })

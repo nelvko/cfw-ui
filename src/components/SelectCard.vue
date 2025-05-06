@@ -1,7 +1,15 @@
-<script setup></script>
+<script setup>
+import { getDelay } from '@/api/proxies.js'
+
+function delay(name) {
+  getDelay(name).then((res) => {
+    console.log(111, res.data)
+  })
+}
+</script>
 
 <template>
-  <div class="proxies-item" @click="selectProxy(item.name)">
+  <div class="proxies-item">
     <div class="select" :class="{ selected: item.name === selectedProxy }" />
     <div class="info">
       <div class="left">
@@ -13,7 +21,7 @@
           <div class="udp" v-if="item.udp">UDP</div>
         </div>
       </div>
-      <div class="right">check</div>
+      <div class="right" @click="delay(item.name)">{{ 'check' }}</div>
     </div>
   </div>
 </template>

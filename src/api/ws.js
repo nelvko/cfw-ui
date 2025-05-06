@@ -2,7 +2,7 @@ import { useLoginStore } from '@/stores/login/index.js'
 import { storeToRefs } from 'pinia'
 
 const { loginInfo } = storeToRefs(useLoginStore())
-const { host, secret } = loginInfo
+const { host, secret } = loginInfo.value
 
 export const connections = new WebSocket(`ws://${host}/connections?token=${secret}`)
 export const logs = new WebSocket(`ws://${host}/logs?token=${secret}`)

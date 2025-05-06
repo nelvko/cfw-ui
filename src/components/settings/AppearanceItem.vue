@@ -1,10 +1,9 @@
 <script setup>
 import OptionItem from '@/components/OptionItem.vue'
-import ToolTip from '@/components/ToolTip.vue'
 import SettingItem from '@/components/SettingItem.vue'
 import SwitchOption from '@/components/SwitchOption.vue'
-import { useSettingsStore } from '@/stores/settings.js'
 import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settings/settings.js'
 
 const { titleBarText } = storeToRefs(useSettingsStore())
 </script>
@@ -25,7 +24,7 @@ const { titleBarText } = storeToRefs(useSettingsStore())
     <OptionItem label="Title Bar Text">
       <template #left> </template>
       <template #right>
-        <input type="text" v-model.lazy="titleBarText" />
+        <input type="text" v-model="titleBarText" />
       </template>
     </OptionItem>
   </SettingItem>

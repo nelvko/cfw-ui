@@ -4,22 +4,24 @@
 // Disconnected
 import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
-import { getConfig, getTraffic, getVersion } from '@/api/common.js'
+import { getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
+import { getConfig } from '@/api/configs.js'
+
+const version = ref({})
 
 onMounted(() => {
   getTraffic().then((res) => {
     console.log(res)
   })
   getVersion().then((res) => {
-    version.value = res
+    version.value = res.data
   })
   getConfig().then((res) => {
-    config.value = res
+    config.value = res.data
   })
 })
 
-const version = ref({})
 const config = ref({})
 const allowLanInfo = ref(
   `Turn on to listen on all interfaces by\n

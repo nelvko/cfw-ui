@@ -1,10 +1,35 @@
 <script setup>
 import ProxyGroups from '@/components/mode/ProxyGroups.vue'
+import { ref } from 'vue'
+import { getGroupList, getProviders, getProxies } from '@/api/proxies.js'
+
+defineProps({
+  mode: String,
+})
+const providers = ref([])
+getProxies()
+getProviders().then((res) => {
+  // providers.value = Object.entries(res.data.providers).reverse()
+  providers.value = Object.entries(res.data.providers).reverse()
+})
+getGroupList().then((res) => {
+  console.log(res.data)
+})
 </script>
 
 <template>
-  <ProxyGroups group-name="default" />
-  <ProxyGroups group-name="default" />
+  <ProxyGroups
+    v-if="mode === 'global'"
+    :group-name="mode.toUpperCase()"
+    :providers="providers.at(-1)[1]"
+  />
+  <ProxyGroups
+    v-else
+    v-for="(item, index) in providers.slice(0, -1)"
+    :key="index"
+    :group-name="item[0]"
+    :providers="item[1]"
+  />
 </template>
 
 <style scoped></style>

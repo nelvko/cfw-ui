@@ -1,8 +1,8 @@
 <script setup>
-import { computed, onActivated, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { computed, onActivated, ref, useTemplateRef } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
 import { logs } from '@/api/ws.js'
-import { getConfig } from '@/api/common.js'
+import { getMode } from '@/api/configs.js'
 
 const isSimple = ref(true)
 const isInfo = ref(true)
@@ -44,8 +44,8 @@ function onMessage({ data, timeStamp }) {
 
 onActivated(() => {
   console.log('onActivated')
-  getConfig().then((config) => {
-    mode.value = config.mode
+  getMode().then((mode) => {
+    mode.value = mode
   })
   isStop.value = false
 
