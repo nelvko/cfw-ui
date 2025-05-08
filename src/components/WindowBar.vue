@@ -13,32 +13,21 @@ const { titleBarText } = storeToRefs(useSettingsStore())
 </script>
 
 <template>
-  <div class="relative flex h-6 flex-none items-center justify-center bg-[#ebebeb]">
+  <div class="relative flex h-[25px] flex-none items-center justify-center bg-[#ebebeb]">
     <div class="text-[12px]">{{ titleBarText }}</div>
     <div class="absolute right-0 flex h-full items-center justify-center">
-      <span
-        class="material-icons light-blue-grey"
-        @click="isKeep = !isKeep"
-        :class="{ keepActive: isKeep }"
+      <span class="material-icons" @click="isKeep = !isKeep" :class="{ keepActive: isKeep }"
         >push_pin</span
       >
-      <span class="material-icons light-blue-grey">remove</span>
-      <span class="material-icons light-blue-grey" @click="isFull = !isFull">{{ fullState }} </span>
-      <span class="material-icons light-blue-grey close">close</span>
+      <span class="material-icons">remove</span>
+      <span class="material-icons" @click="isFull = !isFull">{{ fullState }} </span>
+      <span class="material-icons hover:!bg-[#fc6868]">close</span>
     </div>
   </div>
 </template>
 
 <style scoped>
 .material-icons {
-  font-variation-settings:
-    'FILL' 1,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 20;
-}
-
-.light-blue-grey {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,15 +38,13 @@ const { titleBarText } = storeToRefs(useSettingsStore())
   line-height: 100%;
   height: 100%;
 }
-.light-blue-grey:hover {
-  background-color: #c6c6c6;
-}
 
-.close:hover {
-  background-color: #fc6868;
+.material-icons:hover {
+  background-color: #c6c6c6;
 }
 
 .keepActive {
   color: #0c7d9d;
+  gap: 1px;
 }
 </style>

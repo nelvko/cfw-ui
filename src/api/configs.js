@@ -8,5 +8,11 @@ export const reloadConfig = () => http.put('/configs?force=true')
 export const updateConfig = (data) => http.patch('/configs', data)
 
 export const updateMode = (mode) => axios.patch(`/configs`, { mode })
+export const updateLogLevel = (level) => axios.patch(`/configs`, { 'log-level': level })
+export const updateAllowLan = (val) => {
+  console.log('before', val)
 
-export const getMode = () => getConfig().then((res) => res.data.mode)
+  return axios.patch(`/configs`, { 'allow-lan': val })
+}
+
+export const getMode = () => getConfig().then((data) => data.mode)

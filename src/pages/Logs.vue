@@ -1,9 +1,8 @@
 <script setup>
-import { computed, onActivated, ref, useTemplateRef } from 'vue'
+import { computed, onActivated, ref, useTemplateRef, watch, watchEffect } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
 import { logs } from '@/api/ws.js'
 import { getMode } from '@/api/configs.js'
-
 const isSimple = ref(true)
 const isInfo = ref(true)
 const logList = ref([])
@@ -29,7 +28,7 @@ function parseLogLine(log) {
   return result
 }
 
-const mode = ref(null)
+const activeMode = ref(null)
 
 function onMessage({ data, timeStamp }) {
   const { payload, type } = JSON.parse(data)
@@ -45,7 +44,7 @@ function onMessage({ data, timeStamp }) {
 onActivated(() => {
   console.log('onActivated')
   getMode().then((mode) => {
-    mode.value = mode
+    activeMode.value = mode
   })
   isStop.value = false
 
@@ -55,18 +54,18 @@ onActivated(() => {
   }
 })
 
-function switchLogSimple() {
+function switchSimple() {
   isSimple.value = !isSimple.value
   if (isSimple.value) {
-    showLAddrList.value.length = 0
+    detailIdList.value.length = 0
   } else {
     logList.value.forEach((item) => {
-      showLAddrList.value.push(item.id)
+      detailIdList.value.push(item.id)
     })
   }
 }
 
-function switchLogInfo() {
+function switchInfo() {
   isInfo.value = !isInfo.value
 }
 
@@ -82,7 +81,7 @@ function formatTimeStamp(timeStamp) {
   return formatter.format(timeStamp)
 }
 
-const showLAddrList = ref([])
+const detailIdList = ref([])
 const isStop = ref(false)
 
 function stopLog() {
@@ -94,25 +93,29 @@ function stopLog() {
   }
 }
 
-function changeShowLAddrList(id) {
-  const index = showLAddrList.value.indexOf(id)
+function showDetail(id) {
+  const index = detailIdList.value.indexOf(id)
   if (index === -1) {
-    showLAddrList.value.push(id)
+    detailIdList.value.push(id)
   } else {
-    showLAddrList.value.splice(index, 1)
+    detailIdList.value.splice(index, 1)
   }
 }
 
 const keyword = ref('')
 
-// watch(keyword.value, (newVal) => {})
-const filterLogList = computed(() => {
-  const a = logList.value.filter(
+const filterLogList = computed(() =>
+  logList.value.filter(
     (item) => item.type === 'info' && isInfo.value && item.raw.match(keyword.value)
   )
-  console.log(a)
-
-  return a
+)
+watch(keyword, (newValue) => {
+  filterLogList.value.forEach((item) => {
+    detailIdList.value.push(item.id)
+  })
+  if (!newValue) {
+    detailIdList.value.length = 0
+  }
 })
 </script>
 
@@ -121,18 +124,23 @@ const filterLogList = computed(() => {
     <TopInfo class="flex items-center">
       <div class="ml-[21px] whitespace-nowrap">
         <div class="text-[20px]">Request Logs</div>
-        <div>mode: {{ mode }}</div>
+        <div>mode: {{ activeMode }}</div>
       </div>
-      <input type="text" placeholder="Search" v-model="keyword" class="cursor-default" />
+      <input
+        type="text"
+        placeholder="Search"
+        v-model="keyword"
+        class="ml-[16px] h-[35px] flex-1 cursor-default rounded-lg pl-[12px]"
+      />
       <div class="button">
         <div class="level-group">
-          <div class="level" @click="switchLogSimple">
+          <div class="level" @click="switchSimple">
             <div class="simple" :class="{ blue: isSimple }" style="width: 46%">Simple</div>
             <div class="detailed" :class="{ blue: isSimple === false }" style="width: 54%">
               Detailed
             </div>
           </div>
-          <div class="level" @click="switchLogInfo">
+          <div class="level" @click="switchInfo">
             <div class="info duration-150 ease-linear" :class="{ blue: isInfo, infoLong: isInfo }">
               info
             </div>
@@ -153,14 +161,14 @@ const filterLogList = computed(() => {
     <div
       v-if="logList.length !== 0"
       ref="logsBox"
-      class="mr-[2px] flex flex-1 flex-col overflow-y-auto"
+      class="mr-[3px] flex flex-1 flex-col overflow-y-auto"
       id="logs"
     >
       <div
         v-for="item in filterLogList"
         :key="item.id"
-        class="height-[47px] mt-[2px] mr-[3px] !cursor-pointer border-b-[1px] border-b-[#eaeaea] pl-[20px]"
-        @click="changeShowLAddrList(item.id)"
+        class="height-[47px] mt-[2px] mr-[3px] cursor-pointer border-b-[1px] border-b-[#eaeaea] pl-[20px]"
+        @click="showDetail(item.id)"
       >
         <div class="flex justify-between" style="font-size: 12px">
           <span class="flex items-center justify-center">
@@ -178,7 +186,7 @@ const filterLogList = computed(() => {
           </span>
           <span class="text-[14px]">{{ item.data.rAddr }}</span>
         </div>
-        <div v-if="showLAddrList.includes(item.id)" class="flex">
+        <div v-if="detailIdList.includes(item.id)" class="flex">
           <div>
             <span class="text-[12px] text-[#045c85]">FROM</span>
             <span>-></span>
@@ -208,22 +216,6 @@ const filterLogList = computed(() => {
 </template>
 
 <style scoped>
-input {
-  padding-left: 12px;
-  border-radius: 5px;
-  flex: 1;
-  margin-left: 16px;
-  height: 35px;
-  line-height: 35px;
-  box-sizing: border-box;
-  border: 1px solid #dcdcdc;
-}
-
-input::placeholder {
-  color: #a3a3a3;
-  font-size: 16px;
-}
-
 .blue {
   background-color: #179bbb;
   flex: auto;

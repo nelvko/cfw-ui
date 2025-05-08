@@ -1,19 +1,16 @@
 <script setup>
 import ProxyGroups from '@/components/mode/ProxyGroups.vue'
+import { getProviders, getProxies } from '@/api/proxies.js'
 import { ref } from 'vue'
-import { getGroupList, getProviders, getProxies } from '@/api/proxies.js'
 
 defineProps({
   mode: String,
 })
 const providers = ref([])
 getProxies()
-getProviders().then((res) => {
+getProviders().then((data) => {
   // providers.value = Object.entries(res.data.providers).reverse()
-  providers.value = Object.entries(res.data.providers).reverse()
-})
-getGroupList().then((res) => {
-  console.log(res.data)
+  providers.value = Object.entries(data.providers).reverse()
 })
 </script>
 

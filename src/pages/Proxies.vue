@@ -47,7 +47,7 @@ async function switchMode(val) {
       </div>
     </TopInfo>
     <div
-      class="mt-[8px] flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]"
+      class="mt-[8px] mr-[3px] flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]"
       id="proxies"
     >
       <DirectMode v-if="activeMode === 'direct'" />

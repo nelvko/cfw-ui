@@ -21,7 +21,7 @@ instance.interceptors.request.use((config) => {
 })
 
 instance.interceptors.response.use(
-  (res) => res,
+  (res) => res.data,
   (res) => {
     console.log('响应拦截', res)
 

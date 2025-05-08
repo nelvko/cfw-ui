@@ -2,11 +2,12 @@
 //Loading...
 // 00:00:00
 // Disconnected
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
-import { getConfig } from '@/api/configs.js'
+import { getConfig, updateAllowLan, updateLogLevel } from '@/api/configs.js'
+import Model from '@/components/Model.vue'
 
 const version = ref({})
 
@@ -14,11 +15,11 @@ onMounted(() => {
   getTraffic().then((res) => {
     console.log(res)
   })
-  getVersion().then((res) => {
-    version.value = res.data
+  getVersion().then((data) => {
+    version.value = data
   })
-  getConfig().then((res) => {
-    config.value = res.data
+  getConfig().then((data) => {
+    config.value = data
   })
 })
 
@@ -83,12 +84,34 @@ function addRules() {
       break
   }
 }
+
+watch(
+  config,
+  () => {
+    console.log('watch')
+
+    getConfig().then((data) => {
+      Object.assign(config.value, data)
+    })
+  },
+  { immediate: true }
+)
+const isShowSwitchLogLevel = ref(false)
+const logLevelList = ['silent', 'error', 'warning', 'info', 'debug']
+
+async function changeLogLevel(level) {
+  await updateLogLevel(level)
+  isShowSwitchLogLevel.value = false
+}
+function changeAllowLan() {
+  updateAllowLan(!config.value['allow-lan'])
+}
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center">
+  <div class="flex flex-col items-center">
     <div class="flex items-center justify-center">
-      <img alt="logo" class="h-24" src="@/assets/Clash_Logo.png" />
+      <img alt="logo" class="h-[60px] w-[60px]" src="@/assets/clash-1.svg" />
       <div style="display: flex; align-items: baseline">
         <!--        快速重启软件-->
         <div class="cfw" @dblclick="reloadPage">Clash for Windows</div>
@@ -111,7 +134,11 @@ function addRules() {
           </ToolTip>
         </template>
       </OptionItem>
-      <OptionItem :label="$t('Allow LAN')" :value="config['allow-lan']">
+      <OptionItem
+        :label="$t('Allow LAN')"
+        :value="config['allow-lan']"
+        @click-value="changeAllowLan"
+      >
         <template #left>
           <ToolTip :tip="allowLanInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
@@ -126,7 +153,27 @@ function addRules() {
           </div>
         </template>
       </OptionItem>
-      <OptionItem label="Log Level" :value="config['allow-lan']" />
+      <OptionItem
+        label="Log Level"
+        :value="config['log-level']"
+        @click-value="isShowSwitchLogLevel = true"
+      />
+      <Model v-if="isShowSwitchLogLevel" to="#myId" @close="isShowSwitchLogLevel = false">
+        <div class="bg-white p-[20px]">
+          <h1>Change Log Level</h1>
+          <div>silent will prevent .log file to generate on next startup</div>
+          <div class="mt-4">
+            <button
+              class="mr-[10px] h-[35px] rounded-md bg-[#3e3c4d] px-[9px] text-white"
+              v-for="item in logLevelList"
+              :key="item"
+              @click="changeLogLevel(item)"
+            >
+              {{ item }}
+            </button>
+          </div>
+        </div>
+      </Model>
       <OptionItem label="IPv6" :value="config.ipv6" />
       <OptionItem :label="$t('Clash Core')" :value="clashCore">
         <template #left>
@@ -135,14 +182,14 @@ function addRules() {
               >gpp_maybe</span
             >
             <span
-              v-if="addRule === 1"
+              v-else-if="addRule === 1"
               class="material-icons icon-grey-bg animate-bounce text-[#2c3e50]"
             >
               edit
             </span>
             <span
               @click="addRules"
-              v-if="addRule === 2"
+              v-else-if="addRule === 2"
               class="material-icons icon-grey-bg text-[#41b883]"
             >
               gpp_good

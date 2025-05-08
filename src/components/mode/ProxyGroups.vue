@@ -18,8 +18,8 @@ function selectProxy(name) {
 }
 
 function delay(name) {
-  getDelay(name).then((res) => {
-    console.log(111, res.data)
+  getDelay(name).then((data) => {
+    console.log(111, data)
   })
 }
 </script>
@@ -49,14 +49,14 @@ function delay(name) {
         <ToolTip dark tip="Test latency" top>
           <span class="material-icons">network_check</span>
         </ToolTip>
-        <div v-if="groupName !== 'GLOBAL'">
+        <template v-if="groupName !== 'GLOBAL'">
           <ToolTip dark left tip="Show/hide proxies" v-if="!isShow">
             <span class="material-icons">visibility_off</span>
           </ToolTip>
           <ToolTip dark left tip="Show/hide proxies" v-if="isShow">
             <span class="material-icons">visibility</span>
           </ToolTip>
-        </div>
+        </template>
       </div>
     </div>
     <div

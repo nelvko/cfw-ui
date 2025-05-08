@@ -20,6 +20,7 @@ input {
 
 input::placeholder {
     color: #a3a3a3;
+    font-size: 16px;
 }
 .grey-bg {
     background-color: #F5F5F5;

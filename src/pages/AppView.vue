@@ -6,7 +6,7 @@ import WindowBar from '@/components/WindowBar.vue'
 <template>
   <div class="flex h-screen w-screen flex-col">
     <WindowBar />
-    <div class="flex flex-1 overflow-y-hidden">
+    <div class="relative flex flex-1 overflow-y-hidden" id="myId">
       <SideMenu />
       <div class="relative flex-1" id="app-view">
         <RouterView v-slot="{ Component }">

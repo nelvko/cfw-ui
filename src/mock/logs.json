@@ -1,4 +1,4 @@
-export default [
+[
   {
     type: 'info',
     payload:
@@ -65,9 +65,8 @@ export default [
     payload:
       '[TCP] connected lAddr=127.0.0.1:50675 rAddr=clients4.google.com:443 mode=rule rule=DomainKeyword(google) proxy=🍃 Proxies[台湾 03]',
   },
-  // {
-  //   type: 'info',
-  //   payload:
-  //     '[TCP] connected lAddr=127.0.0.1:50675 rAddr=clients4.google.com:443 mode=rule rule=DomainKeyword(google) proxy=🍃 Proxies[台湾 03]',
-  // },
+  {
+    type: 'info',
+    payload: '[TCP] connected lAddr=127.0.0.1:50675 rAddr=clients4.google.com:443 mode=rule rule=DomainKeyword(google) proxy=🍃 Proxies[台湾 03]',
+  },
 ]
