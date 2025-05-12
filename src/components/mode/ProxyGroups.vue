@@ -1,34 +1,59 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { getDelay, updateSelectedProxy } from '@/api/proxies.js'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ToolTip from '@/components/ToolTip.vue'
 import { useProxiesStore } from '@/stores/proxies/proxies.js'
-defineProps({
+
+const props = defineProps({
   groupName: String,
   providers: Object,
 })
 const { selectedProxy } = storeToRefs(useProxiesStore())
 
-const isShow = ref(false)
+const isHideProxies = ref(false)
 
 function selectProxy(name) {
   selectedProxy.value = name
   updateSelectedProxy(name)
 }
 
-function delay(name) {
-  getDelay(name).then((res) => {
-    console.log(111, res.data)
+function delay(proxy) {
+  getDelay(proxy.name).then((res) => {
+    const { delay, meanDelay } = res.data
+    if (!delay) proxy.timeout = true
+    proxy.delay = delay
   })
+}
+
+function networkStatus(proxy) {
+  if (proxy.timeout) return 'Timeout'
+  if (proxy.delay) return proxy.delay
+  return 'Check'
+}
+
+function networkCheck() {
+  props.providers.proxies.forEach(delay)
+}
+
+const filterList = computed(() =>
+  props.providers?.proxies.filter((proxy) => !isHideTimeoutProxies.value || !proxy.timeout),
+)
+const isHideTimeoutProxies = ref(false)
+
+function scrollToSelected() {
+  const a = filterList.value.findIndex((proxy) => {
+    return proxy.value === selectedProxy.value
+  })
+  console.log('a', a)
 }
 </script>
 
 <template>
   <div class="relative flex flex-col bg-white">
     <div
-      class="sticky top-0 mr-[20px] mb-[4px] ml-[30px] flex h-[44px] items-center justify-between rounded-[5px] bg-white pr-[10px] hover:bg-[#f1f1f1]"
-      @click="isShow = !isShow"
+      class="sticky top-0 mr-[20px] ml-[30px] flex h-[44px] items-center justify-between rounded-[5px] bg-white pr-[10px] hover:bg-[#f1f1f1]"
+      @click.self="isHideProxies = !isHideProxies"
     >
       <div class="flex items-center">
         <div class="mr-[9px] ml-[10px] tracking-[1px]">{{ groupName }}</div>
@@ -40,33 +65,34 @@ function delay(name) {
         <div class="ml-[7px] text-[13px]">{{ selectedProxy }}</div>
       </div>
       <div class="flex items-center justify-center">
-        <ToolTip dark tip="Scroll to selected proxy" top v-if="isShow">
-          <span class="material-icons">travel_explore</span>
+        <ToolTip dark tip="Scroll to selected proxy" top v-if="isHideProxies">
+          <span class="material-icons" @click="scrollToSelected">travel_explore</span>
         </ToolTip>
         <ToolTip dark tip="Show/Hide timed-out proxies" top>
-          <span class="material-icons">report</span>
+          <span class="material-icons" @click="isHideTimeoutProxies = !isHideTimeoutProxies"
+            >report</span
+          >
         </ToolTip>
         <ToolTip dark tip="Test latency" top>
-          <span class="material-icons">network_check</span>
+          <span class="material-icons" @click="networkCheck">network_check</span>
         </ToolTip>
         <template v-if="groupName !== 'GLOBAL'">
-          <ToolTip dark left tip="Show/hide proxies" v-if="!isShow">
-            <span class="material-icons">visibility_off</span>
-          </ToolTip>
-          <ToolTip dark left tip="Show/hide proxies" v-if="isShow">
-            <span class="material-icons">visibility</span>
+          <ToolTip dark left tip="Show/hide proxies">
+            <span class="material-icons" @click="isHideProxies = !isHideProxies">
+              {{ isHideProxies ? 'visibility' : 'visibility_off' }}</span
+            >
           </ToolTip>
         </template>
       </div>
     </div>
     <div
-      class="ml-[36px] flex flex-1 flex-wrap gap-x-[12px] gap-y-[8px] overflow-y-auto"
-      v-if="isShow || groupName === 'GLOBAL'"
+      class="ml-[36px] flex flex-1 flex-wrap gap-x-[12px] overflow-y-auto"
+      v-if="isHideProxies || groupName === 'GLOBAL'"
     >
       <div
-        v-for="item in providers?.proxies"
-        :key="item.id"
-        class="flex h-[56px] cursor-pointer items-center justify-center"
+        v-for="(item, index) in filterList"
+        :key="index"
+        class="my-[4px] flex h-[56px] cursor-pointer items-center justify-center"
         @click="selectProxy(item.name)"
       >
         <div
@@ -89,8 +115,12 @@ function delay(name) {
               </div>
             </div>
           </div>
-          <div class="mr-[15px] flex items-center" @click="delay(encodeURIComponent(item.name))">
-            check
+          <div
+            class="mr-[15px] flex items-center text-[12px]"
+            :class="{ good: item.delay, timeout: item.timeout }"
+            @click="delay(item)"
+          >
+            {{ networkStatus(item) }}
           </div>
         </div>
       </div>
@@ -107,5 +137,13 @@ function delay(name) {
 
 .selected {
   background-color: #41b883;
+}
+
+.good {
+  @apply text-[#41b883];
+}
+
+.timeout {
+  @apply text-[#ec0505];
 }
 </style>

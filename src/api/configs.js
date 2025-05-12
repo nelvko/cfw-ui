@@ -15,4 +15,4 @@ export const updateAllowLan = (val) => {
   return axios.patch(`/configs`, { 'allow-lan': val })
 }
 
-export const getMode = () => getConfig().then((data) => data.mode)
+export const getMode = () => getConfig().then((res) => res.data.mode)

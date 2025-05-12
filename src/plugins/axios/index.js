@@ -15,20 +15,17 @@ instance.interceptors.request.use((config) => {
   if (secret) {
     config.headers['Authorization'] = `Bearer ${secret}`
   }
-  console.log('请求拦截', config)
-
   return config
 })
 
 instance.interceptors.response.use(
   (res) => res,
   (res) => {
-    console.log('响应拦截', res)
-
     const { status } = res.response
     if (status === 401) {
-      router.push('/setup')
+      return router.push('/setup')
     }
+    return res.response
   },
 )
 

@@ -5,7 +5,8 @@ export const useSettingsStore = defineStore(
   'settings',
   () => {
     const titleBarText = ref('')
-    return { titleBarText }
+    const testLatency = ref({ url: 'http://www.gstatic.com/generate_204', timeout: 5000 })
+    return { titleBarText, testLatency }
   },
-  { persist: true }
+  { persist: true },
 )
