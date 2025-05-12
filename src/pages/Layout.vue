@@ -1,20 +1,20 @@
 <script setup>
-import SideMenu from '/src/components/SideMenu.vue'
 import WindowBar from '@/components/WindowBar.vue'
+import SideMenu from '@/components/SideMenu.vue'
 </script>
 
 <template>
   <div class="flex h-screen w-screen flex-col">
     <WindowBar />
-    <div class="relative flex flex-1 overflow-y-hidden" id="myId">
-      <SideMenu />
-      <div class="relative flex-1" id="app-view">
+    <div class="relative flex flex-1 overflow-y-hidden" id="layout">
+      <SideMenu id="aside" />
+      <main class="relative flex-1" id="main">
         <RouterView v-slot="{ Component }">
           <KeepAlive>
             <component :is="Component" />
           </KeepAlive>
         </RouterView>
-      </div>
+      </main>
     </div>
   </div>
 </template>

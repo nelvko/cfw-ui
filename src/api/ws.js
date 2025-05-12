@@ -1,8 +1,8 @@
-import { useLoginStore } from '@/stores/login/index.js'
+import { useSetupStore } from '@/stores/setup/index.js'
 import { storeToRefs } from 'pinia'
 
-const { loginInfo } = storeToRefs(useLoginStore())
-const { host, secret } = loginInfo.value
+const { setupInfo } = storeToRefs(useSetupStore())
+const { host, secret } = setupInfo.value
 
 export const connections = new WebSocket(`ws://${host}/connections?token=${secret}`)
 export const logs = new WebSocket(`ws://${host}/logs?token=${secret}`)

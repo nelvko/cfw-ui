@@ -18,8 +18,8 @@ function selectProxy(name) {
 }
 
 function delay(name) {
-  getDelay(name).then((data) => {
-    console.log(111, data)
+  getDelay(name).then((res) => {
+    console.log(111, res.data)
   })
 }
 </script>
@@ -60,13 +60,13 @@ function delay(name) {
       </div>
     </div>
     <div
-      class="ml-[36px] flex flex-1 flex-wrap overflow-y-auto"
+      class="ml-[36px] flex flex-1 flex-wrap gap-x-[12px] gap-y-[8px] overflow-y-auto"
       v-if="isShow || groupName === 'GLOBAL'"
     >
       <div
         v-for="item in providers?.proxies"
         :key="item.id"
-        class="mr-[12px] mb-[8px] flex h-[56px] cursor-pointer items-center justify-center"
+        class="flex h-[56px] cursor-pointer items-center justify-center"
         @click="selectProxy(item.name)"
       >
         <div

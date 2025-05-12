@@ -2,69 +2,68 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { i18n } from '@/plugins/i18n/index.js'
 import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useLoginStore } from '@/stores/login/index.js'
+import { useSetupStore } from '@/stores/setup/index.js'
 
 const { t, locale } = i18n.global
 
 const routes = [
   {
     path: '/',
-    name: 'AppView',
+    component: () => import('@/pages/Layout.vue'),
     redirect: '/general',
-    component: () => import('@/pages/AppView.vue'),
     children: [
       {
         path: 'general',
         name: 'General',
         component: () => import('@/pages/General.vue'),
-        meta: { title: 'General' },
+        meta: { title: 'General', requiresAuth: true },
       },
       {
         path: 'proxies',
         name: 'Proxies',
         component: () => import('@/pages/Proxies.vue'),
-        meta: { title: 'Proxies' },
+        meta: {
+          title: 'Proxies',
+          requiresAuth: true,
+        },
       },
       {
         path: 'profiles',
         name: 'Profiles',
         component: () => import('@/pages/Profiles.vue'),
-        meta: { title: 'Profiles' },
+        meta: { title: 'Profiles', requiresAuth: true },
       },
       {
         path: 'logs',
         name: 'Logs',
         component: () => import('@/pages/Logs.vue'),
-        meta: { title: 'Logs' },
+        meta: { title: 'Logs', requiresAuth: true },
       },
       {
         path: 'connections',
         name: 'Connections',
         component: () => import('@/pages/Connections.vue'),
-        meta: { title: 'Connections' },
+        meta: { title: 'Connections', requiresAuth: true },
       },
       {
         path: 'settings',
         name: 'Settings',
         component: () => import('@/pages/Settings.vue'),
-        meta: { title: 'Settings' },
+        meta: { title: 'Settings', requiresAuth: true },
       },
       {
         path: 'feedback',
         name: 'Feedback',
         component: () => import('@/pages/Feedback.vue'),
-        meta: { title: 'Feedback' },
+        meta: { title: 'Feedback', requiresAuth: true },
       },
     ],
   },
   {
-    path: '/login',
-    name: 'Login',
-    meta: {
-      requiresAuth: false,
-      title: 'login',
-    },
-    component: () => import('@/pages/Login.vue'),
+    path: '/setup',
+    name: 'Setup',
+    component: () => import('@/pages/Setup.vue'),
+    meta: { requiresAuth: false, title: 'Setup' },
   },
 ]
 
@@ -74,11 +73,9 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const { loginInfo } = storeToRefs(useLoginStore())
-  // console.log(999, loginInfo.value)
-
-  if (!loginInfo.value?.host && to.name !== 'Login') {
-    return { name: 'Login' }
+  const { setupInfo } = storeToRefs(useSetupStore())
+  if (!setupInfo.value?.host && to.name !== 'Setup') {
+    return { name: 'Setup' }
   }
 })
 

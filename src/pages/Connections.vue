@@ -3,9 +3,9 @@ import TopInfo from '@/components/TopInfo.vue'
 import GreyButton from '@/components/GreyButton.vue'
 import { computed, onActivated, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
-import { connections } from '@/api/ws.js'
 import ToolTip from '@/components/ToolTip.vue'
 import { closeAllConnections, closeConnection } from '@/api/common.js'
+import { connections } from '@/api/ws.js'
 
 const isPause = ref(false)
 const connectionList = ref([])
@@ -48,7 +48,7 @@ function switchPause() {
     <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
       <div class="my-[8px] flex">
         <div class="mr-[5px] text-[18px]">Connections</div>
-        <input placeholder="Search" type="text" class="cursor-default" />
+        <input placeholder="Search" type="text" class="flex-1 cursor-default" />
         <div class="flex items-center">
           <span>Total:</span>
           <span class="material-icons up">straight</span>
@@ -58,7 +58,7 @@ function switchPause() {
         </div>
       </div>
       <div class="flex justify-between">
-        <div class="flex">
+        <div class="flex gap-x-[5px]">
           <ToolTip dark tip="Upload Speed" top>
             <GreyButton>
               <span class="material-icons">upload</span>
@@ -110,10 +110,18 @@ function switchPause() {
       </div>
     </TopInfo>
     <div class="mr-[2px] flex flex-1 flex-col overflow-y-auto">
-      <div v-for="item in connectionList" :key="item.id" class="connection">
-        <div class="left">
-          <div>{{ item.metadata.host }}:{{ item.metadata.destinationPort }}</div>
-          <div class="metadata">
+      <div
+        v-for="item in connectionList"
+        :key="item.id"
+        class="ml-[20px] flex h-[50px] items-center justify-between border-b border-b-[#ededed]"
+      >
+        <div class="flex flex-col justify-center">
+          <div class="text-[14px]">
+            {{ item.metadata.host }}:{{ item.metadata.destinationPort }}
+          </div>
+          <div
+            class="pb-[3px] text-[12px] *:mr-[5px] *:h-[20.5px] *:rounded-[3px] *:px-[4px] *:py-[1px] *:text-white"
+          >
             <span class="bg-[#ce8647]">{{ item.metadata.network.toUpperCase() }}</span>
             <span class="bg-[#cf9f46]">{{ item.metadata.type }}</span>
             <span class="bg-[#75ab5b]">{{ item.chains[0] }}</span>
@@ -123,6 +131,7 @@ function switchPause() {
         <span
           class="material-icons"
           style="margin-right: 23px; color: #333333"
+          v-show="!isPause"
           @click="closeConnection(item.id)"
         >
           block
@@ -133,30 +142,6 @@ function switchPause() {
 </template>
 
 <style scoped>
-.metadata {
-  padding-bottom: 3px;
-}
-.metadata > span {
-  color: white;
-  height: 20.5px;
-  margin-right: 5px;
-  font-size: 12px;
-  line-height: 21px;
-  padding: 1px 4px;
-  box-sizing: border-box;
-  border-radius: 4px;
-}
-
-.connection {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-  border-bottom: 1px solid #ededed;
-  margin-left: 20px;
-}
-
 .pause,
 .close-all,
 .resume {
@@ -183,9 +168,5 @@ function switchPause() {
 
 .resume {
   background-color: #179bbb;
-}
-
-input {
-  flex: 1;
 }
 </style>

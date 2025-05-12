@@ -12,7 +12,9 @@ body {
     padding: 0;
     
 }
-
+button {
+  cursor: pointer;
+}
 input {
     outline: none;
     border: 1px solid #dcdcdc;

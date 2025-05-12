@@ -2,8 +2,8 @@
 import { getDelay } from '@/api/proxies.js'
 
 function delay(name) {
-  getDelay(name).then((data) => {
-    console.log(111, data)
+  getDelay(name).then((res) => {
+    console.log(111, res.data)
   })
 }
 </script>

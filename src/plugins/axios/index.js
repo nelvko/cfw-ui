@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useLoginStore } from '@/stores/login/index.js'
+import { useSetupStore } from '@/stores/setup/index.js'
 
-const { loginInfo } = storeToRefs(useLoginStore())
-const { host, secret } = loginInfo.value
+const { setupInfo } = storeToRefs(useSetupStore())
+const { host, secret } = setupInfo.value
 const router = useRouter()
 const instance = axios.create({
   timeout: 10000,
@@ -21,15 +21,15 @@ instance.interceptors.request.use((config) => {
 })
 
 instance.interceptors.response.use(
-  (res) => res.data,
+  (res) => res,
   (res) => {
     console.log('响应拦截', res)
 
     const { status } = res.response
     if (status === 401) {
-      router.push('/login')
+      router.push('/setup')
     }
-  }
+  },
 )
 
 export default instance

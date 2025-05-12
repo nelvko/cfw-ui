@@ -1,27 +1,26 @@
 <script setup>
 import { ref } from 'vue'
-import { login } from '@/api/common.js'
 import { useRouter } from 'vue-router'
-import { useLoginStore } from '@/stores/login/index.js'
+import { useSetupStore } from '@/stores/setup/index.js'
 import { storeToRefs } from 'pinia'
-
-const { loginInfo } = storeToRefs(useLoginStore())
+import { setup } from '@/api/common.js'
+const { setupInfo } = storeToRefs(useSetupStore())
 const router = useRouter()
 const failMsg = ref('')
-const loginData = ref({ host: '127.0.0.1:9090', secret: '' })
+const loginData = ref({ host: '', secret: '' })
 function submit() {
-  if (!loginData.value) {
+  if (!setupInfo.value) {
     alert('请填写host')
   }
-  login(loginData.value)
+  setup(setupInfo.value)
     .then((res) => {
-      loginInfo.value = loginData.value
+      setupInfo.value = loginData.value
       router.push('/')
     })
     .catch((err) => {
       console.log(err)
 
-      // loginInfo.value = null
+      // setupInfo.value = null
       failMsg.value = 'Failed to connect'
     })
 }
@@ -33,16 +32,17 @@ function submit() {
     <div>
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
-          主机：
+          {{ $t('Host') }}
           <input v-model="loginData.host" placeholder="" type="text" @focus="failMsg = ''" />
           <span class="text-[#f56363]">{{ failMsg }}</span>
         </label>
         <label>
-          密码：
+          {{ $t('Secret') }}
           <input type="password" v-model="loginData.secret" />
         </label>
         <button type="submit" class="bg-cyan-600 text-white">提交</button>
       </form>
+      <div>中文|English</div>
     </div>
   </div>
 </template>

@@ -1,4 +1,7 @@
 {
+  "Host": "主机",
+  "Secret": "密钥",
+  "Port" : "端口",
   "General": "常规",
   "Proxies": "代理",
   "Profiles": "配置",

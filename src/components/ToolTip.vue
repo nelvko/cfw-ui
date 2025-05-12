@@ -25,22 +25,6 @@ defineProps({
 </script>
 
 <style scoped>
-.msg {
-  z-index: 99999;
-  visibility: hidden;
-  opacity: 0;
-  font-size: 12px;
-  border-radius: 3px;
-  position: absolute;
-  height: 19px;
-}
-
-/*.a:hover .msg {*/
-/*  visibility: visible;*/
-/*  pointer-events: none; !* 防止隐藏时被误点 *!*/
-/*  opacity: 1;*/
-/*}*/
-
 /*✅*/
 .top {
   bottom: calc(100% + 5px);

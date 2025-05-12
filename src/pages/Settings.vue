@@ -7,10 +7,10 @@ import AppearanceItem from '@/components/settings/AppearanceItem.vue'
   <div class="flex h-full flex-col overflow-y-hidden">
     <TopInfo class="flex items-center justify-between px-[20px]">
       <div class="text-[20px]">Settings</div>
-      <div class="btn">
-        <span>Reset All Settings</span>
-        <span>Force Quit</span>
-        <span>Quit</span>
+      <div>
+        <button>Reset All Settings</button>
+        <button>Force Quit</button>
+        <button>Quit</button>
       </div>
     </TopInfo>
     <div class="flex-1 overflow-y-auto px-6">
@@ -26,7 +26,7 @@ import AppearanceItem from '@/components/settings/AppearanceItem.vue'
   --spacing: 0.25rem;
 }
 
-.btn > span {
+button {
   color: #fa1313;
   background-color: #f1f1f1;
   height: 31px;

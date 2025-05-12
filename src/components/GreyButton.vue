@@ -1,27 +1,11 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-  <div class="button">
-    <slot/>
+  <div
+    class="flex h-[28px] w-[65px] items-center justify-center rounded-[3px] bg-[#b1b1b1] text-white"
+  >
+    <slot />
   </div>
 </template>
 
-<style scoped>
-.button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #b1b1b1;
-    height: 28PX;
-    width: 65px;
-    box-sizing: border-box;
-    margin-right: 5px;
-    color: white;
-    border-radius: 3px;
-}
-.active{
-    background-color: #1ebc4d;
-}
-</style>
+<style scoped></style>

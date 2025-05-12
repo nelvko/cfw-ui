@@ -2,12 +2,13 @@
 //Loading...
 // 00:00:00
 // Disconnected
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
-import { getConfig, updateAllowLan, updateLogLevel } from '@/api/configs.js'
+import { getConfig, updateAllowLan, updateConfig, updateLogLevel } from '@/api/configs.js'
 import Model from '@/components/Model.vue'
+import { useSetupStore } from '@/stores/setup/index.js'
 
 const version = ref({})
 
@@ -15,11 +16,11 @@ onMounted(() => {
   getTraffic().then((res) => {
     console.log(res)
   })
-  getVersion().then((data) => {
-    version.value = data
+  getVersion().then((res) => {
+    version.value = res.data
   })
-  getConfig().then((data) => {
-    config.value = data
+  getConfig().then((res) => {
+    config.value = res.data
   })
 })
 
@@ -29,11 +30,11 @@ const allowLanInfo = ref(
     default,or else only listen on 127.0.0.1.\n
     You can change the Bind Address on the\n
     right side to specify a particular interface.\n
-    Inbounds`
+    Inbounds`,
 )
 const tunInfo = ref(
   `To enable this mode, please install\n
-    Service Mode first!`
+    Service Mode first!`,
 )
 const mixinInfo = ref(`Mixin allows you to overwrite the original\n
     configuration file. Docs`)
@@ -43,10 +44,25 @@ function reloadPage() {
 }
 
 function checkUpdate() {}
+const showModal = ref(false)
+const isChangeMixedPort = ref(false)
+const mixedPort = ref(null)
+const isMixedPortError = ref(false)
 
+async function changeMixedPort() {
+  if (!mixedPort.value || mixedPort.value < 0 || mixedPort.value >= 65353) {
+    return (isMixedPortError.value = true)
+  }
+  await updateConfig({ 'mixed-port': mixedPort.value })
+  refreshConfig()
+  isChangeMixedPort.value = false
+}
 const isRandomPort = ref(false)
 
-function switchRandomPort() {
+async function switchRandomPort() {
+  mixedPort.value = Math.floor(Math.random() * (65353 + 1))
+  await updateConfig({ 'mixed-port': mixedPort.value })
+  refreshConfig()
   isRandomPort.value = !isRandomPort.value
 }
 
@@ -85,26 +101,42 @@ function addRules() {
   }
 }
 
-watch(
-  config,
-  () => {
-    console.log('watch')
+async function refreshConfig() {
+  const res = await getConfig()
+  Object.assign(config.value, res.data)
+}
 
-    getConfig().then((data) => {
-      Object.assign(config.value, data)
-    })
-  },
-  { immediate: true }
-)
+// // function withRefresh(fn: Function) {
+// return async (...args: any[]) => {
+//   await fn(...args)
+//   await refreshConfig()
+// }
+// }
+
 const isShowSwitchLogLevel = ref(false)
 const logLevelList = ['silent', 'error', 'warning', 'info', 'debug']
 
 async function changeLogLevel(level) {
-  await updateLogLevel(level)
+  await updateConfig({ 'log-level': level })
+  refreshConfig()
   isShowSwitchLogLevel.value = false
 }
-function changeAllowLan() {
-  updateAllowLan(!config.value['allow-lan'])
+
+async function changeAllowLan() {
+  await updateAllowLan(!config.value['allow-lan'])
+  refreshConfig()
+}
+
+function openWebUI() {
+  const { setupInfo } = useSetupStore()
+  let { host: hostInfo = '127.0.0.1', secret = null } = setupInfo
+  // if (host.indexOf(':') !== -1) {
+  const [host, port] = hostInfo.split(':')
+  // }
+  window.open(
+    `https://clash.razord.top/#/proxies?host=${host}&port=${port}&secret=${secret}`,
+    '_target',
+  )
 }
 </script>
 
@@ -114,12 +146,18 @@ function changeAllowLan() {
       <img alt="logo" class="h-[60px] w-[60px]" src="@/assets/clash-1.svg" />
       <div style="display: flex; align-items: baseline">
         <!--        快速重启软件-->
-        <div class="cfw" @dblclick="reloadPage">Clash for Windows</div>
-        <div class="version" @click="checkUpdate">{{ version.version }}</div>
+        <div class="m-[19px] cursor-pointer text-[30px] text-[#2c3e50]" @dblclick="reloadPage">
+          Clash for Windows
+        </div>
+        <div class="cursor-pointer" @click="checkUpdate">{{ version.version }}</div>
       </div>
     </div>
-    <div class="options">
-      <OptionItem :label="$t('Port')" :value="config['mixed-port']">
+    <div class="flex w-1/2 flex-col">
+      <OptionItem
+        :label="$t('Port')"
+        :value="config['mixed-port']"
+        @click-value="isChangeMixedPort = true"
+      >
         <template #right>
           <ToolTip :top="true" :dark="true" tip="terminal">
             <span class="material-icons">terminal</span>
@@ -134,6 +172,32 @@ function changeAllowLan() {
           </ToolTip>
         </template>
       </OptionItem>
+      <Model to="#layout" v-if="isChangeMixedPort" @close="isChangeMixedPort = false">
+        <div class="min-h-[239px] w-[390px] bg-white *:px-[20px]">
+          <div class="flex h-[80px] flex-col justify-evenly">
+            <div class="text-xl">Change Mixed Port</div>
+            <div class="text-[#179bbb]">mixed = http + socks</div>
+          </div>
+          <div class="flex h-[88px] flex-col justify-between border-t border-t-[#e9e9e9] py-[10px]">
+            <div>New Port</div>
+            <input
+              type="text"
+              class="h-[43px]"
+              v-model.number="mixedPort"
+              :placeholder="config['mixed-port']"
+            />
+          </div>
+          <div class="border-t border-t-[#e9e9e9] pt-[10px] pb-[20px]">
+            <div class="text-[#ff0000]" v-show="isMixedPortError">
+              Port must be an integer between 0 to 65353
+            </div>
+            <div class="flex justify-evenly text-white *:h-[40px] *:w-[100px]">
+              <button class="bg-[#676475]" @click="isChangeMixedPort = false">Cancel</button>
+              <button class="bg-[#3e3c4d]" @click="changeMixedPort">OK</button>
+            </div>
+          </div>
+        </div>
+      </Model>
       <OptionItem
         :label="$t('Allow LAN')"
         :value="config['allow-lan']"
@@ -158,9 +222,9 @@ function changeAllowLan() {
         :value="config['log-level']"
         @click-value="isShowSwitchLogLevel = true"
       />
-      <Model v-if="isShowSwitchLogLevel" to="#myId" @close="isShowSwitchLogLevel = false">
+      <Model v-if="isShowSwitchLogLevel" to="#layout" @close="isShowSwitchLogLevel = false">
         <div class="bg-white p-[20px]">
-          <h1>Change Log Level</h1>
+          <div class="text-xl">Change Log Level</div>
           <div>silent will prevent .log file to generate on next startup</div>
           <div class="mt-4">
             <button
@@ -175,7 +239,7 @@ function changeAllowLan() {
         </div>
       </Model>
       <OptionItem label="IPv6" :value="config.ipv6" />
-      <OptionItem :label="$t('Clash Core')" :value="clashCore">
+      <OptionItem :label="$t('Clash Core')" :value="clashCore" @click-value="openWebUI">
         <template #left>
           <ToolTip tip="add firewall rules(for Allow LAN and system stack)" right dark>
             <span v-if="addRule === 0" class="material-icons grey icon-grey-bg" @click="addRules"
@@ -261,16 +325,6 @@ function changeAllowLan() {
   font-variation-settings: 'FILL' 1;
   font-size: 16px;
 }
-.cfw {
-  color: #2c3e50;
-  margin: 19px;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-.version {
-  cursor: pointer;
-}
 
 .near {
   margin-left: 5px;
@@ -286,12 +340,6 @@ function changeAllowLan() {
 
 .grey {
   color: #b3b3b3;
-}
-
-.options {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
 }
 
 .icon-grey-bg:hover {

@@ -106,8 +106,8 @@ const keyword = ref('')
 
 const filterLogList = computed(() =>
   logList.value.filter(
-    (item) => item.type === 'info' && isInfo.value && item.raw.match(keyword.value)
-  )
+    (item) => item.type === 'info' && isInfo.value && item.raw.match(keyword.value),
+  ),
 )
 watch(keyword, (newValue) => {
   filterLogList.value.forEach((item) => {
@@ -132,8 +132,8 @@ watch(keyword, (newValue) => {
         v-model="keyword"
         class="ml-[16px] h-[35px] flex-1 cursor-default rounded-lg pl-[12px]"
       />
-      <div class="button">
-        <div class="level-group">
+      <div class="mr-[20px] flex items-center">
+        <div class="mx-16px my-0 flex flex-col">
           <div class="level" @click="switchSimple">
             <div class="simple" :class="{ blue: isSimple }" style="width: 46%">Simple</div>
             <div class="detailed" :class="{ blue: isSimple === false }" style="width: 54%">
@@ -223,54 +223,40 @@ watch(keyword, (newValue) => {
 
 .infoLong {
   width: 65px;
-
   transition-timing-function: linear;
 }
 
 .debugLong {
   width: 67px;
-
   transition-timing-function: linear;
 }
 
-.button {
-  margin-right: 20px;
+.level {
   display: flex;
-  align-items: center;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  height: 26px;
+  width: 117px;
+  line-height: 26px;
+  box-sizing: border-box;
+  background-color: #c7bfbf;
+  margin: 2px 0;
 
-  .level-group {
-    display: flex;
-    flex-direction: column;
-    margin: 0 16px;
+  .simple,
+  .info {
+    text-align: center;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    width: 50px;
+  }
 
-    .level {
-      display: flex;
-      color: white;
-      font-size: 14px;
-      border-radius: 5px;
-      height: 26px;
-      width: 117px;
-      line-height: 26px;
-      box-sizing: border-box;
-      background-color: #c7bfbf;
-      margin: 2px 0;
-
-      .simple,
-      .info {
-        text-align: center;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-        width: 50px;
-      }
-
-      .detailed,
-      .debug {
-        text-align: center;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        width: 52px;
-      }
-    }
+  .detailed,
+  .debug {
+    text-align: center;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    width: 52px;
   }
 }
 

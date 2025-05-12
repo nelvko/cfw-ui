@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useLoginStore = defineStore(
-  'login',
+export const useSetupStore = defineStore(
+  'setup',
   () => {
-    const loginInfo = ref({
+    const setupInfo = ref({
       host: '127.0.0.1:9090',
       secret: '',
     })
     const activeMenu = ref(0)
 
-    return { loginInfo, activeMenu }
+    return { setupInfo, activeMenu }
   },
-  { persist: true }
+  { persist: true },
 )

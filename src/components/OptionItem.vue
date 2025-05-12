@@ -8,6 +8,7 @@ defineProps({
     default: undefined,
   },
 })
+defineEmits(['clickValue'])
 </script>
 
 <template>
@@ -16,7 +17,7 @@ defineProps({
       <div class="flex justify-center">{{ label }}</div>
       <slot name="left" />
     </div>
-    <div class="flex items-center">
+    <div class="flex cursor-pointer items-center">
       <slot name="right" />
       <div
         v-if="typeof value !== 'boolean'"

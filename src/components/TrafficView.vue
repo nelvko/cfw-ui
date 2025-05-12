@@ -24,7 +24,7 @@ const downSpeed = computed(() => {
 </script>
 
 <template>
-  <div class="traffic-view">
+  <div class="flex h-full flex-col items-center justify-around">
     <div class="traffic">
       <span class="material-icons up">straight</span>
       <span class="num">{{ upSpeed.num }}</span>
@@ -32,7 +32,7 @@ const downSpeed = computed(() => {
     </div>
 
     <div class="traffic">
-      <span class="material-icons down">straight</span>
+      <span class="material-icons rotate-180">straight</span>
       <span class="num">{{ downSpeed.num }}</span>
       <span class="unit">{{ downSpeed.unit }}/s</span>
     </div>
@@ -40,38 +40,22 @@ const downSpeed = computed(() => {
 </template>
 
 <style scoped>
-.traffic-view {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  height: 100%;
+.material-icons {
+  font-size: 12px;
+}
+
+.num {
+  font-size: 14px;
+  margin: 0 -5px 0 -9px;
+  /*margin-left: 7px;*/
+}
+
+.unit {
+  font-size: 0.6rem;
+  /*margin-right: 13px;*/
 }
 
 .traffic {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: baseline;
-  width: 100%;
-
-  .up,
-  .down {
-    font-size: 12px;
-  }
-
-  .down {
-    transform: rotate(180deg);
-  }
-
-  .num {
-    font-size: 14px;
-    margin: 0 -5px 0 -9px;
-    /*margin-left: 7px;*/
-  }
-
-  .unit {
-    font-size: 0.6rem;
-    /*margin-right: 13px;*/
-  }
+  @apply flex w-full items-baseline justify-evenly;
 }
 </style>

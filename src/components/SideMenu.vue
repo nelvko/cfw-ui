@@ -5,8 +5,9 @@ import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import { useLoginStore } from '@/stores/login/index.js'
-const { activeMenu } = storeToRefs(useLoginStore())
+import { useSetupStore } from '@/stores/setup/index.js'
+
+const { activeMenu } = storeToRefs(useSetupStore())
 
 const { locale } = useI18n()
 
@@ -17,6 +18,7 @@ const time = ref(null)
 const menuList = ref([
   'General',
   'Proxies',
+  'Rules',
   'Profiles',
   'Logs',
   'Connections',
@@ -46,14 +48,14 @@ function switchLanguage() {
 </script>
 
 <template>
-  <div class="side-menu grey-bg">
+  <div class="grey-bg flex h-full w-[170px] flex-col">
     <TopInfo>
       <traffic-view />
     </TopInfo>
 
-    <div class="menu">
+    <div class="flex flex-col bg-white">
       <div
-        class="menu-item grey-bg"
+        class="grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
         :class="[
           { active: activeMenu === index },
           { topRadius: activeMenu === index - 1 },
@@ -65,11 +67,16 @@ function switchLanguage() {
       >
         {{ $t(item) }}
       </div>
-      <div class="menu-item grey-bg" @click="switchLanguage">language</div>
+      <div
+        class="grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
+        @click="switchLanguage"
+      >
+        language
+      </div>
     </div>
-    <div class="connected-time">
-      <div class="time">{{ time }}</div>
-      <div class="status">
+    <div class="mb-[14px] flex flex-1 flex-col items-center justify-end">
+      <div class="bottom-[40px] text-[1em]">{{ time }}</div>
+      <div class="flex items-center">
         <span class="material-icons">circle</span>
         <span style="font-size: 0.7em">Connected</span>
       </div>
@@ -78,32 +85,9 @@ function switchLanguage() {
 </template>
 
 <style scoped>
-.side-menu {
-  display: flex;
-  flex-direction: column;
-  width: 170px;
-  height: 100%;
-}
-
 .material-icons {
-  font-variation-settings: 'FILL' 1;
   color: #41b883;
   font-size: 16px;
-}
-
-.menu {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-
-  .menu-item {
-    cursor: pointer;
-    height: 57px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #747d88;
-  }
 }
 
 .active {
@@ -117,23 +101,5 @@ function switchLanguage() {
 
 .bottomRadius {
   border-radius: 0 0 10px 0;
-}
-
-.connected-time {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 14px;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-.time {
-  font-size: 1em;
-  bottom: 40px;
-}
-.status {
-  display: flex;
-  align-items: center;
 }
 </style>

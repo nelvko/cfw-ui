@@ -45,7 +45,7 @@ const show = ref(false)
       <img class="h-[150px] w-[620px]" src="https://gh-card.dev/repos/nelvko/cfw-ui.svg" />
     </div>
   </main>
-  <Model to="#app-view" v-if="show" @close="show = false">
+  <Model to="#main" v-if="show" @close="show = false">
     <div class="h-[80%] w-[50%] overflow-y-auto rounded-xl bg-white p-4">
       <p>
         1. This software is only intended for the purpose of learning and researching network

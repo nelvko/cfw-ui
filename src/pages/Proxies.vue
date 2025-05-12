@@ -34,12 +34,12 @@ async function switchMode(val) {
 
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <TopInfo class="flex items-center justify-center">
+    <TopInfo class="flex items-center justify-center gap-x-[40px]">
       <div
         v-for="(item, index) in modeList"
         :key="index"
         :class="{ 'active-mode': activeMode === item.value }"
-        class="mx-[20px] flex h-[40px] w-[120px] cursor-pointer items-center justify-center rounded-[5px] text-[16px] text-[#747474] shadow"
+        class="flex h-[40px] w-[120px] cursor-pointer items-center justify-center rounded-[5px] text-[16px] text-[#747474] shadow-md"
         @click="switchMode(item.name)"
       >
         <div>{{ item.name }}</div>
