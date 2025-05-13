@@ -28,6 +28,15 @@ const routes = [
         },
       },
       {
+        path: 'rules',
+        name: 'Rules',
+        component: () => import('@/pages/Rules.vue'),
+        meta: {
+          title: 'Rules',
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'profiles',
         name: 'Profiles',
         component: () => import('@/pages/Profiles.vue'),

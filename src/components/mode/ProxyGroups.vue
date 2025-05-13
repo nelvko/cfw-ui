@@ -28,7 +28,7 @@ function delay(proxy) {
 
 function networkStatus(proxy) {
   if (proxy.timeout) return 'Timeout'
-  if (proxy.delay) return proxy.delay
+  if (proxy.delay) return `${proxy.delay} ms`
   return 'Check'
 }
 

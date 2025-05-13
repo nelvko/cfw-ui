@@ -1,8 +1,9 @@
 <script setup>
-import { computed, onActivated, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { computed, onActivated, ref, useTemplateRef } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
 import { logs } from '@/api/ws.js'
 import { getMode } from '@/api/configs.js'
+
 const isSimple = ref(true)
 const isInfo = ref(true)
 const logList = ref([])
@@ -33,7 +34,6 @@ const activeMode = ref(null)
 function onMessage({ data, timeStamp }) {
   const { payload, type } = JSON.parse(data)
   logList.value.push({
-    id: crypto.randomUUID(),
     raw: payload,
     type: type, //info
     data: parseLogLine(payload),
@@ -57,11 +57,9 @@ onActivated(() => {
 function switchSimple() {
   isSimple.value = !isSimple.value
   if (isSimple.value) {
-    detailIdList.value.length = 0
+    filterLogList.value.forEach((item) => (item.isShowDetail = false))
   } else {
-    logList.value.forEach((item) => {
-      detailIdList.value.push(item.id)
-    })
+    filterLogList.value.forEach((item) => (item.isShowDetail = true))
   }
 }
 
@@ -72,16 +70,16 @@ function switchInfo() {
 const logsBox = useTemplateRef('logsBox')
 
 function formatTimeStamp(timeStamp) {
-  const formatter = new Intl.DateTimeFormat('en-US', {
+  const navigationStart = performance.timing.navigationStart
+  const date = new Date(navigationStart + timeStamp)
+  return date.toLocaleTimeString({
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: false,
   })
-  return formatter.format(timeStamp)
 }
 
-const detailIdList = ref([])
 const isStop = ref(false)
 
 function stopLog() {
@@ -93,15 +91,6 @@ function stopLog() {
   }
 }
 
-function showDetail(id) {
-  const index = detailIdList.value.indexOf(id)
-  if (index === -1) {
-    detailIdList.value.push(id)
-  } else {
-    detailIdList.value.splice(index, 1)
-  }
-}
-
 const keyword = ref('')
 
 const filterLogList = computed(() =>
@@ -109,20 +98,12 @@ const filterLogList = computed(() =>
     (item) => item.type === 'info' && isInfo.value && item.raw.match(keyword.value),
   ),
 )
-watch(keyword, (newValue) => {
-  filterLogList.value.forEach((item) => {
-    detailIdList.value.push(item.id)
-  })
-  if (!newValue) {
-    detailIdList.value.length = 0
-  }
-})
 </script>
 
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <TopInfo class="flex items-center">
-      <div class="ml-[21px] whitespace-nowrap">
+    <TopInfo class="flex items-center gap-x-[16px] px-[20px]">
+      <div class="whitespace-nowrap">
         <div class="text-[20px]">Request Logs</div>
         <div>mode: {{ activeMode }}</div>
       </div>
@@ -130,32 +111,37 @@ watch(keyword, (newValue) => {
         type="text"
         placeholder="Search"
         v-model="keyword"
-        class="ml-[16px] h-[35px] flex-1 cursor-default rounded-lg pl-[12px]"
+        class="h-[35px] flex-1 cursor-default rounded-[4px] pl-[12px]"
       />
-      <div class="mr-[20px] flex items-center">
-        <div class="mx-16px my-0 flex flex-col">
-          <div class="level" @click="switchSimple">
-            <div class="simple" :class="{ blue: isSimple }" style="width: 46%">Simple</div>
-            <div class="detailed" :class="{ blue: isSimple === false }" style="width: 54%">
-              Detailed
-            </div>
-          </div>
-          <div class="level" @click="switchInfo">
-            <div class="info duration-150 ease-linear" :class="{ blue: isInfo, infoLong: isInfo }">
-              info
-            </div>
-            <div
-              class="debug duration-150 ease-linear"
-              :class="{ blue: isInfo === false, debugLong: isInfo === false }"
-            >
-              debug
-            </div>
-          </div>
+      <div
+        class="flex flex-col gap-y-[4px] text-center text-[14px] text-white *:flex *:h-[26px] *:w-[117px]"
+      >
+        <div class="*:bg-[#c7bfbf]" @click="switchSimple">
+          <button class="w-[46%] rounded-l-[7px]" :class="{ blue: isSimple }">Simple</button>
+          <button class="w-[54%] rounded-r-[7px]" :class="{ blue: isSimple === false }">
+            Detailed
+          </button>
         </div>
-        <div class="clear" @click="logList.length = 0">Clear</div>
-        <div :class="{ stop: !isStop, start: isStop }" @click="stopLog">
+        <div class="*:bg-[#c7bfbf]" @click="switchInfo">
+          <button
+            class="w-[calc(50/117*100%)] rounded-l-[7px] duration-150 ease-linear"
+            :class="{ blue: isInfo, 'w-[calc(65/117*100%)]': isInfo }"
+          >
+            info
+          </button>
+          <button
+            class="w-[calc(52/117*100%)] rounded-r-[7px] duration-150 ease-linear"
+            :class="{ blue: isInfo === false, 'w-[calc(67/117*100%)]': isInfo === false }"
+          >
+            debug
+          </button>
+        </div>
+      </div>
+      <div class="text-center text-white *:h-[30px] *:w-[70px] *:rounded-[3px]">
+        <button class="mr-[8px] bg-[#2ca51d]" @click="logList.length = 0">Clear</button>
+        <button :class="{ 'bg-[#f56363]': !isStop, 'bg-[#179bbb]': isStop }" @click="stopLog">
           {{ isStop ? 'Start' : 'Stop' }}
-        </div>
+        </button>
       </div>
     </TopInfo>
     <div
@@ -165,28 +151,31 @@ watch(keyword, (newValue) => {
       id="logs"
     >
       <div
-        v-for="item in filterLogList"
-        :key="item.id"
+        v-for="(item, index) in filterLogList"
+        :key="index"
         class="height-[47px] mt-[2px] mr-[3px] cursor-pointer border-b-[1px] border-b-[#eaeaea] pl-[20px]"
-        @click="showDetail(item.id)"
+        @click="item.isShowDetail = !item.isShowDetail"
       >
-        <div class="flex justify-between" style="font-size: 12px">
+        <div class="flex justify-between">
           <span class="flex items-center justify-center">
-            <span class="material-icons text-[#77b255]" style="font-size: 18px"> check_box </span>
-            <span class="text-[#13af42]">[TCP] connected</span>
+            <span class="material-icons !text-[16px] text-[#77b255]"> check_box </span>
+            <span class="text-[12px] text-[#13af42]">[TCP] connected</span>
           </span>
 
-          <span style="color: #666666; margin-right: 10px" class="">{{
+          <span class="mr-[10px] text-[12px] text-[#666]">{{
             formatTimeStamp(item.timeStamp)
           }}</span>
         </div>
         <div class="flex items-center justify-start">
-          <span class="material-icons text-[13px] text-[#999]" style="font-size: 13px">
+          <span
+            class="material-icons !text-[12px] text-[#999] transition"
+            :class="{ 'rotate-90': item.isShowDetail }"
+          >
             play_arrow
           </span>
           <span class="text-[14px]">{{ item.data.rAddr }}</span>
         </div>
-        <div v-if="detailIdList.includes(item.id)" class="flex">
+        <div v-if="item.isShowDetail" class="flex">
           <div>
             <span class="text-[12px] text-[#045c85]">FROM</span>
             <span>-></span>
@@ -221,68 +210,12 @@ watch(keyword, (newValue) => {
   flex: auto;
 }
 
-.infoLong {
-  width: 65px;
-  transition-timing-function: linear;
-}
-
-.debugLong {
-  width: 67px;
-  transition-timing-function: linear;
-}
-
 .level {
   display: flex;
-  color: white;
   font-size: 14px;
-  border-radius: 5px;
   height: 26px;
   width: 117px;
-  line-height: 26px;
-  box-sizing: border-box;
   background-color: #c7bfbf;
   margin: 2px 0;
-
-  .simple,
-  .info {
-    text-align: center;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    width: 50px;
-  }
-
-  .detailed,
-  .debug {
-    text-align: center;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    width: 52px;
-  }
-}
-
-.clear {
-  background-color: #2ca51d;
-  margin-right: 8px;
-}
-
-.stop {
-  background-color: #f56363;
-}
-
-.start {
-  background-color: #179bbb;
-}
-
-.clear,
-.stop,
-.start {
-  user-select: none;
-  cursor: pointer;
-  height: 30px;
-  width: 70px;
-  line-height: 30px;
-  text-align: center;
-  color: #fff;
-  border-radius: 3px;
 }
 </style>
