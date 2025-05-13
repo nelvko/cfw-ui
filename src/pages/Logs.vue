@@ -114,15 +114,15 @@ const filterLogList = computed(() =>
         class="h-[35px] flex-1 cursor-default rounded-[4px] pl-[12px]"
       />
       <div
-        class="flex flex-col gap-y-[4px] text-center text-[14px] text-white *:flex *:h-[26px] *:w-[117px]"
+        class="flex flex-col gap-y-[4px] text-center text-[14px] text-white *:flex *:h-[26px] *:w-[117px] **:[button]:bg-[#c7bfbf]"
       >
-        <div class="*:bg-[#c7bfbf]" @click="switchSimple">
+        <div @click="switchSimple">
           <button class="w-[46%] rounded-l-[7px]" :class="{ blue: isSimple }">Simple</button>
           <button class="w-[54%] rounded-r-[7px]" :class="{ blue: isSimple === false }">
             Detailed
           </button>
         </div>
-        <div class="*:bg-[#c7bfbf]" @click="switchInfo">
+        <div @click="switchInfo">
           <button
             class="w-[calc(50/117*100%)] rounded-l-[7px] duration-150 ease-linear"
             :class="{ blue: isInfo, 'w-[calc(65/117*100%)]': isInfo }"
@@ -175,21 +175,21 @@ const filterLogList = computed(() =>
           </span>
           <span class="text-[14px]">{{ item.data.rAddr }}</span>
         </div>
-        <div v-if="item.isShowDetail" class="flex">
+        <div v-if="item.isShowDetail" class="flex text-[12px]">
           <div>
-            <span class="text-[12px] text-[#045c85]">FROM</span>
+            <span class="text-[#045c85]">FROM</span>
             <span>-></span>
-            <span class="text-[12px] text-[#333]">{{ item.data.lAddr }}</span>
+            <span class="text-[#333]">{{ item.data.lAddr }}</span>
           </div>
           <div class="ml-[12px]">
-            <span class="text-[12px] text-[#045c85]">RULE</span>
+            <span class="text-[#045c85]">RULE</span>
             <span>-></span>
-            <span class="text-[12px] text-[#333]">{{ item.data.rule }}</span>
+            <span class="text-[#333]">{{ item.data.rule }}</span>
           </div>
           <div class="ml-[12px]">
-            <span class="text-[12px] text-[#045c85]">PROXY</span>
+            <span class="text-[#045c85]">PROXY</span>
             <span>-></span>
-            <span class="text-[12px] text-[#333]">{{ item.data.proxy }}</span>
+            <span class="text-[#333]">{{ item.data.proxy }}</span>
           </div>
         </div>
       </div>
