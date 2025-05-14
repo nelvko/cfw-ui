@@ -48,14 +48,14 @@ function switchLanguage() {
 </script>
 
 <template>
-  <div class="grey-bg flex h-full w-[170px] flex-col">
+  <div class="bg-grey-bg flex h-full w-[170px] flex-col">
     <TopInfo>
       <traffic-view />
     </TopInfo>
 
     <div class="flex flex-col bg-white">
       <div
-        class="grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
+        class="bg-grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
         :class="[
           { active: activeMenu === index },
           { topRadius: activeMenu === index - 1 },
@@ -68,7 +68,7 @@ function switchLanguage() {
         {{ $t(item) }}
       </div>
       <div
-        class="grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
+        class="bg-grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
         @click="switchLanguage"
       >
         language

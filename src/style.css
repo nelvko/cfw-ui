@@ -1,31 +1,29 @@
 @import "tailwindcss";
 @import "@material-design-icons/font/filled.css";
 
-*{
-    user-select: none;
-}
-span.material-icons {
+@layer base {
+  * {
+    @apply select-none;
+  }
+
+  button {
     cursor: pointer;
-}
-body {
-    margin: 0;
-    padding: 0;
-    
-}
-button {
-  cursor: pointer;
-}
-input {
+  }
+
+  input {
     outline: none;
     border: 1px solid #dcdcdc;
-}
+  }
 
-input::placeholder {
+  input::placeholder {
     color: #a3a3a3;
     font-size: 16px;
+  }
 }
-.grey-bg {
-    background-color: #F5F5F5;
+
+@theme {
+  --color-grey-bg: #F5F5F5;
+  --color-blue-bg: #179bbb
 }
 
 ::-webkit-scrollbar {

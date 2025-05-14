@@ -4,7 +4,7 @@
   <div class="min-h-[239px] w-[390px] bg-white *:px-[20px]">
     <div class="flex h-[80px] flex-col justify-evenly">
       <div class="text-xl">Change Mixed Port</div>
-      <div class="text-[#179bbb]">mixed = http + socks</div>
+      <div class="text-blue-bg">mixed = http + socks</div>
     </div>
     <div class="flex h-[88px] flex-col justify-between border-t border-t-[#e9e9e9] py-[10px]">
       <div>New Port</div>

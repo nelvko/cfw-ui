@@ -117,21 +117,23 @@ const filterLogList = computed(() =>
         class="flex flex-col gap-y-[4px] text-center text-[14px] text-white *:flex *:h-[26px] *:w-[117px] **:[button]:bg-[#c7bfbf]"
       >
         <div @click="switchSimple">
-          <button class="w-[46%] rounded-l-[7px]" :class="{ blue: isSimple }">Simple</button>
-          <button class="w-[54%] rounded-r-[7px]" :class="{ blue: isSimple === false }">
+          <button class="w-[46%] rounded-l-[7px]" :class="{ '!bg-blue-bg': isSimple }">
+            Simple
+          </button>
+          <button class="w-[54%] rounded-r-[7px]" :class="{ '!bg-blue-bg': isSimple === false }">
             Detailed
           </button>
         </div>
         <div @click="switchInfo">
           <button
             class="w-[calc(50/117*100%)] rounded-l-[7px] duration-150 ease-linear"
-            :class="{ blue: isInfo, 'w-[calc(65/117*100%)]': isInfo }"
+            :class="{ '!bg-blue-bg': isInfo, 'w-[calc(65/117*100%)]': isInfo }"
           >
             info
           </button>
           <button
             class="w-[calc(52/117*100%)] rounded-r-[7px] duration-150 ease-linear"
-            :class="{ blue: isInfo === false, 'w-[calc(67/117*100%)]': isInfo === false }"
+            :class="{ '!bg-blue-bg': isInfo === false, 'w-[calc(67/117*100%)]': isInfo === false }"
           >
             debug
           </button>
@@ -204,18 +206,4 @@ const filterLogList = computed(() =>
   </div>
 </template>
 
-<style scoped>
-.blue {
-  background-color: #179bbb;
-  flex: auto;
-}
-
-.level {
-  display: flex;
-  font-size: 14px;
-  height: 26px;
-  width: 117px;
-  background-color: #c7bfbf;
-  margin: 2px 0;
-}
-</style>
+<style scoped></style>

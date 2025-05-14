@@ -1,14 +1,22 @@
 <script setup>
-defineProps({
+import { ref } from 'vue'
+
+const props = defineProps({
   value: Boolean,
 })
+const switchValue = ref(props.value)
 </script>
 
 <template>
-  <label class="switch">
-    <input type="checkbox" :value />
-    <span class="slider"></span>
-  </label>
+  <div
+    class="flex h-[20px] w-[34px] items-center rounded-3xl bg-[#c7bfbf] px-[4px]"
+    @click="switchValue = !switchValue"
+  >
+    <div
+      class="size-[12px] rounded-full transition ease-linear"
+      :class="switchValue ? 'translate-x-[14px] bg-[#13af42]' : 'bg-[#d44545]'"
+    ></div>
+  </div>
 </template>
 
 <style scoped>

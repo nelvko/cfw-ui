@@ -9,19 +9,19 @@ const { t, locale } = i18n.global
 const routes = [
   {
     path: '/',
-    component: () => import('@/pages/Layout.vue'),
+    component: () => import('@/views/Layout.vue'),
     redirect: '/general',
     children: [
       {
         path: 'general',
         name: 'General',
-        component: () => import('@/pages/General.vue'),
+        component: () => import('@/views/General.vue'),
         meta: { title: 'General', requiresAuth: true },
       },
       {
         path: 'proxies',
         name: 'Proxies',
-        component: () => import('@/pages/Proxies.vue'),
+        component: () => import('@/views/Proxies.vue'),
         meta: {
           title: 'Proxies',
           requiresAuth: true,
@@ -30,7 +30,7 @@ const routes = [
       {
         path: 'rules',
         name: 'Rules',
-        component: () => import('@/pages/Rules.vue'),
+        component: () => import('@/views/Rules.vue'),
         meta: {
           title: 'Rules',
           requiresAuth: true,
@@ -39,31 +39,31 @@ const routes = [
       {
         path: 'profiles',
         name: 'Profiles',
-        component: () => import('@/pages/Profiles.vue'),
+        component: () => import('@/views/Profiles.vue'),
         meta: { title: 'Profiles', requiresAuth: true },
       },
       {
         path: 'logs',
         name: 'Logs',
-        component: () => import('@/pages/Logs.vue'),
+        component: () => import('@/views/Logs.vue'),
         meta: { title: 'Logs', requiresAuth: true },
       },
       {
         path: 'connections',
         name: 'Connections',
-        component: () => import('@/pages/Connections.vue'),
+        component: () => import('@/views/Connections.vue'),
         meta: { title: 'Connections', requiresAuth: true },
       },
       {
         path: 'settings',
         name: 'Settings',
-        component: () => import('@/pages/Settings.vue'),
+        component: () => import('@/views/Settings.vue'),
         meta: { title: 'Settings', requiresAuth: true },
       },
       {
         path: 'feedback',
         name: 'Feedback',
-        component: () => import('@/pages/Feedback.vue'),
+        component: () => import('@/views/Feedback.vue'),
         meta: { title: 'Feedback', requiresAuth: true },
       },
     ],
@@ -71,7 +71,7 @@ const routes = [
   {
     path: '/setup',
     name: 'Setup',
-    component: () => import('@/pages/Setup.vue'),
+    component: () => import('@/views/Setup.vue'),
     meta: { requiresAuth: false, title: 'Setup' },
   },
 ]

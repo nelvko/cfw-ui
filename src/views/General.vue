@@ -6,7 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
-import { getConfig, updateAllowLan, updateConfig, updateLogLevel } from '@/api/configs.js'
+import { getConfig, updateAllowLan, updateConfig } from '@/api/configs.js'
 import Modal from '@/components/Model.vue'
 import { useSetupStore } from '@/stores/setup/index.js'
 
@@ -175,7 +175,7 @@ function openWebUI() {
         <div class="min-h-[239px] w-[390px] bg-white *:px-[20px]">
           <div class="flex h-[80px] flex-col justify-evenly">
             <div class="text-xl">Change Mixed Port</div>
-            <div class="text-[#179bbb]">mixed = http + socks</div>
+            <div class="text-blue-bg">mixed = http + socks</div>
           </div>
           <div class="flex h-[88px] flex-col justify-between border-t border-t-[#e9e9e9] py-[10px]">
             <div>New Port</div>
@@ -237,7 +237,7 @@ function openWebUI() {
       <Modal to="#layout" v-if="isChangeBindAddress" @close="isChangeBindAddress = false">
         <div class="bg-white *:px-[20px]">
           <div>Change Bind Address</div>
-          <div class="text-[#179bbb]">
+          <div class="text-blue-bg">
             Allow LAN will only bind to address you set,* means all interfaces
           </div>
           <div>New Bind Address</div>
