@@ -1,17 +1,16 @@
 import axios from 'axios'
-import { useRouter } from 'vue-router'
+import router from '@/router'
 import { storeToRefs } from 'pinia'
 import { useSetupStore } from '@/stores/setup/index.js'
 
 const { setupInfo } = storeToRefs(useSetupStore())
-const { host, secret } = setupInfo.value
-const router = useRouter()
+const { host, port, secret } = setupInfo.value
 const instance = axios.create({
   timeout: 10000,
 })
 
 instance.interceptors.request.use((config) => {
-  config.baseURL = `http://${host}`
+  config.baseURL = `http://${host}:${port}`
   if (secret) {
     config.headers['Authorization'] = `Bearer ${secret}`
   }

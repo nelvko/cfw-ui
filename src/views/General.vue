@@ -6,9 +6,10 @@ import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 import { getTraffic, getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
-import { getConfig, updateAllowLan, updateConfig } from '@/api/configs.js'
+import { getConfig, updateConfig } from '@/api/configs.js'
 import Modal from '@/components/Model.vue'
 import { useSetupStore } from '@/stores/setup/index.js'
+import SwitchOption from '@/components/SwitchOption.vue'
 
 const version = ref({})
 
@@ -121,8 +122,8 @@ async function changeLogLevel(level) {
   isShowSwitchLogLevel.value = false
 }
 
-async function changeAllowLan() {
-  await updateAllowLan(!config.value['allow-lan'])
+async function changeConfig(data) {
+  await updateConfig(data)
   refreshConfig()
 }
 
@@ -155,11 +156,11 @@ function openWebUI() {
       <OptionItem
         :label="$t('Port')"
         :value="config['mixed-port']"
-        @click-value="isChangeMixedPort = true"
+        @handler-click="isChangeMixedPort = true"
       >
         <template #right>
           <ToolTip :top="true" :dark="true" tip="terminal">
-            <span @click="isTerminal = true" class="material-icons">terminal</span>
+            <span @click="isTerminal = true" class="material-icons mr-[1px]">terminal</span>
           </ToolTip>
           <ToolTip top dark tip="random mixed port">
             <span
@@ -171,55 +172,7 @@ function openWebUI() {
           </ToolTip>
         </template>
       </OptionItem>
-      <Modal to="#layout" v-if="isChangeMixedPort" @close="isChangeMixedPort = false">
-        <div class="min-h-[239px] w-[390px] bg-white *:px-[20px]">
-          <div class="flex h-[80px] flex-col justify-evenly">
-            <div class="text-xl">Change Mixed Port</div>
-            <div class="text-blue-bg">mixed = http + socks</div>
-          </div>
-          <div class="flex h-[88px] flex-col justify-between border-t border-t-[#e9e9e9] py-[10px]">
-            <div>New Port</div>
-            <input
-              type="text"
-              class="h-[43px]"
-              v-model.number="mixedPort"
-              :placeholder="config['mixed-port']"
-            />
-          </div>
-          <div class="border-t border-t-[#e9e9e9] pt-[10px] pb-[20px]">
-            <div class="text-[#ff0000]" v-show="isMixedPortError">
-              Port must be an integer between 0 to 65353
-            </div>
-            <div class="flex justify-evenly text-white *:h-[40px] *:w-[100px]">
-              <button class="bg-[#676475]" @click="isChangeMixedPort = false">Cancel</button>
-              <button class="bg-[#3e3c4d]" @click="changeMixedPort">OK</button>
-            </div>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal to="#layout" v-if="isTerminal" @close="isTerminal = false">
-        <div class="bg-white *:px-[20px]">
-          <div>Open terminal with proxy set up</div>
-          <div>Select a terminal</div>
-          <div>
-            <input type="checkbox" />
-            run as admin
-          </div>
-          <div class="flex flex-wrap text-white *:h-[40px] *:w-[100px] *:bg-[#3e3c4d]">
-            <button>CMD</button>
-            <button>Powershell</button>
-            <button>Windows Terminal</button>
-            <button>Copy Commands Only</button>
-          </div>
-        </div>
-      </Modal>
-
-      <OptionItem
-        :label="$t('Allow LAN')"
-        :value="config['allow-lan']"
-        @click-value="changeAllowLan"
-      >
+      <OptionItem :label="$t('Allow LAN')">
         <template #left>
           <ToolTip :tip="allowLanInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
@@ -232,45 +185,26 @@ function openWebUI() {
           <div class="border-b border-dashed border-[#cbcbcb]" @click="isChangeBindAddress = true">
             Bind {{ config['bind-address'] }}
           </div>
+          <switch-option
+            :value="config['allow-lan']"
+            @handler-click="changeConfig({ 'allow-lan': !config['allow-lan'] })"
+          />
         </template>
       </OptionItem>
-      <Modal to="#layout" v-if="isChangeBindAddress" @close="isChangeBindAddress = false">
-        <div class="bg-white *:px-[20px]">
-          <div>Change Bind Address</div>
-          <div class="text-blue-bg">
-            Allow LAN will only bind to address you set,* means all interfaces
-          </div>
-          <div>New Bind Address</div>
-          <input />
-          <div class="flex justify-evenly text-white *:h-[40px] *:w-[100px]">
-            <button class="bg-[#676475]" @click="isChangeMixedPort = false">Cancel</button>
-            <button class="bg-[#3e3c4d]" @click="changeMixedPort">OK</button>
-          </div>
-        </div>
-      </Modal>
       <OptionItem
-        label="Log Level"
+        :label="$t('Log Level')"
         :value="config['log-level']"
-        @click-value="isShowSwitchLogLevel = true"
+        @handler-click="isShowSwitchLogLevel = true"
       />
-      <Modal v-if="isShowSwitchLogLevel" to="#layout" @close="isShowSwitchLogLevel = false">
-        <div class="bg-white p-[20px]">
-          <div class="text-xl">Change Log Level</div>
-          <div>silent will prevent .log file to generate on next startup</div>
-          <div class="mt-4">
-            <button
-              class="mr-[10px] h-[35px] rounded-md bg-[#3e3c4d] px-[9px] text-white"
-              v-for="item in logLevelList"
-              :key="item"
-              @click="changeLogLevel(item)"
-            >
-              {{ item }}
-            </button>
-          </div>
-        </div>
-      </Modal>
-      <OptionItem label="IPv6" :value="config.ipv6" />
-      <OptionItem :label="$t('Clash Core')" :value="clashCore" @click-value="openWebUI">
+      <OptionItem label="IPv6">
+        <template #right>
+          <switch-option
+            :value="config.ipv6"
+            @handler-click="changeConfig({ ipv6: !config.ipv6 })"
+          />
+        </template>
+      </OptionItem>
+      <OptionItem :label="$t('Clash Core')" :value="clashCore" @handler-click="openWebUI">
         <template #left>
           <ToolTip tip="add firewall rules(for Allow LAN and system stack)" right dark>
             <span v-if="addRule === 0" class="material-icons grey icon-grey-bg" @click="addRules"
@@ -318,7 +252,7 @@ function openWebUI() {
         </template>
       </OptionItem>
 
-      <OptionItem :label="$t('Tun Mode')" :value="config?.tun?.enable ?? false">
+      <OptionItem :label="$t('Tun Mode')">
         <template #left>
           <ToolTip :tip="tunInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
@@ -327,22 +261,111 @@ function openWebUI() {
             <span class="material-icons dark-blue-grey icon-grey-bg">settings</span>
           </ToolTip>
         </template>
+        <template #right>
+          <switch-option
+            :value="config?.tun?.enable ?? false"
+            @handler-click="changeConfig({ tun: { enable: !config?.tun?.enable || false } })"
+          />
+        </template>
       </OptionItem>
 
-      <OptionItem :label="$t('Mixin')" :value="true">
+      <OptionItem :label="$t('Mixin')">
         <template #left>
           <ToolTip :tip="mixinInfo" light right>
             <span class="material-icons light-blue-grey near">info</span>
           </ToolTip>
-
           <ToolTip tip="Edit Mixin content" right dark>
             <span class="material-icons dark-blue-grey icon-grey-bg">settings</span>
           </ToolTip>
         </template>
+        <template #right>
+          <switch-option disabled />
+        </template>
       </OptionItem>
 
-      <OptionItem :label="$t('System Proxy')" :value="true" />
-      <OptionItem :label="$t('Start with Windows')" :value="true" />
+      <OptionItem :label="$t('System Proxy')">
+        <template #right>
+          <switch-option disabled />
+        </template>
+      </OptionItem>
+      <OptionItem :label="$t('Start with Windows')">
+        <template #right>
+          <switch-option disabled />
+        </template>
+      </OptionItem>
+
+      <Modal to="#layout" v-if="isChangeMixedPort" @close="isChangeMixedPort = false">
+        <div class="min-h-[239px] w-[390px] bg-white *:px-[20px]">
+          <div class="flex h-[80px] flex-col justify-evenly">
+            <div class="text-xl">Change Mixed Port</div>
+            <div class="text-blue-bg">mixed = http + socks</div>
+          </div>
+          <div class="flex h-[88px] flex-col justify-between border-t border-t-[#e9e9e9] py-[10px]">
+            <div>New Port</div>
+            <input
+              type="text"
+              class="h-[43px]"
+              v-model.number="mixedPort"
+              :placeholder="config['mixed-port']"
+            />
+          </div>
+          <div class="border-t border-t-[#e9e9e9] pt-[10px] pb-[20px]">
+            <div class="text-[#ff0000]" v-show="isMixedPortError">
+              Port must be an integer between 0 to 65353
+            </div>
+            <div class="flex justify-evenly text-white *:h-[40px] *:w-[100px]">
+              <button class="bg-[#676475]" @click="isChangeMixedPort = false">Cancel</button>
+              <button class="bg-[#3e3c4d]" @click="changeMixedPort">OK</button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      <Modal to="#layout" v-if="isTerminal" @close="isTerminal = false">
+        <div class="bg-white *:px-[20px]">
+          <div>Open terminal with proxy set up</div>
+          <div>Select a terminal</div>
+          <div>
+            <input type="checkbox" />
+            run as admin
+          </div>
+          <div class="flex flex-wrap text-white *:h-[40px] *:w-[100px] *:bg-[#3e3c4d]">
+            <button>CMD</button>
+            <button>Powershell</button>
+            <button>Windows Terminal</button>
+            <button>Copy Commands Only</button>
+          </div>
+        </div>
+      </Modal>
+      <Modal to="#layout" v-if="isChangeBindAddress" @close="isChangeBindAddress = false">
+        <div class="bg-white *:px-[20px]">
+          <div>Change Bind Address</div>
+          <div class="text-blue-bg">
+            Allow LAN will only bind to address you set,* means all interfaces
+          </div>
+          <div>New Bind Address</div>
+          <input />
+          <div class="flex justify-evenly text-white *:h-[40px] *:w-[100px]">
+            <button class="bg-[#676475]" @click="isChangeMixedPort = false">Cancel</button>
+            <button class="bg-[#3e3c4d]" @click="changeMixedPort">OK</button>
+          </div>
+        </div>
+      </Modal>
+      <Modal v-if="isShowSwitchLogLevel" to="#layout" @close="isShowSwitchLogLevel = false">
+        <div class="bg-white p-[20px]">
+          <div class="text-xl">Change Log Level</div>
+          <div>silent will prevent .log file to generate on next startup</div>
+          <div class="mt-4">
+            <button
+              class="mr-[10px] h-[35px] rounded-md bg-[#3e3c4d] px-[9px] text-white"
+              v-for="item in logLevelList"
+              :key="item"
+              @click="changeLogLevel(item)"
+            >
+              {{ item }}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   </div>
 </template>

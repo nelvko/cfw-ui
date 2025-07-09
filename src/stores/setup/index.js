@@ -5,7 +5,8 @@ export const useSetupStore = defineStore(
   'setup',
   () => {
     const setupInfo = ref({
-      host: '127.0.0.1:9090',
+      host: '',
+      port: '',
       secret: '',
     })
     const activeMenu = ref(0)

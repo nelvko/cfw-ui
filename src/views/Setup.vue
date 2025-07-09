@@ -4,23 +4,23 @@ import { useRouter } from 'vue-router'
 import { useSetupStore } from '@/stores/setup/index.js'
 import { storeToRefs } from 'pinia'
 import { setup } from '@/api/common.js'
+import { switchLanguage } from '@/hooks/switchLanguage.js'
+
 const { setupInfo } = storeToRefs(useSetupStore())
 const router = useRouter()
 const failMsg = ref('')
-const loginData = ref({ host: '', secret: '' })
 function submit() {
-  if (!setupInfo.value) {
+  if (!setupInfo.value.host) {
     alert('请填写host')
   }
   setup(setupInfo.value)
-    .then((res) => {
-      setupInfo.value = loginData.value
+    .then(() => {
       router.push('/')
     })
     .catch((err) => {
-      console.log(err)
+      console.log('err', err)
 
-      // setupInfo.value = null
+      setupInfo.value = {}
       failMsg.value = 'Failed to connect'
     })
 }
@@ -33,16 +33,25 @@ function submit() {
       <form class="flex flex-col" @submit.prevent="submit">
         <label>
           {{ $t('Host') }}
-          <input v-model="loginData.host" placeholder="" type="text" @focus="failMsg = ''" />
+          <input
+            v-model="setupInfo.host"
+            placeholder="127.0.0.1"
+            type="text"
+            @focus="failMsg = ''"
+          />
           <span class="text-[#f56363]">{{ failMsg }}</span>
         </label>
         <label>
-          {{ $t('Secret') }}
-          <input type="password" v-model="loginData.secret" />
+          {{ $t('Port') }}
+          <input type="text" placeholder="9090" v-model="setupInfo.port" />
         </label>
-        <button type="submit" class="bg-cyan-600 text-white">提交</button>
+        <label>
+          {{ $t('Secret') }}
+          <input type="password" v-model="setupInfo.secret" />
+        </label>
+        <button type="submit" class="bg-cyan-600 text-white">{{ $t('Submit') }}</button>
       </form>
-      <div>中文|English</div>
+      <div @click="switchLanguage">中文|English</div>
     </div>
   </div>
 </template>

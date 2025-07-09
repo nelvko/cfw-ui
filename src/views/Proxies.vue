@@ -4,16 +4,17 @@ import DirectMode from '@/components/mode/DirectMode.vue'
 import TopInfo from '@/components/TopInfo.vue'
 import ProxyMode from '@/components/mode/ProxyMode.vue'
 import { getMode, updateMode } from '@/api/configs.js'
+import PopUp from '@/components/PopUp.vue'
 
 onUnmounted(() => {
   console.log('unmounted')
 })
 onActivated(() => {
-  console.log('onActivated')
+  getMode().then((mode) => {
+    activeMode.value = mode
+  })
 })
-onDeactivated(() => {
-  console.log('onDeactivated')
-})
+
 const modeList = [
   { name: 'Global', value: 'global', icon: 'merge' },
   { name: 'Rule', value: 'rule', icon: 'alt_route' },
@@ -22,9 +23,6 @@ const modeList = [
 ]
 
 const activeMode = ref(null)
-getMode().then((mode) => {
-  activeMode.value = mode
-})
 
 async function switchMode(val) {
   await updateMode(val)
@@ -42,16 +40,16 @@ async function switchMode(val) {
         class="flex h-[40px] w-[120px] cursor-pointer items-center justify-center rounded-[5px] text-[16px] text-[#747474] shadow-md"
         @click="switchMode(item.name)"
       >
-        <div>{{ item.name }}</div>
+        <div>{{ $t(item.name) }}</div>
         <span class="material-icons">{{ item.icon }}</span>
       </div>
     </TopInfo>
-    <div
-      class="mt-[8px] mr-[3px] flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]"
-      id="proxies"
-    >
-      <DirectMode v-if="activeMode === 'direct'" />
-      <ProxyMode v-else :mode="activeMode" />
+    <div class="flex flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[66px]" id="proxies">
+      <div class="mt-[8px] mr-[3px] size-full">
+        <DirectMode v-if="activeMode === 'direct'" />
+        <ProxyMode v-else :mode="activeMode" />
+      </div>
+      <PopUp :active-mode="activeMode" />
     </div>
   </div>
 </template>

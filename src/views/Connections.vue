@@ -45,19 +45,17 @@ function switchPause() {
 <template>
   <!--  padding: 0 20px 0 16px -->
   <div class="flex h-full flex-col overflow-y-hidden">
-    <TopInfo class="flex flex-col pr-[20px] pl-[16px]">
-      <div class="my-[8px] flex">
-        <div class="mr-[5px] text-[18px]">Connections</div>
-        <input placeholder="Search" type="text" class="flex-1 cursor-default" />
-        <div class="flex items-center">
-          <span>Total:</span>
-          <span class="material-icons up">straight</span>
-          <span>{{ `${upload.num} ${upload.unit}` }}</span>
-          <span class="material-icons down">straight</span>
-          <span>{{ `${download.num} ${download.unit}` }}</span>
+    <TopInfo class="flex pr-[20px] pl-[16px]">
+      <!--      左边-->
+      <div class="my-[8px] mr-[10px] flex flex-1 flex-col">
+        <div class="mb-[7px] flex">
+          <div class="mr-[5px] text-[18px]">{{ $t('Connections') }}</div>
+          <input
+            :placeholder="$t('Search')"
+            type="text"
+            class="flex-1 cursor-default rounded-[4px] pl-[6px]"
+          />
         </div>
-      </div>
-      <div class="flex justify-between">
         <div class="flex gap-x-[5px]">
           <ToolTip dark tip="Upload Speed" top>
             <GreyButton>
@@ -99,12 +97,22 @@ function switchPause() {
             </GreyButton>
           </ToolTip>
         </div>
+      </div>
+      <!--      右边-->
+      <div class="flex w-[193] flex-col justify-around">
+        <div class="flex items-center">
+          <span>{{ $t('Total') }}:</span>
+          <span class="material-icons up">straight</span>
+          <span>{{ `${upload.num} ${upload.unit}` }}</span>
+          <span class="material-icons down">straight</span>
+          <span>{{ `${download.num} ${download.unit}` }}</span>
+        </div>
         <div class="flex">
           <div :class="{ pause: !isPause, resume: isPause }" @click="switchPause">
-            {{ isPause ? 'Resume' : 'Pause' }}
+            {{ isPause ? $t('Resume') : $t('Pause') }}
           </div>
           <div class="close-all ml-[10px]" @click="closeAllConnections()">
-            Close All（{{ connectionList.length }}）
+            {{ $t('Close All') }} ({{ connectionList.length }})
           </div>
         </div>
       </div>

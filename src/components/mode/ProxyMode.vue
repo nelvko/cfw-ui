@@ -1,6 +1,6 @@
 <script setup>
 import ProxyGroups from '@/components/mode/ProxyGroups.vue'
-import {  getProviders, getProxies } from '@/api/proxies.js'
+import { getProviders, getProxies } from '@/api/proxies.js'
 import { ref } from 'vue'
 
 defineProps({

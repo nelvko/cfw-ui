@@ -104,12 +104,12 @@ const filterLogList = computed(() =>
   <div class="flex h-full flex-col overflow-hidden">
     <TopInfo class="flex items-center gap-x-[16px] px-[20px]">
       <div class="whitespace-nowrap">
-        <div class="text-[20px]">Request Logs</div>
-        <div>mode: {{ activeMode }}</div>
+        <div class="text-[20px]">{{ $t('Request Logs') }}</div>
+        <div>{{ $t('mode') }}: {{ activeMode }}</div>
       </div>
       <input
         type="text"
-        placeholder="Search"
+        :placeholder="$t('Search')"
         v-model="keyword"
         class="h-[35px] flex-1 cursor-default rounded-[4px] pl-[12px]"
       />
@@ -118,10 +118,10 @@ const filterLogList = computed(() =>
       >
         <div @click="switchSimple">
           <button class="w-[46%] rounded-l-[7px]" :class="{ '!bg-blue-bg': isSimple }">
-            Simple
+            {{ $t('Simple') }}
           </button>
           <button class="w-[54%] rounded-r-[7px]" :class="{ '!bg-blue-bg': isSimple === false }">
-            Detailed
+            {{ $t('Detailed') }}
           </button>
         </div>
         <div @click="switchInfo">
@@ -129,25 +129,25 @@ const filterLogList = computed(() =>
             class="w-[calc(50/117*100%)] rounded-l-[7px] duration-150 ease-linear"
             :class="{ '!bg-blue-bg': isInfo, 'w-[calc(65/117*100%)]': isInfo }"
           >
-            info
+            {{ $t('info') }}
           </button>
           <button
             class="w-[calc(52/117*100%)] rounded-r-[7px] duration-150 ease-linear"
             :class="{ '!bg-blue-bg': isInfo === false, 'w-[calc(67/117*100%)]': isInfo === false }"
           >
-            debug
+            {{ $t('debug') }}
           </button>
         </div>
       </div>
       <div class="text-center text-white *:h-[30px] *:w-[70px] *:rounded-[3px]">
-        <button class="mr-[8px] bg-[#2ca51d]" @click="logList.length = 0">Clear</button>
+        <button class="mr-[8px] bg-[#2ca51d]" @click="logList.length = 0">{{ $t('Clear') }}</button>
         <button :class="{ 'bg-[#f56363]': !isStop, 'bg-[#179bbb]': isStop }" @click="stopLog">
-          {{ isStop ? 'Start' : 'Stop' }}
+          {{ isStop ? $t('Start') : $t('Stop') }}
         </button>
       </div>
     </TopInfo>
     <div
-      v-if="logList.length !== 0"
+      v-if="logList.length > 0"
       ref="logsBox"
       class="mr-[3px] flex flex-1 flex-col overflow-y-auto"
       id="logs"
@@ -197,7 +197,7 @@ const filterLogList = computed(() =>
       </div>
     </div>
     <div
-      v-if="logList.length === 0"
+      v-else
       class="flex flex-1 cursor-default flex-col items-center justify-center text-[#808080]"
     >
       <span class="text-[18px]">Empty log list</span>

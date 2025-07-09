@@ -3,13 +3,11 @@ import TrafficView from '@/components/TrafficView.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
-import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useSetupStore } from '@/stores/setup/index.js'
+import { switchLanguage } from '@/hooks/switchLanguage.js'
 
 const { activeMenu } = storeToRefs(useSetupStore())
-
-const { locale } = useI18n()
 
 const router = useRouter()
 
@@ -18,8 +16,8 @@ const time = ref(null)
 const menuList = ref([
   'General',
   'Proxies',
-  'Rules',
   'Profiles',
+  'Rules',
   'Logs',
   'Connections',
   'Settings',
@@ -38,12 +36,6 @@ setInterval(updateTime, 1000)
 const clickItem = (index, item) => {
   activeMenu.value = index
   router.push({ name: item })
-}
-
-function switchLanguage() {
-  if (locale.value === 'cn') {
-    locale.value = 'en'
-  } else locale.value = 'cn'
 }
 </script>
 
@@ -71,14 +63,14 @@ function switchLanguage() {
         class="bg-grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
         @click="switchLanguage"
       >
-        language
+        {{ $t('Language') }}
       </div>
     </div>
     <div class="mb-[14px] flex flex-1 flex-col items-center justify-end">
       <div class="bottom-[40px] text-[1em]">{{ time }}</div>
       <div class="flex items-center">
         <span class="material-icons">circle</span>
-        <span style="font-size: 0.7em">Connected</span>
+        <span style="font-size: 0.7em">{{ $t('Connected') }}</span>
       </div>
     </div>
   </div>

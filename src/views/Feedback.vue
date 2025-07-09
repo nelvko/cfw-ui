@@ -8,16 +8,16 @@ const show = ref(false)
 <template>
   <main class="relative flex h-full">
     <div class="mx-8 mt-3 flex-1 overflow-hidden">
-      <div class="title">Developer</div>
+      <div class="title">{{ $t('Developer') }}</div>
       <a href="https://github.com/nelvko">nelvko</a>
-      <div class="title">Relevance</div>
+      <div class="title">{{ $t('Relevance') }}</div>
       <div>
         <a href="https://github.com/Fndroid/clash_for_windows_pkg">Github</a>
         <a href="https://docs.cfw.lbyczf.com/">Document</a>
         <a @click="show = !show">Disclaimer</a>
         <a @click="show = !show">Statement</a>
       </div>
-      <div class="title">Credits</div>
+      <div class="title">{{ $t('Credits') }}</div>
       <div class="flex flex-wrap">
         <a href="https://github.com/Dreamacro/clash">Clash</a>
         <a href="https://github.com/yichengchen/clashX">ClashX</a>
@@ -37,7 +37,7 @@ const show = ref(false)
         <a href="https://github.com/microsoft/monaco-editor">monaco-editor</a>
         <a href="https://fonts.google.com/icons">Material Icons</a>
       </div>
-      <div class="title">Advertisement</div>
+      <div class="title">{{ $t('Advertisement') }}</div>
       <img
         class="my-[10px] h-[150px] w-[620px]"
         src="https://gh-card.dev/repos/nelvko/clash-for-linux-install.svg"

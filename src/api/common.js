@@ -15,11 +15,11 @@ export const updateGeo = (data) => http.post('/geo')
 
 export const restartKernel = (data) => http.patch('/restart', data)
 
-export const setup = (login) => {
+export const setup = ({ host, port, secret }) => {
   return axios({
-    baseURL: `http://${login.host}`,
-    timeout: 2000,
-    headers: { Authorization: `Bearer ${login.secret}` },
+    baseURL: `http://${host}:${port}`,
+    timeout: 5000,
+    headers: { Authorization: `Bearer ${secret}` },
   })
 }
 
