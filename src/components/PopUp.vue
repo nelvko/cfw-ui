@@ -12,7 +12,8 @@ function format(str) {
   if (show.value) {
     return str
   }
-  return str.trim()[0]
+  // return str.trim()[4]
+  return 'P'
 }
 
 watch(
@@ -40,7 +41,7 @@ watch(
   <div
     @mouseleave="show = false"
     :class="{ a: show }"
-    class="absolute right-[20px] flex h-full flex-col justify-center border-l-transparent bg-white pr-[5px] text-[12px] transition duration-200 ease-linear"
+    class="absolute right-[18px] flex h-full flex-col justify-center border-l-transparent bg-white pr-[5px] text-[12px] transition duration-1000 ease-linear"
   >
     <span
       class="text-[#808080]"

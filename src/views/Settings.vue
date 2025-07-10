@@ -8,6 +8,7 @@ const { setupInfo } = storeToRefs(useSetupStore())
 
 function quit() {
   setupInfo.value.host = null
+  setupInfo.value.port = null
   setupInfo.value.secret = null
   window.location.reload(true)
 }

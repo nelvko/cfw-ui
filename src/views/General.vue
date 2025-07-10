@@ -4,21 +4,21 @@
 // Disconnected
 import { computed, onMounted, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
-import { getTraffic, getVersion } from '@/api/common.js'
+import { getVersion } from '@/api/common.js'
 import ToolTip from '@/components/ToolTip.vue'
 import { getConfig, updateConfig } from '@/api/configs.js'
 import Modal from '@/components/Model.vue'
 import { useSetupStore } from '@/stores/setup/index.js'
 import SwitchOption from '@/components/SwitchOption.vue'
 
-const version = ref({})
+const coreVersion = ref({})
+const uiVersion = ref('')
+console.log(import.meta.env.PACKAGE_VERSION)
 
 onMounted(() => {
-  getTraffic().then((res) => {
-    console.log(res)
-  })
+  uiVersion.value = import.meta.env.PACKAGE_VERSION
   getVersion().then((res) => {
-    version.value = res.data
+    coreVersion.value = res.data
   })
   getConfig().then((res) => {
     config.value = res.data
@@ -70,15 +70,15 @@ const isTerminal = ref(false)
 const isChangeBindAddress = ref(false)
 
 const clashCore = computed(() => {
-  let clash = 'clash'
-  const versionNo = version.value.version
-  if (version.value.premium) {
-    clash = 'Premium'
+  let core = ''
+  const versionNo = coreVersion.value.version
+  if (coreVersion.value.premium) {
+    core = 'Premium'
   }
-  if (version.value.meta) {
-    clash = 'mihomo'
+  if (coreVersion.value.meta) {
+    core = 'mihomo'
   }
-  return `${versionNo} ${clash} (9090)`
+  return `${versionNo} ${core} (9090)`
 })
 // 0关闭 1开启中 2 开启
 const addRule = ref(0)
@@ -149,7 +149,7 @@ function openWebUI() {
         <div class="m-[19px] cursor-pointer text-[30px] text-[#2c3e50]" @dblclick="reloadPage">
           Clash for Windows
         </div>
-        <div class="cursor-pointer" @click="checkUpdate">{{ version.version }}</div>
+        <div class="cursor-pointer" @click="checkUpdate">{{ `v${uiVersion}` }}</div>
       </div>
     </div>
     <div class="flex w-1/2 flex-col">

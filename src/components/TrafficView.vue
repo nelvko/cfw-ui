@@ -7,7 +7,7 @@ const up = ref(null)
 const down = ref(null)
 
 onMounted(() => {
-  traffic.onmessage = (event) => {
+  traffic().onmessage = (event) => {
     // console.log('📩 收到消息：', event)
     const data = JSON.parse(event.data)
     up.value = data.up

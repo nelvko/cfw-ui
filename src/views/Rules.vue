@@ -7,7 +7,6 @@ const keyword = ref('')
 const ruleList = ref([])
 onActivated(() => {
   getRules().then(({ data }) => {
-    console.log(data.rules)
     ruleList.value = data.rules
   })
 })
@@ -41,9 +40,9 @@ const filterRuleList = computed(() => {
       <div
         v-for="(item, index) in filterRuleList"
         :key="index"
-        class="flex h-[40px] items-center border-b-[1px] border-b-[#eaeaea]"
+        class="flex h-[40px] items-center border-b-[1px] border-b-[#eaeaea] text-center"
       >
-        <span class="ml-[20px] flex-1 text-[#808080]">{{ item.type }}</span>
+        <span class="flex-1 text-[#808080]">{{ item.type }}</span>
         <span class="flex-1">{{ item.payload }}</span>
         <span class="flex-1">{{ item.proxy }}</span>
       </div>

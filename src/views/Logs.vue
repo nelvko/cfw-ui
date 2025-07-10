@@ -7,6 +7,10 @@ import { getMode } from '@/api/configs.js'
 const isSimple = ref(true)
 const isInfo = ref(true)
 const logList = ref([])
+const logType = computed(() => {
+  return isInfo.value ? 'info' : 'debug'
+})
+console.log(111, logType.value)
 
 function parseLogLine(log) {
   const result = {}
@@ -48,7 +52,7 @@ onActivated(() => {
   })
   isStop.value = false
 
-  logs.onmessage = onMessage
+  logs(logType.value).onmessage = onMessage
   if (logList.value.length > 0) {
     logsBox.value.scrollTop = logsBox.value.scrollHeight
   }
@@ -85,9 +89,9 @@ const isStop = ref(false)
 function stopLog() {
   isStop.value = !isStop.value
   if (isStop.value) {
-    logs.onmessage = null
+    logs(logType.value).onmessage = null
   } else {
-    logs.onmessage = onMessage
+    logs(logType.value).onmessage = onMessage
   }
 }
 

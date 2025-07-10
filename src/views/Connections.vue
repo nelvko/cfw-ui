@@ -20,7 +20,7 @@ function onMessage(event) {
   connectionList.value = data.connections
 }
 onActivated(() => {
-  connections.onmessage = onMessage
+  connections().onmessage = onMessage
 })
 
 const upload = computed(() => {
@@ -35,9 +35,9 @@ function switchPause() {
   console.log(123, isPause.value)
 
   if (isPause.value) {
-    connections.onmessage = null
+    connections().onmessage = null
   } else {
-    connections.onmessage = onMessage
+    connections().onmessage = onMessage
   }
 }
 </script>
