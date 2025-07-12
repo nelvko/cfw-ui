@@ -1,27 +1,34 @@
 <script setup>
 import TopInfo from '@/components/TopInfo.vue'
 import GreyButton from '@/components/GreyButton.vue'
-import { computed, onActivated, ref } from 'vue'
+import { computed, onActivated, onMounted, onUnmounted, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
 import ToolTip from '@/components/ToolTip.vue'
 import { closeAllConnections, closeConnection } from '@/api/common.js'
-import { connections } from '@/api/ws.js'
+import { createConnectionWebSocket } from '@/api/ws.js'
 
 const isPause = ref(false)
 const connectionList = ref([])
 const downloadTotal = ref(0)
 const uploadTotal = ref(0)
-
+let connWs
+onMounted(() => {
+  connWs = createConnectionWebSocket()
+})
+onUnmounted(() => {
+  if (connWs && connWs.readyState === WebSocket.OPEN) connWs.close()
+})
+onActivated(() => {
+  if (!connWs.onmessage) {
+    connWs.onmessage = onMessage
+  }
+})
 function onMessage(event) {
   const data = JSON.parse(event.data)
-  // console.log('📩 收到消息：', data)
   downloadTotal.value = data.downloadTotal
   uploadTotal.value = data.uploadTotal
   connectionList.value = data.connections
 }
-onActivated(() => {
-  connections().onmessage = onMessage
-})
 
 const upload = computed(() => {
   return useFormatSpeed(uploadTotal.value, 1)
@@ -35,9 +42,9 @@ function switchPause() {
   console.log(123, isPause.value)
 
   if (isPause.value) {
-    connections().onmessage = null
+    connWs.onmessage = null
   } else {
-    connections().onmessage = onMessage
+    connWs.onmessage = onMessage
   }
 }
 </script>
@@ -54,6 +61,7 @@ function switchPause() {
             :placeholder="$t('Search')"
             type="text"
             class="flex-1 cursor-default rounded-[4px] pl-[6px]"
+            :class="$theme.input"
           />
         </div>
         <div class="flex gap-x-[5px]">

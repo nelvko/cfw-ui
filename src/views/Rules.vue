@@ -34,6 +34,7 @@ const filterRuleList = computed(() => {
         :placeholder="$t('Search')"
         v-model="keyword"
         class="h-[35px] flex-1 cursor-default rounded-[4px] pl-[12px]"
+        :class="$theme.input"
       />
     </TopInfo>
     <div class="overflow-y-auto" v-if="ruleList.length > 0">

@@ -41,7 +41,7 @@ watch(
   <div
     @mouseleave="show = false"
     :class="{ a: show }"
-    class="absolute right-[18px] flex h-full flex-col justify-center border-l-transparent bg-white pr-[5px] text-[12px] transition duration-1000 ease-linear"
+    class="absolute right-[18px] flex h-full flex-col justify-center border-l-transparent bg-transparent pr-[5px] text-[12px] transition-[width] duration-10000 ease-in hover:bg-white"
   >
     <span
       class="text-[#808080]"

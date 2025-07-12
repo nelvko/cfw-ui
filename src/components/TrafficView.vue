@@ -1,19 +1,21 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useFormatSpeed } from '@/hooks/formatSpeed.js'
-import { traffic } from '@/api/ws.js'
+import { createTrafficWebSocket } from '@/api/ws.js'
 
 const up = ref(null)
 const down = ref(null)
-
+let trafficWebSockets
 onMounted(() => {
-  traffic().onmessage = (event) => {
-    // console.log('📩 收到消息：', event)
-    const data = JSON.parse(event.data)
-    up.value = data.up
-    down.value = data.down
-  }
+  trafficWebSockets = createTrafficWebSocket()
+  trafficWebSockets.onmessage = onMessage
 })
+
+function onMessage(event) {
+  const data = JSON.parse(event.data)
+  up.value = data.up
+  down.value = data.down
+}
 
 const upSpeed = computed(() => {
   return useFormatSpeed(up.value)
@@ -24,7 +26,7 @@ const downSpeed = computed(() => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col items-center justify-around">
+  <div class="flex h-full flex-col items-center justify-around" :class="$theme.traffic">
     <div class="traffic">
       <span class="material-icons up">straight</span>
       <span class="num">{{ upSpeed.num }}</span>

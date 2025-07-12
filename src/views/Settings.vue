@@ -3,6 +3,8 @@ import TopInfo from '@/components/TopInfo.vue'
 import AppearanceItem from '@/components/settings/AppearanceItem.vue'
 import { useSetupStore } from '@/stores/setup/index.js'
 import { storeToRefs } from 'pinia'
+import SecurityItem from '@/components/settings/SecurityItem.vue'
+import GeneralItem from '@/components/settings/GeneralItem.vue'
 
 const { setupInfo } = storeToRefs(useSetupStore())
 

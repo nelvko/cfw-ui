@@ -1,6 +1,6 @@
 <script setup>
 import TrafficView from '@/components/TrafficView.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopInfo from '@/components/TopInfo.vue'
 import { storeToRefs } from 'pinia'
@@ -37,19 +37,28 @@ const clickItem = (index, item) => {
   activeMenu.value = index
   router.push({ name: item })
 }
+
+import { getCurrentInstance } from 'vue'
+
+const { appContext } = getCurrentInstance()
+const theme = appContext.config.globalProperties.$theme
+
+const active = computed(() => {
+  return theme.sideMenu.selected
+})
 </script>
 
 <template>
-  <div class="bg-grey-bg flex h-full w-[170px] flex-col">
+  <div class="flex h-full w-[170px] flex-col" :class="$theme.sideMenu.select">
     <TopInfo>
       <traffic-view />
     </TopInfo>
 
-    <div class="flex flex-col bg-white">
+    <div class="flex flex-col">
       <div
-        class="bg-grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
+        class="flex h-[57px] cursor-pointer items-center justify-center"
         :class="[
-          { active: activeMenu === index },
+          activeMenu === index ? active : $theme.sideMenu.select,
           { topRadius: activeMenu === index - 1 },
           { bottomRadius: activeMenu === index + 1 },
         ]"
@@ -59,14 +68,14 @@ const clickItem = (index, item) => {
       >
         {{ $t(item) }}
       </div>
-      <div
-        class="bg-grey-bg flex h-[57px] cursor-pointer items-center justify-center text-[#747d88]"
-        @click="switchLanguage"
-      >
+      <div class="flex h-[57px] cursor-pointer items-center justify-center" @click="switchLanguage">
         {{ $t('Language') }}
       </div>
     </div>
-    <div class="mb-[14px] flex flex-1 flex-col items-center justify-end">
+    <div
+      class="mb-[14px] flex flex-1 flex-col items-center justify-end"
+      :class="$theme.sideMenu.connection"
+    >
       <div class="bottom-[40px] text-[1em]">{{ time }}</div>
       <div class="flex items-center">
         <span class="material-icons">circle</span>
@@ -80,11 +89,6 @@ const clickItem = (index, item) => {
 .material-icons {
   color: #41b883;
   font-size: 16px;
-}
-
-.active {
-  background-color: #fff;
-  color: #000;
 }
 
 .topRadius {

@@ -5,8 +5,8 @@ defineProps({
 </script>
 
 <template>
-  <div class="">{{ title }}</div>
-  <div class="bg-[#f1f1f1]">
+  <div>{{ title }}</div>
+  <div class="bg-[#084a5a]">
     <slot />
   </div>
 </template>

@@ -146,7 +146,7 @@ function openWebUI() {
       <img alt="logo" class="h-[60px] w-[60px]" src="@/assets/clash-1.svg" />
       <div style="display: flex; align-items: baseline">
         <!--        快速重启软件-->
-        <div class="m-[19px] cursor-pointer text-[30px] text-[#2c3e50]" @dblclick="reloadPage">
+        <div class="m-[19px] cursor-pointer text-[30px]" @dblclick="reloadPage">
           Clash for Windows
         </div>
         <div class="cursor-pointer" @click="checkUpdate">{{ `v${uiVersion}` }}</div>

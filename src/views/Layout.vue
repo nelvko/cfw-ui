@@ -8,7 +8,7 @@ import SideMenu from '@/components/SideMenu.vue'
     <WindowBar />
     <div class="relative flex flex-1 overflow-y-hidden" id="layout">
       <SideMenu id="aside" />
-      <main class="relative flex-1" id="main">
+      <main class="relative flex-1" :class="$theme.main" id="main">
         <RouterView v-slot="{ Component }">
           <KeepAlive>
             <component :is="Component" />

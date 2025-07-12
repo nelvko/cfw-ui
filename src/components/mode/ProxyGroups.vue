@@ -50,15 +50,16 @@ function scrollToSelected() {
 </script>
 
 <template>
-  <div class="relative flex flex-col bg-white">
+  <div class="relative flex flex-col">
     <div
-      class="sticky top-0 mr-[20px] ml-[30px] flex h-[44px] items-center justify-between rounded-[5px] bg-white pr-[10px] hover:bg-[#f1f1f1]"
+      class="sticky top-0 mr-[20px] ml-[30px] flex h-[44px] items-center justify-between rounded-[5px] pr-[10px]"
+      :class="$theme.optionItem"
       @click.self="isHideProxies = !isHideProxies"
     >
       <div class="flex items-center">
         <div class="mr-[9px] ml-[10px] tracking-[1px]">{{ groupName }}</div>
         <div
-          class="mr-[3px] flex h-[15px] w-[13.5px] items-center justify-center rounded-[3px] bg-[#41b883] text-[10px] text-white"
+          class="mr-[3px] flex h-[15px] w-[13.5px] items-center justify-center rounded-[3px] bg-[#41b883] text-[10px]"
         >
           S
         </div>
@@ -93,14 +94,15 @@ function scrollToSelected() {
         v-for="(item, index) in filterList"
         :key="index"
         class="my-[4px] flex h-[56px] cursor-pointer items-center justify-center"
+        :class="{ timeout: item.timeout }"
         @click="selectProxy(item.name)"
       >
         <div
-          class="mr-[4px] h-[56px] w-[4px] cursor-pointer bg-[#dedede]"
-          :class="{ selected: item.name === selectedProxy }"
+          class="mr-[4px] h-[56px] w-[4px] cursor-pointer"
+          :class="item.name === selectedProxy ? $theme.proxies.selected : $theme.proxies.select"
         />
 
-        <div class="flex h-[56px] w-[382px] cursor-pointer justify-between bg-[#f4f4f4]">
+        <div class="flex h-[56px] w-[382px] cursor-pointer justify-between" :class="$theme.card">
           <div class="ml-[15px] flex flex-col justify-center">
             <div>{{ item.name }}</div>
             <div class="flex">
@@ -124,7 +126,7 @@ function scrollToSelected() {
           </div>
         </div>
       </div>
-      <div class="h-[30px] bg-pink-500"></div>
+      <div class="h-[30px] bg-pink-500" />
     </div>
   </div>
 </template>
@@ -132,7 +134,7 @@ function scrollToSelected() {
 <style scoped>
 .material-icons {
   font-size: 16px;
-  @apply flex h-[30px] w-[30px] items-center justify-center rounded-[5px] hover:bg-[#d6d6d6];
+  @apply flex h-[30px] w-[30px] items-center justify-center rounded-[5px] hover:bg-white/60;
 }
 
 .selected {

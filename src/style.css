@@ -12,7 +12,7 @@
 
   input {
     outline: none;
-    border: 1px solid #dcdcdc;
+    border: 1px solid;
   }
 
   input::placeholder {

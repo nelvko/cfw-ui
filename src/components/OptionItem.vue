@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="flex justify-between p-[10px] hover:rounded-[4px] hover:bg-[#f1f1f1]">
+  <div class="flex justify-between p-[10px] hover:rounded-[4px]" :class="$theme.optionItem">
     <div class="flex items-center">
       <div class="flex justify-center">{{ label }}</div>
       <slot name="left" />

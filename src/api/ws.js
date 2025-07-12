@@ -3,10 +3,11 @@ import { storeToRefs } from 'pinia'
 
 const { setupInfo } = storeToRefs(useSetupStore())
 const { host, port, secret } = setupInfo.value
+const prefix = `ws://${host}:${port}`
+const suffix = `?token=${secret}`
 
-export const connections = () => new WebSocket(`ws://${host}:${port}/connections?token=${secret}`)
+export const createConnectionWebSocket = () => new WebSocket(`${prefix}/connections${suffix}`)
 
-export const logs = (level) =>
-  new WebSocket(`ws://${host}:${port}/logs?token=${secret}&level=${level}`)
+export const createLogWebSocket = (level) => new WebSocket(`${prefix}/logs${suffix}&level=${level}`)
 
-export const traffic = () => new WebSocket(`ws://${host}:${port}/traffic?token=${secret}`)
+export const createTrafficWebSocket = () => new WebSocket(`${prefix}/traffic${suffix}`)

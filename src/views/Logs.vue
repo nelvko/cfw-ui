@@ -1,8 +1,30 @@
 <script setup>
-import { computed, onActivated, ref, useTemplateRef } from 'vue'
+import { computed, onActivated, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import TopInfo from '@/components/TopInfo.vue'
-import { logs } from '@/api/ws.js'
+import { createLogWebSocket } from '@/api/ws.js'
 import { getMode } from '@/api/configs.js'
+
+let logWs
+onMounted(() => {
+  logWs = createLogWebSocket(logType.value)
+})
+onUnmounted(() => {
+  if (logWs && logWs.readyState === WebSocket.OPEN) logWs.close()
+})
+
+onActivated(() => {
+  if (!logWs.onmessage) {
+    logWs.onmessage = onMessage
+  }
+  getMode().then((mode) => {
+    activeMode.value = mode
+  })
+  isStop.value = false
+
+  if (logList.value.length > 0) {
+    logsBox.value.scrollTop = logsBox.value.scrollHeight
+  }
+})
 
 const isSimple = ref(true)
 const isInfo = ref(true)
@@ -10,7 +32,6 @@ const logList = ref([])
 const logType = computed(() => {
   return isInfo.value ? 'info' : 'debug'
 })
-console.log(111, logType.value)
 
 function parseLogLine(log) {
   const result = {}
@@ -45,19 +66,6 @@ function onMessage({ data, timeStamp }) {
   })
 }
 
-onActivated(() => {
-  console.log('onActivated')
-  getMode().then((mode) => {
-    activeMode.value = mode
-  })
-  isStop.value = false
-
-  logs(logType.value).onmessage = onMessage
-  if (logList.value.length > 0) {
-    logsBox.value.scrollTop = logsBox.value.scrollHeight
-  }
-})
-
 function switchSimple() {
   isSimple.value = !isSimple.value
   if (isSimple.value) {
@@ -89,9 +97,9 @@ const isStop = ref(false)
 function stopLog() {
   isStop.value = !isStop.value
   if (isStop.value) {
-    logs(logType.value).onmessage = null
+    createLogWebSocket(logType.value).onmessage = null
   } else {
-    logs(logType.value).onmessage = onMessage
+    createLogWebSocket(logType.value).onmessage = onMessage
   }
 }
 
@@ -116,6 +124,7 @@ const filterLogList = computed(() =>
         :placeholder="$t('Search')"
         v-model="keyword"
         class="h-[35px] flex-1 cursor-default rounded-[4px] pl-[12px]"
+        :class="$theme.input"
       />
       <div
         class="flex flex-col gap-y-[4px] text-center text-[14px] text-white *:flex *:h-[26px] *:w-[117px] **:[button]:bg-[#c7bfbf]"

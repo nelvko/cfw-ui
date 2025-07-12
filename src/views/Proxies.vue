@@ -1,5 +1,5 @@
 <script setup>
-import { onActivated, onDeactivated, onUnmounted, ref } from 'vue'
+import { onActivated, onUnmounted, ref } from 'vue'
 import DirectMode from '@/components/mode/DirectMode.vue'
 import TopInfo from '@/components/TopInfo.vue'
 import ProxyMode from '@/components/mode/ProxyMode.vue'
@@ -36,7 +36,7 @@ async function switchMode(val) {
       <div
         v-for="(item, index) in modeList"
         :key="index"
-        :class="{ 'active-mode': activeMode === item.value }"
+        :class="activeMode === item.value ? $theme.proxies.activeMode : $theme.proxies.mode"
         class="flex h-[40px] w-[120px] cursor-pointer items-center justify-center rounded-[5px] text-[16px] text-[#747474] shadow-md"
         @click="switchMode(item.name)"
       >

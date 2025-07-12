@@ -1,19 +1,21 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSettingsStore } from '@/stores/settings/settings.js'
 
 const isFull = ref(true)
 const isKeep = ref(false)
 const fullState = computed(() => {
   return isFull.value ? 'close_fullscreen' : 'check_box_outline_blank'
 })
-
+import { useSettingsStore } from '@/stores/settings/settings.js'
 const { titleBarText } = storeToRefs(useSettingsStore())
 </script>
 
 <template>
-  <div class="relative flex h-[25px] flex-none items-center justify-center bg-[#ebebeb]">
+  <div
+    class="relative flex h-[25px] flex-none items-center justify-center"
+    :class="$theme.windowBar"
+  >
     <div class="text-[12px]">{{ titleBarText }}</div>
     <div class="absolute right-0 flex h-full items-center justify-center">
       <span class="material-icons" @click="isKeep = !isKeep" :class="{ 'text-[#0c7d9d]': isKeep }"

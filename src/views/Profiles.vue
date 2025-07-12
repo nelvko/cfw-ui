@@ -12,7 +12,7 @@ function selectProfile() {
 <template>
   <TopInfo style="display: flex; align-items: center">
     <div class="relative flex grow-1 items-center">
-      <input :placeholder="$t('Download from a URL')" />
+      <input :placeholder="$t('Download from a URL')" :class="$theme.input" />
       <span class="material-icons absolute right-[12px] text-[#7f7f7f] hover:cursor-pointer"
         >content_copy</span
       >
@@ -32,7 +32,8 @@ function selectProfile() {
         :class="{ 'bg-[#41b883]': isSelect, 'bg-[#dedede]': !isSelect }"
       ></div>
       <div
-        class="flex h-[72px] max-w-[387px] min-w-[295px] flex-1 cursor-pointer items-center justify-between bg-[#f4f4f4] px-[8px]"
+        class="flex h-[72px] max-w-[387px] min-w-[295px] flex-1 cursor-pointer items-center justify-between px-[8px]"
+        :class="$theme.card"
       >
         <div class="flex flex-col justify-center">
           <span class="text-[15px]">config.yaml</span>
