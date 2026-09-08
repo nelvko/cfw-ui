@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Clash for Web - a web-based Clash dashboard" />
+    <title>Clash for Web</title>
+    <style>
+      /* 首屏防白闪:在 JS 加载前先按 html 上的 data-theme 铺底色 */
+      html[data-theme='dark'] body {
+        background: #2c2a38;
+      }
+      html[data-theme='red'] body {
+        background: #f8b74f;
+      }
+      html[data-theme='2077'] body {
+        background: #136377;
+      }
+      html[data-theme='light'] body {
+        background: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
