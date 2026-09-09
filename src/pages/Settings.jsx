@@ -11,6 +11,11 @@ import { bootstrap } from '../service'
 const THEME_VALUES = ['light', 'dark', 'red', '2077']
 const THEME_LABELS = ['Light', 'Dark', '国庆中秋', 'Cyberpunk']
 
+// 特例(Web 版新增):原版 CFW 纯英文界面无语言切换项。
+// 语言与主题同属界面外观,故放入 Appearance 区块,用 SelectView 保持原版设计语言。
+const LANG_VALUES = ['zh', 'en']
+const LANG_LABELS = ['中文', 'English']
+
 export default function Settings() {
   const t = useT()
   const s = useSettings()
@@ -58,6 +63,14 @@ export default function Settings() {
             <div className="item">
               <div>{t('Follow System Theme')}</div>
               <Switch checked={s.systemTheme} onChange={(v) => s.patch({ systemTheme: v })} />
+            </div>
+            <div className="item">
+              <div>{t('Language')}</div>
+              <SelectView
+                items={LANG_LABELS}
+                value={Math.max(0, LANG_VALUES.indexOf(s.lang))}
+                onChange={(i) => s.patch({ lang: LANG_VALUES[i] })}
+              />
             </div>
           </div>
         </div>
