@@ -269,11 +269,10 @@ body {
   overflow: hidden;
 }
 
-/* 对齐原版 .right-side: 页面各自内部滚动, 内容溢出在此裁剪 */
+/* 对齐原版 .right-side: 无 overflow(溢出由 .app 的 overflow:hidden 兜底) */
 .content {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
 }
 
 /* ============ 侧边栏(结构与数值 1:1 对应 CFW .main-main-menu) ============ */
@@ -763,7 +762,6 @@ select.as-text {
   display: flex;
   align-items: center;
   max-width: 500px;
-  min-width: 0;
 }
 .proxy-section-name-left {
   display: flex;
@@ -794,7 +792,6 @@ select.as-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
 }
 .proxy-section-right {
   display: flex;
@@ -833,7 +830,6 @@ select.as-text {
   display: flex;
   align-items: center;
   flex-grow: 1;
-  min-width: 0;
   transition: all 0.3s;
 }
 .scroll-view .proxy-item .indicator {
