@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { useClash } from '../store/clash'
+import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
 import { selectProxy, testGroupDelay, updateMode } from '../service'
 
@@ -115,6 +116,7 @@ export default function Proxies() {
   const mode = useClash((s) => s.mode)
   const groupNames = useClash((s) => s.groupNames)
   const groups = mode === 'global' ? ['GLOBAL'] : groupNames
+  const showProxyFilter = useSettings((s) => s.showProxyFilter)
 
   const [filterKeyword, setFilterKeyword] = useState('')
   const [isShowFilter, setIsShowFilter] = useState(false)
@@ -174,20 +176,22 @@ export default function Proxies() {
         ))}
       </div>
 
-      <div className="filter-keyword">
-        {isShowFilter && (
-          <input
-            ref={filterInputRef}
-            type="text"
-            spellCheck="false"
-            value={filterKeyword}
-            onChange={(e) => setFilterKeyword(e.target.value)}
-          />
-        )}
-        <div onClick={toggleFilter}>
-          <span className="material-icons">{isShowFilter ? 'close' : 'filter_list'}</span>
+      {showProxyFilter && (
+        <div className="filter-keyword">
+          {isShowFilter && (
+            <input
+              ref={filterInputRef}
+              type="text"
+              spellCheck="false"
+              value={filterKeyword}
+              onChange={(e) => setFilterKeyword(e.target.value)}
+            />
+          )}
+          <div onClick={toggleFilter}>
+            <span className="material-icons">{isShowFilter ? 'close' : 'filter_list'}</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -25,6 +25,8 @@ export const useSettings = create(
       logLevel: 'info',
       testUrl: 'https://www.gstatic.com/generate_204',
       testTimeout: 5000,
+      // Proxies(原版 showProxyFilter 默认关闭, 右下角不显示关键词过滤图标)
+      showProxyFilter: false,
       // 订阅(演示模式下本地保存)
       profiles: [],
       activeProfileId: null,
@@ -60,6 +62,7 @@ export const useSettings = create(
           logLevel: 'info',
           testUrl: 'https://www.gstatic.com/generate_204',
           testTimeout: 5000,
+          showProxyFilter: false,
           profiles: [],
           activeProfileId: null,
         }),
