@@ -763,6 +763,7 @@ select.as-text {
   display: flex;
   align-items: center;
   max-width: 500px;
+  min-width: 0;
 }
 .proxy-section-name-left {
   display: flex;
@@ -793,6 +794,7 @@ select.as-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 .proxy-section-right {
   display: flex;
@@ -831,7 +833,7 @@ select.as-text {
   display: flex;
   align-items: center;
   flex-grow: 1;
-  width: 290px;
+  min-width: 0;
   transition: all 0.3s;
 }
 .scroll-view .proxy-item .indicator {
