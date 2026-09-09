@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vite
+
+# Agent 工作区临时产物
+.psacowork/
+
+# 原版 CFW 反编译提取的参考资产（版权敏感，仅本地保留）
+.cfw-extract/
