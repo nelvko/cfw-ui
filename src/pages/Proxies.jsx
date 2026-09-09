@@ -14,6 +14,10 @@ const MODES = [
 // 原版 proxy-hint-type 显示类型英文首字母
 const TYPE_FIRST = { Selector: 'S', URLTest: 'U', Fallback: 'F', Direct: 'D', Reject: 'R' }
 
+// 原版 proxy-item 宽度 = settings.proxyItemWidth(>=150 时生效, 否则回退 290px)
+// 当前 Settings 页尚未实现 "Proxy Item Width" 设置项, 暂用原版默认值 290
+const PROXY_ITEM_WIDTH = 290
+
 // 原版 latency:-1 → "- ms";"Timeout" → offline;其他 → online + "N ms"
 function latencyInfo(ms, t) {
   if (ms == null) return { text: '- ms', cls: '' }
@@ -80,6 +84,7 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
               <div
                 key={node}
                 className={`proxy-item${selected ? ' selected' : ''}${selectable ? ' clickable' : ''}`}
+                style={{ width: PROXY_ITEM_WIDTH }}
                 onClick={() => selectable && selectProxy(name, node)}
               >
                 <div className="indicator" />
@@ -97,7 +102,7 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
             )
           })}
           {Array.from({ length: 20 }, (_, i) => (
-            <i key={i} />
+            <i key={i} style={{ width: PROXY_ITEM_WIDTH }} />
           ))}
         </div>
       )}
