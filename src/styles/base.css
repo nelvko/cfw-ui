@@ -559,14 +559,6 @@ body {
 input.as-text {
   cursor: text;
 }
-select.as-text {
-  appearance: none;
-  -webkit-appearance: none;
-}
-.as-text option {
-  color: var(--fgc);
-  background: var(--bgc);
-}
 
 /* ============ 开关(灰底红点=关,绿底白点=开) ============ */
 .cfw-toggle {

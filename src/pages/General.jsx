@@ -5,7 +5,8 @@ import { useT } from '../hooks/useT'
 import Switch from '../components/Switch'
 import { syncConfigs, updateLogLevel } from '../service'
 
-const LEVELS = ['debug', 'info', 'warning', 'error', 'silent']
+// 与原版 handleEditLogLevel 的 $select items 顺序一致(降序)
+const LEVELS = ['silent', 'error', 'warning', 'info', 'debug']
 const DESK = 'Desktop Only'
 
 // 与原版 InfoIcon 一致:info 图标,16px,opacity 0.7
@@ -47,6 +48,7 @@ export default function General() {
   const version = useClash((c) => c.version)
   const [editingPort, setEditingPort] = useState(false)
   const [portDraft, setPortDraft] = useState('')
+  const [editingLogLevel, setEditingLogLevel] = useState(false)
 
   const toggle = (key, configField) => (val) => {
     s.patch({ [key]: val })
@@ -130,13 +132,9 @@ export default function General() {
         </Gitem>
 
         <Gitem label={t('Log Level')}>
-          <select className="as-text" value={s.logLevel} onChange={(e) => updateLogLevel(e.target.value)}>
-            {LEVELS.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
+          <span className="clickable" onClick={() => setEditingLogLevel(true)}>
+            {s.logLevel}
+          </span>
         </Gitem>
 
         <Gitem label={t('IPv6')}>
@@ -234,6 +232,33 @@ export default function General() {
               </button>
               <button type="button" className="btn primary" onClick={commitPort}>
                 {t('Save')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingLogLevel && (
+        <div className="mask" onMouseDown={() => setEditingLogLevel(false)}>
+          <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modal-title">Change Log Level</div>
+            <div className="modal-body">silent will prevent .log file to generate on next startup</div>
+            <div className="modal-footer">
+              {LEVELS.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    updateLogLevel(l)
+                    setEditingLogLevel(false)
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+              <button type="button" className="btn" onClick={() => setEditingLogLevel(false)}>
+                {t('Cancel')}
               </button>
             </div>
           </div>

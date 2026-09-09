@@ -3,15 +3,13 @@ import { useSettings } from '../store/settings'
 import { useClash } from '../store/clash'
 import { useT } from '../hooks/useT'
 import Switch from '../components/Switch'
+import SelectView from '../components/SelectView'
 import { bootstrap } from '../service'
 
-// 原版 Appearance > Theme 的 SelectView 显示文案(值映射 light/dark/red/2077)
-const THEME_OPTIONS = [
-  ['light', 'Light'],
-  ['dark', 'Dark'],
-  ['red', '国庆中秋'],
-  ['2077', 'Cyberpunk'],
-]
+// 原版 Appearance > Theme 的 SelectView(renderer.js @3178564):
+// items Light/Dark/国庆中秋/Cyberpunk, 值映射 light/dark/red/2077(store 索引)
+const THEME_VALUES = ['light', 'dark', 'red', '2077']
+const THEME_LABELS = ['Light', 'Dark', '国庆中秋', 'Cyberpunk']
 
 export default function Settings() {
   const t = useT()
@@ -49,43 +47,17 @@ export default function Settings() {
           <div className="content">
             {!s.systemTheme && (
               <div className="item">
-                <div className="relative flex items-center">
-                  <div>{t('Theme')}</div>
-                </div>
-                <div className="relative flex items-center">
-                  <select
-                    className="as-text"
-                    style={{ width: 140 }}
-                    value={s.theme}
-                    onChange={(e) => s.patch({ theme: e.target.value })}
-                  >
-                    {THEME_OPTIONS.map(([v, label]) => (
-                      <option key={v} value={v}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <div>{t('Theme')}</div>
+                <SelectView
+                  items={THEME_LABELS}
+                  value={Math.max(0, THEME_VALUES.indexOf(s.theme))}
+                  onChange={(i) => s.patch({ theme: THEME_VALUES[i] })}
+                />
               </div>
             )}
             <div className="item">
-              <div className="relative flex items-center">
-                <div>{t('Follow System Theme')}</div>
-              </div>
-              <div className="relative flex items-center">
-                <Switch checked={s.systemTheme} onChange={(v) => s.patch({ systemTheme: v })} />
-              </div>
-            </div>
-            <div className="item">
-              <div className="relative flex items-center">
-                <div>{t('Language')}</div>
-              </div>
-              <div className="relative flex items-center">
-                <select className="as-text" value={s.lang} onChange={(e) => s.patch({ lang: e.target.value })}>
-                  <option value="zh">中文</option>
-                  <option value="en">English</option>
-                </select>
-              </div>
+              <div>{t('Follow System Theme')}</div>
+              <Switch checked={s.systemTheme} onChange={(v) => s.patch({ systemTheme: v })} />
             </div>
           </div>
         </div>
