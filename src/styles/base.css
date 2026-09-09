@@ -604,6 +604,42 @@ select.as-text {
   cursor: not-allowed;
 }
 
+/* ============ SelectView 分段选择按钮 —— 对应 CFW data-v-e458e7bc ============ */
+.main-select-view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.main-select-view .item {
+  color: #fff;
+  height: 26px;
+  font-size: 0.8em;
+  line-height: 25px;
+  padding: 0 6px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 50px;
+  transition: all 0.3s;
+}
+.main-select-view .item-single {
+  background-color: var(--switch-bgc);
+}
+.main-select-view .item-double {
+  background-color: var(--switch-bgc-second);
+}
+.main-select-view .item-first {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+.main-select-view .item-last {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.main-select-view .item-selected {
+  background-color: #179bbb;
+  flex-grow: 1;
+}
+
 /* ============ 模式切换 #main-mode-switcher —— 对应 CFW data-v-357c3e79 ============ */
 #main-mode-switcher {
   width: calc(100vw - 170px);
@@ -1296,15 +1332,9 @@ select.as-text {
   gap: 4px;
   font-size: 16px;
 }
-.main-log-view .selects select {
-  border: none;
-  border-bottom: 1px dashed var(--general-clickable-border-c);
-  background: transparent;
-  color: var(--fgc);
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  font-family: inherit;
+/* 对应原版 SelectView 上的 tailwind mr-4 */
+.main-log-view .selects .main-select-view {
+  margin-right: 16px;
 }
 .main-log-view .button {
   font-size: 0.8em;

@@ -3,6 +3,7 @@ import { useClash } from '../store/clash'
 import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
 import { fmtTime } from '../utils/format'
+import SelectView from '../components/SelectView'
 
 // 与原版 logTypeEmoji 一致
 const EMOJI = { info: '✅', debug: '🪲', warn: '‼️', error: '❌' }
@@ -91,14 +92,8 @@ export default function Logs() {
         </div>
         <div className="btns">
           <div className="selects">
-            <select value={logStyle} onChange={(e) => setLogStyle(Number(e.target.value))}>
-              <option value={0}>Simple</option>
-              <option value={1}>Detailed</option>
-            </select>
-            <select value={logLevel} onChange={(e) => setLogLevel(Number(e.target.value))}>
-              <option value={0}>info</option>
-              <option value={1}>debug</option>
-            </select>
+            <SelectView items={['Simple', 'Detailed']} value={logStyle} onChange={setLogStyle} />
+            <SelectView items={['info', 'debug']} value={logLevel} onChange={setLogLevel} />
           </div>
           <div className="button button-clear" onClick={clearLogs}>
             Clear
