@@ -109,7 +109,7 @@ export default function Profiles() {
   }
 
   return (
-    <div>
+    <div className="main">
       <div className="card remote-view">
         <div className="input-container">
           <input
@@ -122,7 +122,7 @@ export default function Profiles() {
             onKeyDown={(e) => e.key === 'Enter' && onDownload()}
           />
           <span
-            className="icon clear-icon"
+            className="material-icons clear-icon"
             title={subUrl ? t('Clear') : t('Paste')}
             onClick={() => (subUrl ? setSubUrl('') : navigator.clipboard?.readText().then((x) => setSubUrl(x)))}
           >
@@ -130,19 +130,19 @@ export default function Profiles() {
           </span>
         </div>
         <div className="btns-container">
-          <div className="btn download" onClick={onDownload}>
-            {loading ? '…' : 'Download'}
+          <div className="confirm confirm-left" onClick={onDownload}>
+            {loading ? 'Downloading' : 'Download'}
           </div>
-          <div className="btn update-all" onClick={onUpdateAll}>
+          <div className="confirm confirm-right update-all-btn" onClick={onUpdateAll}>
             Update All
           </div>
-          <div className="btn import" onClick={onDownload}>
+          <div className="confirm confirm-right" onClick={onDownload}>
             Import
           </div>
         </div>
       </div>
 
-      <div className="profile-list">
+      <div className="list-view">
         {profiles.map((p) => {
           const cur = p.id === activeId
           const remote = !!p.url
@@ -150,21 +150,28 @@ export default function Profiles() {
           return (
             <div
               key={p.id}
-              className={`profile-item${cur ? ' item-cur' : ''}`}
+              className={`list-item${cur ? ' item-cur' : ''}`}
               onClick={() => setActive(p.id)}
               onContextMenu={(e) => {
                 e.preventDefault()
                 setMenu({ x: e.clientX, y: e.clientY, profile: p })
               }}
             >
-              <div className="indicator">{cur && <div className="indicator-fill" />}</div>
+              <div className="indicator">
+                {cur && (
+                  <>
+                    <div className="indicator-fill" />
+                    <div className="indicator-cycle" />
+                  </>
+                )}
+              </div>
               <div className="item-info">
                 <div className="item-name">
                   <div className="item-name-top" title={p.name}>
                     {p.name}
                   </div>
                   <div className="item-name-bottom" title={p.url}>
-                    <span className="domain">{remote ? parseDomain(p.url) : 'Local'}</span>
+                    <span className="domain-text">{remote ? parseDomain(p.url) : 'Local'}</span>
                     <span className="item-time">({fmtDateTime(p.updatedAt)})</span>
                   </div>
                   {p.total ? (
@@ -181,7 +188,7 @@ export default function Profiles() {
                 <div className="item-actions">
                   {remote ? (
                     <span
-                      className={`icon${updatingId === p.id ? ' rotating' : ''}`}
+                      className={`material-icons${updatingId === p.id ? ' rotating' : ''}`}
                       title="Update"
                       onClick={(e) => {
                         e.stopPropagation()
@@ -192,7 +199,7 @@ export default function Profiles() {
                     </span>
                   ) : (
                     <span
-                      className="icon"
+                      className="material-icons"
                       title="Edit"
                       onClick={(e) => {
                         e.stopPropagation()
@@ -207,6 +214,9 @@ export default function Profiles() {
             </div>
           )
         })}
+        {Array.from({ length: 20 }, (_, i) => (
+          <i key={`hidden${i}`} />
+        ))}
         {profiles.length === 0 && <div className="empty-tip">{t('No Profiles')}</div>}
       </div>
 
@@ -220,7 +230,7 @@ export default function Profiles() {
             .filter((m) => !m.hide && !(m.hideWhenLocal && !menu.profile.url))
             .map((m) => (
               <div key={m.text} className="ctx-item" onClick={() => onMenuAction(m, menu.profile)}>
-                <span className="icon">{m.icon}</span>
+                <span className="material-icons">{m.icon}</span>
                 <span>{m.text}</span>
               </div>
             ))}

@@ -21,7 +21,7 @@ export default function Rules() {
   )
 
   return (
-    <div>
+    <div className="rules">
       <div className="page-header">
         <div className="left">
           <input

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // 与原版 CFW About 页 select(index) 打开的外部链接数组一致
 const URLS = [
@@ -69,6 +69,14 @@ const DISCLAIMER = `1. This software is only intended for the purpose of learnin
 export default function Feedback() {
   const [disclaimer, setDisclaimer] = useState(false)
   const select = (i) => window.open(URLS[i], '_blank')
+
+  // 原版 EscCapture: 支持 Esc 关闭免责声明
+  useEffect(() => {
+    if (!disclaimer) return
+    const onKey = (e) => e.key === 'Escape' && setDisclaimer(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [disclaimer])
 
   return (
     <div id="main-about-view" className="about">

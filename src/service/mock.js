@@ -119,16 +119,19 @@ const LOG_HOSTS = [
   'www.bilibili.com:443',
 ]
 
-const randomLogPayload = () => {
+const randomLogPayload = (type) => {
   const host = LOG_HOSTS[rand(0, LOG_HOSTS.length)]
   const net = Math.random() < 0.85 ? 'TCP' : 'UDP'
   const node = regionNodes[rand(0, regionNodes.length)].name
+  const ip = `${rand(1, 223)}.${rand(0, 255)}.${rand(0, 255)}.${rand(1, 255)}:${rand(1, 65535)}`
   const r = Math.random()
-  if (r < 0.72) return `[${net}] 127.0.0.1:${rand(40000, 60000)} --> ${host} match DomainSuffix using 🚀 节点选择 [${node}]`
-  if (r < 0.85) return `[${net}] 127.0.0.1:${rand(40000, 60000)} --> ${host} match GeoIP(CN) using DIRECT`
-  if (r < 0.93) return `start initial dns record ${host}`
-  if (r < 0.97) return `[UDP] dns resolve ${host} failed: timeout`
-  return `restless dns resolving ${host}`
+  if (type === 'info') {
+    if (r < 0.7) return `[${net}] 127.0.0.1:${rand(40000, 60000)} --> ${host} match DomainSuffix using 🚀 节点选择 [${node}] rAddr=${ip} host=${host}`
+    return `[${net}] 127.0.0.1:${rand(40000, 60000)} --> ${host} match GeoIP(CN) using DIRECT rAddr=${ip} host=${host}`
+  }
+  if (type === 'debug') return `start initial dns record ${host} rAddr=${ip} type=A`
+  if (type === 'warn') return `[UDP] dns resolve ${host} failed: timeout rAddr=${ip} host=${host}`
+  return `[${net}] dial ${host} error: connection refused rAddr=${ip} host=${host}`
 }
 
 // 连接池:定时更新字节数、随机新增/断开,模拟 ws /connections 推送
@@ -163,6 +166,7 @@ function makeConnection(template) {
     upload: rand(1e3, 8e4),
     download: rand(1e4, 2e6),
     start: t.toISOString(),
+    speed: { upload: rand(1e3, 3e5), download: rand(1e4, 8e5) },
     chains: template.chains,
     rule: template.rule,
     rulePayload: template.rule === 'GeoIP(CN)' ? 'CN' : template.host,
@@ -186,6 +190,7 @@ function tickConnections() {
   for (const c of conns) {
     c.upload += rand(0, 6e4)
     c.download += rand(1e3, 9e5)
+    c.speed = { upload: rand(1e3, 3e5), download: rand(1e4, 8e5) }
   }
 }
 
@@ -278,7 +283,9 @@ export function startMockLive({ onTraffic, onConnections, onLog }) {
   let logTimer
   const scheduleLog = () => {
     logTimer = setTimeout(() => {
-      onLog({ type: 'info', payload: randomLogPayload() })
+      const r = Math.random()
+      const type = r < 0.82 ? 'info' : r < 0.92 ? 'debug' : r < 0.97 ? 'warn' : 'error'
+      onLog({ type, payload: randomLogPayload(type) })
       scheduleLog()
     }, rand(400, 2200))
   }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useSettings } from '../store/settings'
 import { useClash } from '../store/clash'
 import { useT } from '../hooks/useT'
@@ -5,17 +6,34 @@ import Switch from '../components/Switch'
 import { syncConfigs, updateLogLevel } from '../service'
 
 const LEVELS = ['debug', 'info', 'warning', 'error', 'silent']
+const DESK = 'Desktop Only'
 
-// 行结构 1:1 对应 CFW:.gitem > .item-left + .item-right(.clickable)
-function Gitem({ label, icons = [], children }) {
+// 与原版 InfoIcon 一致:info 图标,16px,opacity 0.7
+function InfoIcon({ text }) {
+  return (
+    <span className="info-icon-main" title={text}>
+      <span className="material-icons info-icon-text">info</span>
+    </span>
+  )
+}
+
+// 与原版 Hint 一致:可操作设置图标,24x24,hover 背景
+function HintIcon({ icon, title, onClick, style, className = 'tun-settings-icon' }) {
+  return (
+    <span className={`material-icons ${className}`.trim()} title={title} onClick={onClick} style={style}>
+      {icon}
+    </span>
+  )
+}
+
+function Gitem({ label, info, icons = [], children }) {
   return (
     <div className="gitem">
       <div className="item-left">
-        {label}
+        <div>{label}</div>
+        {info && <InfoIcon text={info} />}
         {icons.map((ic) => (
-          <span key={ic.icon} className={`material-icons sec-icon`} title={ic.title}>
-            {ic.icon}
-          </span>
+          <HintIcon key={ic.icon} icon={ic.icon} title={ic.title} onClick={ic.onClick} style={ic.style} />
         ))}
       </div>
       <div className="item-right">{children}</div>
@@ -23,28 +41,40 @@ function Gitem({ label, icons = [], children }) {
   )
 }
 
-const DESK = 'Desktop Only'
-
 export default function General() {
   const t = useT()
   const s = useSettings()
   const version = useClash((c) => c.version)
+  const [editingPort, setEditingPort] = useState(false)
+  const [portDraft, setPortDraft] = useState('')
 
   const toggle = (key, configField) => (val) => {
     s.patch({ [key]: val })
     if (configField) syncConfigs({ [configField]: val })
   }
 
-  const commitPort = (e) => {
-    const v = e.target.value.replace(/\D/g, '').slice(0, 5)
-    s.patchPorts({ mixed: v })
-    if (v) syncConfigs({ 'mixed-port': Number(v) })
+  const toggleRandomPort = () => {
+    const next = !s.randomMixedPort
+    s.patch({ randomMixedPort: next })
+    if (next) {
+      const v = String(Math.floor(10000 + Math.random() * 50000))
+      s.patchPorts({ mixed: v })
+      syncConfigs({ 'mixed-port': Number(v) })
+    }
   }
 
-  const randomPort = () => {
-    const v = String(Math.floor(10000 + Math.random() * 50000))
-    s.patchPorts({ mixed: v })
-    syncConfigs({ 'mixed-port': Number(v) })
+  const openEditPort = () => {
+    setPortDraft(s.ports.mixed)
+    setEditingPort(true)
+  }
+
+  const commitPort = () => {
+    const v = portDraft.replace(/\D/g, '').slice(0, 5)
+    if (v) {
+      s.patchPorts({ mixed: v })
+      syncConfigs({ 'mixed-port': Number(v) })
+    }
+    setEditingPort(false)
   }
 
   const copyVersion = () => {
@@ -60,7 +90,7 @@ export default function General() {
   }
 
   return (
-    <div>
+    <div className="main-general-view">
       <div className="general-header">
         <img src="/logo2.png" alt="Clash" />
         <div className="general-title">
@@ -75,28 +105,27 @@ export default function General() {
 
       <div className="general-content">
         <Gitem label={t('Port')}>
-          <span className="material-icons sec-icon" title={DESK}>
+          <span className="material-icons control-icon" title={DESK}>
             terminal
           </span>
-          <span className="material-icons sec-icon" title={t('Random Port')} onClick={randomPort}>
-            shuffle
+          <span
+            className="material-icons control-icon"
+            title="random mixed port"
+            style={{ color: s.randomMixedPort ? '#41b883' : '#b3b3b3' }}
+            onClick={toggleRandomPort}
+          >
+            {s.randomMixedPort ? 'sync' : 'sync_disabled'}
           </span>
-          <input
-            className="as-text"
-            style={{ width: 56 }}
-            value={s.ports.mixed}
-            onChange={commitPort}
-            onBlur={commitPort}
-          />
+          <span className="clickable" onClick={openEditPort}>
+            {s.ports.mixed}
+          </span>
         </Gitem>
 
         <Gitem
           label={t('Allow LAN')}
-          icons={[{ icon: 'info_outline', title: t('Allow LAN') }, { icon: 'device_hub', title: DESK }]}
+          info="Turn on to listen on all interfaces by default, or else only listen on 127.0.0.1."
+          icons={[{ icon: 'device_hub', title: 'network interfaces' }]}
         >
-          <span className="clickable" title={DESK}>
-            Bind: *
-          </span>
           <Switch checked={s.allowLan} onChange={toggle('allowLan', 'allow-lan')} />
         </Gitem>
 
@@ -117,14 +146,14 @@ export default function General() {
         <Gitem
           label={t('Clash Core')}
           icons={[
-            { icon: 'security', title: DESK },
-            { icon: 'memory', title: DESK },
-            { icon: 'list_alt', title: DESK },
-            { icon: 'play_arrow', title: DESK },
+            { icon: 'gpp_maybe', title: 'add firewall rules(for Allow LAN and system stack)' },
+            { icon: 'memory', title: 'Preview the final configuration file that was submitted to Clash Core' },
+            { icon: 'dns', title: 'Resolve a host using Clash core' },
+            { icon: 'play_arrow', title: 'Test script using by Script mode' },
           ]}
         >
           <span className="clickable" title={t('Copy Version')} onClick={copyVersion}>
-            {version || '-'}
+            {version || '-'} ({s.backend.port})
           </span>
         </Gitem>
 
@@ -146,7 +175,17 @@ export default function General() {
           </span>
         </Gitem>
 
-        <Gitem label={t('Service Mode')} icons={[{ icon: 'public', title: DESK }]}>
+        <Gitem
+          label={t('Service Mode')}
+          icons={[
+            {
+              icon: 'public',
+              title: DESK,
+              className: '',
+              style: { color: '#b3b3b3', fontSize: '18px', marginLeft: '5px', marginTop: '2px' },
+            },
+          ]}
+        >
           <span className="clickable" title={DESK}>
             {t('Manage')}
           </span>
@@ -154,14 +193,16 @@ export default function General() {
 
         <Gitem
           label={t('Tun Mode')}
-          icons={[{ icon: 'info_outline', title: t('Tun Mode') }, { icon: 'settings', title: DESK }]}
+          info="To enable this mode, please install Service Mode first!"
+          icons={[{ icon: 'settings', title: 'Settings' }]}
         >
           <Switch checked={s.tunMode} onChange={toggle('tunMode')} />
         </Gitem>
 
         <Gitem
           label={t('Mixin')}
-          icons={[{ icon: 'info_outline', title: t('Mixin') }, { icon: 'settings', title: DESK }]}
+          info="Mixin allows you to overwrite the original configuration file."
+          icons={[{ icon: 'settings', title: 'Edit Mixin content' }]}
         >
           <Switch checked={s.mixin} onChange={toggle('mixin')} />
         </Gitem>
@@ -174,6 +215,30 @@ export default function General() {
           <Switch checked={s.autoLaunch} onChange={toggle('autoLaunch')} />
         </Gitem>
       </div>
+
+      {editingPort && (
+        <div className="mask" onMouseDown={() => setEditingPort(false)}>
+          <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modal-title">Mixed Port</div>
+            <div className="modal-body">
+              <input
+                className="as-text"
+                style={{ width: '100%', textAlign: 'left' }}
+                value={portDraft}
+                onChange={(e) => setPortDraft(e.target.value)}
+              />
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn" onClick={() => setEditingPort(false)}>
+                {t('Cancel')}
+              </button>
+              <button type="button" className="btn primary" onClick={commitPort}>
+                {t('Save')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
