@@ -31,6 +31,7 @@ Credits 15 项：Clash、ClashX、Quantumult(X)、GeoLite2、twemoji、EnableLoo
 底部彩蛋「独立思考，明辨是非。」是原版作者藏的（absolute mt-[1000px] 藏到视口外不可见，URL 编码后 decode），正常使用不可见，仅读源码/DevTools 可见
 Profiles 页：顶部「Download from a URL」输入 + Download / Update All / Import 三按钮；卡片右侧仅一个图标按钮（远程=refresh Update，本地=code Edit）；右键菜单 14 项（含 Open web page/Edit externally/Diff/QRCode/Parsers/Run script 等）
 主题：4 个 —— light/dark/red/2077，下拉显示 Light / Dark / 国庆中秋 / Cyberpunk，另有 Follow System Theme 开关
+Proxies 卡片对齐机制：.proxy-item 与 20 个占位 <i> 都走 inline style 统一宽度 = settings.proxyItemWidth（>=150 生效，默认 290px，非响应式）。CSS 是 flex-wrap + space-around + flex-grow:1，卡片等宽上下左右对齐，末行靠占位 <i> 左对齐；850×603 最小窗口一行 2 个卡片。React 端 CSS 不写死宽度，用 JSX inline style（当前 PROXY_ITEM_WIDTH=290 常量，Settings 的 Proxy Item Width 设置项未实现）
 背景图：red→national_day.png、2077→2077.png，class 为 .cloud .opacicy（position:fixed; bottom:110px; left:calc(50% + 80px); width:40%; opacity:0.2）
 已完成工作
 资源复制：从原版 dist 复制到 public/：favicon.ico、logo.png、logo_reverse.png、logo_reverse_32.png、logo_64_eyes.png、imgs/2077.png、imgs/moon_cake.png、imgs/national_day.png、fonts/codicon.ttf
