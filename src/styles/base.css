@@ -261,18 +261,19 @@ body {
 }
 
 /* ============ 布局 ============ */
-/* 对齐原版 .wrapper: overflow:hidden 一刀切, 各页面内部自行滚动 */
+/* 对齐原版 .wrapper: height:100vh / width:100vw / overflow:hidden, 无 min-width */
 .app {
   display: flex;
-  height: 100%;
-  min-width: 850px;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
 }
 
-/* 对齐原版 .right-side: 无 overflow(页面各自内部滚动) */
+/* 对齐原版 .right-side: 页面各自内部滚动, 内容溢出在此裁剪 */
 .content {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 /* ============ 侧边栏(结构与数值 1:1 对应 CFW .main-main-menu) ============ */
