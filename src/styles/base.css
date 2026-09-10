@@ -227,6 +227,7 @@ body {
   font-family:
     'Microsoft Yahei', 'PingFang SC', system-ui, 微软雅黑, 'TwemojiMozilla', sans-serif;
   font-size: 16px;
+  font-weight: 500;
   color: var(--fgc);
   background: var(--bgc);
   -webkit-font-smoothing: antialiased;
