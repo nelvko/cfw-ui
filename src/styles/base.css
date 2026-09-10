@@ -801,6 +801,148 @@ input.as-text {
   box-shadow: 0 0 4px 1px rgba(50, 50, 50, 0.2);
   white-space: nowrap;
 }
+#main-rule-view .header-btns {
+  display: flex;
+  justify-content: flex-end;
+}
+#main-rule-view .btn {
+  cursor: pointer;
+  box-shadow: 0 0 4px 1px rgba(50, 50, 50, 0.2);
+  margin-left: 20px;
+  width: 80px;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #fff;
+}
+#main-rule-view .btn-add {
+  background-color: rgba(49, 167, 227, 1);
+}
+#main-rule-view .btn-save {
+  background-color: rgba(65, 184, 131, 1);
+}
+#main-rule-view .btn-back {
+  background-color: rgb(224, 221, 34);
+}
+#main-rule-view .ctl-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+/* RuleAlterView 弹窗 —— 对应 CFW data-v-eea841c4 */
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 170px;
+  width: calc(100vw - 170px);
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity 0.3s ease;
+}
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+.modal-container {
+  width: 500px;
+  margin: 0 auto;
+  padding: 20px 30px;
+  background-color: var(--bgc);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
+}
+.model-title {
+  display: flex;
+  font-size: 1.2em;
+  justify-content: space-between;
+}
+.rule-floating-btns {
+  display: flex;
+}
+.rule-floating-btns > div {
+  font-size: 0.8em;
+  width: 80px;
+  height: 35px;
+  margin-left: 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 3px;
+  color: #fff;
+}
+.rule-floating-cancel {
+  background-color: rgba(65, 184, 131, 1);
+}
+.rule-floating-ok {
+  background-color: rgba(58, 86, 197, 1);
+}
+.rule-section-title {
+  font-size: 1em;
+  color: rgba(166, 165, 164, 1);
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.rule-type-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  grid-auto-rows: minmax(30px, auto);
+}
+.rule-type-item {
+  text-align: center;
+  line-height: 30px;
+  border-radius: 5px;
+  color: #fff;
+  padding: 5px 10px;
+  background-color: rgba(101, 81, 122, 0.6);
+}
+.rule-type-selected {
+  background-color: rgba(101, 81, 122, 1);
+}
+.rule-proxy-group {
+  margin-bottom: 60px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  grid-auto-rows: minmax(30px, auto);
+}
+.rule-proxy-item {
+  text-align: center;
+  line-height: 30px;
+  border-radius: 5px;
+  color: #fff;
+  padding: 5px 10px;
+  background-color: rgba(55, 57, 72, 0.6);
+}
+.rule-proxy-selected {
+  background-color: rgba(55, 57, 72, 1);
+}
+.modal-container input {
+  height: 40px;
+  width: 100%;
+  font-size: 18px;
+  padding: 0 10px;
+  color: var(--fgc);
+  background-color: var(--bgc);
+}
+.modal-container input:focus {
+  outline: none;
+}
+.modal-container .scroll-view {
+  margin-top: 20px;
+  max-height: 400px;
+  padding: 0 10px;
+  overflow-y: auto;
+}
 
 /* ============ 代理页 —— 对应 CFW data-v-0729f95b ============ */
 #main-proxy-view {

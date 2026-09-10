@@ -140,6 +140,12 @@ export async function fetchRules() {
   }
 }
 
+// 原版 applyRules 写本地 profile yaml; Web 版无内核配置写接口, demo 模式模拟成功
+export async function saveRules(rules) {
+  if (isDemo()) await mock.saveRules(rules)
+  else console.warn('[cfw] save rules: 无内核配置写接口, 仅前端展示')
+}
+
 // ---- 实时数据(traffic / logs / connections)----
 
 let liveStops = []

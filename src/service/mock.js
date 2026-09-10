@@ -239,6 +239,11 @@ export const mock = {
     return { rules: structuredClone(MOCK_RULES) }
   },
 
+  async saveRules() {
+    await sleep(300)
+    return { ok: true }
+  },
+
   async closeConnection(id) {
     conns = conns.filter((c) => c.id !== id)
   },
