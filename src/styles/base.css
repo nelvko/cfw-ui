@@ -348,12 +348,14 @@ body {
   background-color: var(--mbgc);
   color: var(--menu-fgc);
 }
-/* 紧邻激活项的圆角(CFW selected-top / selected-bottom) */
+/* 紧邻激活项的圆角,对齐 CFW selected-top / selected-bottom (149ea1bd)
+   below-active = 激活项下方项 -> 原版 selected-bottom -> 右上圆角
+   above-active = 激活项上方项 -> 原版 selected-top    -> 右下圆角 */
 .menu-item.below-active {
-  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
 }
 .menu-item.above-active {
-  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 /* 底部运行时长 #main-run-time-view */
