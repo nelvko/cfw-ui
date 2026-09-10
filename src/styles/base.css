@@ -750,7 +750,8 @@ input.as-text {
   flex-direction: column;
   overflow: hidden;
 }
-.scroll-view {
+/* Proxies 页专属(原版 data-v-0729f95b, 带 margin-top:88px 等; 限定作用域避免泄漏到 Connections) */
+#main-proxy-view .scroll-view {
   margin-top: 88px;
   padding-bottom: 70px;
   flex-grow: 1;
