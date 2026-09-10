@@ -27,6 +27,9 @@ export const useSettings = create(
       testTimeout: 5000,
       // Proxies(原版 showProxyFilter 默认关闭, 右下角不显示关键词过滤图标)
       showProxyFilter: false,
+      // Proxies(原版: proxyItemWidth <150 回退 290px; miniListWidth=0 隐藏右侧导航条)
+      proxyItemWidth: '290',
+      proxyMiniListWidth: '100',
       // 订阅(演示模式下本地保存)
       profiles: [],
       activeProfileId: null,
@@ -63,6 +66,8 @@ export const useSettings = create(
           testUrl: 'https://www.gstatic.com/generate_204',
           testTimeout: 5000,
           showProxyFilter: false,
+          proxyItemWidth: '290',
+          proxyMiniListWidth: '100',
           profiles: [],
           activeProfileId: null,
         }),

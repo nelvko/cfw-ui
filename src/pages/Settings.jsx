@@ -4,6 +4,7 @@ import { useClash } from '../store/clash'
 import { useT } from '../hooks/useT'
 import Switch from '../components/Switch'
 import SelectView from '../components/SelectView'
+import SimpleInput from '../components/SimpleInput'
 import { bootstrap } from '../service'
 
 // 原版 Appearance > Theme 的 SelectView(renderer.js @3178564):
@@ -71,6 +72,43 @@ export default function Settings() {
                 value={Math.max(0, LANG_VALUES.indexOf(s.lang))}
                 onChange={(i) => s.patch({ lang: LANG_VALUES[i] })}
               />
+            </div>
+          </div>
+        </div>
+
+        <div className="main-setting-section">
+          <div className="title">Proxies</div>
+          <div className="content">
+            <div className="item">
+              <div className="flex items-center">
+                <div>Proxy Item Width</div>
+                <span className="hint">Set the display width of each proxy in the Proxies module</span>
+              </div>
+              <SimpleInput
+                value={s.proxyItemWidth}
+                onChange={(v) => s.patch({ proxyItemWidth: v })}
+                placeholder="290"
+                suffix="px"
+              />
+            </div>
+            <div className="item">
+              <div className="flex items-center">
+                <div>Mini List Width</div>
+                <span className="hint">Set the width of the minilist in the Proxies module</span>
+              </div>
+              <SimpleInput
+                value={s.proxyMiniListWidth}
+                onChange={(v) => s.patch({ proxyMiniListWidth: v })}
+                placeholder="100(0=hide)"
+                suffix="px"
+              />
+            </div>
+            <div className="item">
+              <div className="flex items-center">
+                <div>Show Filter</div>
+                <span className="hint">Set the Proxies module to display the keyword filter icon or not</span>
+              </div>
+              <Switch checked={s.showProxyFilter} onChange={(v) => s.patch({ showProxyFilter: v })} />
             </div>
           </div>
         </div>

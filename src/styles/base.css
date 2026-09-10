@@ -927,6 +927,50 @@ input.as-text {
   background-color: var(--proxy-item-selected-border-c);
 }
 
+/* ============ Proxies 右侧 Navigator 导航条 —— 对应 CFW data-v-298f5540 ============ */
+/* 原版 top:105px(25 标题栏 + 80 mode-switcher);Web 版无标题栏, 调整为 80px */
+.main-proxy-navigator {
+  position: absolute;
+  height: calc(100% - 80px);
+  display: flex;
+  flex-direction: column;
+  top: 80px;
+  right: 20px;
+  overflow-y: scroll;
+  overflow-x: clip;
+  transition: transform 0.2s;
+  background-color: var(--bgc);
+  border-color: var(--bc);
+  border-width: 0;
+  border-style: solid;
+}
+.main-proxy-navigator::before,
+.main-proxy-navigator::after {
+  content: '';
+  margin: auto;
+}
+.main-proxy-navigator::-webkit-scrollbar {
+  display: none;
+}
+.main-proxy-navigator .item {
+  font-size: 12px;
+  font-weight: normal;
+  transition: all 0.1s;
+  white-space: nowrap;
+  padding-left: 5px;
+  z-index: 2;
+  color: var(--fgc);
+}
+.main-proxy-navigator .item-selected {
+  color: var(--proxy-item-selected-border-c);
+}
+.main-proxy-navigator .item-hover {
+  font-weight: bold;
+}
+.main-proxy-navigator .item-error {
+  color: var(--proxy-item-latency-offline-c);
+}
+
 /* ============ 配置页 ============ */
 .profile-bar {
   display: flex;
@@ -1975,6 +2019,31 @@ input.as-text {
 }
 .main-setting-view .items-center {
   align-items: center;
+}
+/* SimpleInput —— 对应 CFW data-v-0f00486f */
+.main-simple-input {
+  position: relative;
+  width: 250px;
+}
+.main-simple-input input {
+  width: 100%;
+  text-align: center;
+  border: none;
+  outline-style: none;
+  background-color: var(--setting-input-bgc);
+  color: var(--fgc);
+  height: 25px;
+  box-shadow: 1px 1px 4px 1px rgba(50, 50, 50, 0.04);
+  border-radius: 2px;
+}
+.main-simple-input .suffix {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 25px;
+  line-height: 25px;
+  color: var(--menu-fgc);
+  font-size: 13px;
 }
 .main-setting-section {
   margin: 0px 2% 10px 2%;

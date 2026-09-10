@@ -3,6 +3,7 @@ import { useClash } from '../store/clash'
 import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
 import { selectProxy, testGroupDelay, updateMode } from '../service'
+import Navigator from '../components/Navigator'
 
 // 顺序与 CFW 0.20.39 mode-switcher 一致:Global / Rule / Direct / Script
 const MODES = [
@@ -15,9 +16,10 @@ const MODES = [
 // 原版 proxy-hint-type 显示类型英文首字母
 const TYPE_FIRST = { Selector: 'S', URLTest: 'U', Fallback: 'F', Direct: 'D', Reject: 'R' }
 
-// 原版 proxy-item 宽度 = settings.proxyItemWidth(>=150 时生效, 否则回退 290px)
-// 当前 Settings 页尚未实现 "Proxy Item Width" 设置项, 暂用原版默认值 290
-const PROXY_ITEM_WIDTH = 290
+// 原版 proxyItemWidth computed: parseInt>=150 时用设置值, 否则回退 290px
+function proxyItemWidthPx(width) {
+  return parseInt(width, 10) >= 150 ? `${width}px` : '290px'
+}
 
 // 原版 latency:-1 → "- ms";"Timeout" → offline;其他 → online + "N ms"
 function latencyInfo(ms, t) {
@@ -31,10 +33,12 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
   const group = useClash((s) => s.proxies[name])
   const delays = useClash((s) => s.delays)
   const nodeMap = useClash((s) => s.proxies)
+  const proxyItemWidth = useSettings((s) => s.proxyItemWidth)
   if (!group) return null
 
   const nodes = group.all?.filter((node) => filterReg.test(node)) ?? []
   const selectable = group.type === 'Selector'
+  const itemWidth = proxyItemWidthPx(proxyItemWidth)
 
   return (
     <div className="proxy-list">
@@ -85,7 +89,7 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
               <div
                 key={node}
                 className={`proxy-item${selected ? ' selected' : ''}${selectable ? ' clickable' : ''}`}
-                style={{ width: PROXY_ITEM_WIDTH }}
+                style={{ width: itemWidth }}
                 onClick={() => selectable && selectProxy(name, node)}
               >
                 <div className="indicator" />
@@ -103,7 +107,7 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
             )
           })}
           {Array.from({ length: 20 }, (_, i) => (
-            <i key={i} style={{ width: PROXY_ITEM_WIDTH }} />
+            <i key={i} style={{ width: itemWidth }} />
           ))}
         </div>
       )}
@@ -117,11 +121,14 @@ export default function Proxies() {
   const groupNames = useClash((s) => s.groupNames)
   const groups = mode === 'global' ? ['GLOBAL'] : groupNames
   const showProxyFilter = useSettings((s) => s.showProxyFilter)
+  const proxyMiniListWidth = useSettings((s) => s.proxyMiniListWidth)
 
   const [filterKeyword, setFilterKeyword] = useState('')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [showSecs, setShowSecs] = useState([])
+  const [topItemIndex, setTopItemIndex] = useState(-1)
   const filterInputRef = useRef(null)
+  const scrollRef = useRef(null)
 
   const filterReg = useMemo(() => {
     try {
@@ -145,6 +152,37 @@ export default function Proxies() {
     setShowSecs((prev) => (prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name]))
   }
 
+  // navigator 列表排除 GLOBAL(对齐原版 proxyInMode)
+  const navigatorList = groups.filter((name) => name !== 'GLOBAL')
+  const showNavigator = parseInt(proxyMiniListWidth, 10) !== 0
+
+  // 原版 handleScroll: [...children,{offsetTop:Infinity}].findIndex(t=>t.offsetTop-120>scrollTop)-1
+  const handleScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    const base = el.getBoundingClientRect().top
+    const tops = [...el.children].map((c) => c.getBoundingClientRect().top - base + el.scrollTop)
+    tops.push(Infinity)
+    setTopItemIndex(tops.findIndex((top) => top - 120 > el.scrollTop) - 1)
+  }
+
+  // 原版 handleNavigatToGroup: 展开 section + scrollTop = children[e].offsetTop - 120
+  const navigateToGroup = (idx) => {
+    const name = navigatorList[idx]
+    if (name && isRuleLike) {
+      setShowSecs((prev) => (prev.includes(name) ? prev : [...prev, name]))
+    }
+    setTimeout(() => {
+      const el = scrollRef.current
+      const children = el?.children
+      if (el && children && children[idx]) {
+        const base = el.getBoundingClientRect().top
+        const top = children[idx].getBoundingClientRect().top - base + el.scrollTop
+        el.scrollTop = top - 120
+      }
+    }, 0)
+  }
+
   return (
     <div id="main-proxy-view">
       <div id="main-mode-switcher">
@@ -163,7 +201,7 @@ export default function Proxies() {
         </div>
       </div>
 
-      <div className="scroll-view">
+      <div className="scroll-view" ref={scrollRef} onScroll={handleScroll}>
         {groups.map((name) => (
           <GroupSection
             key={name}
@@ -175,6 +213,16 @@ export default function Proxies() {
           />
         ))}
       </div>
+
+      {showNavigator && (
+        <Navigator
+          list={navigatorList}
+          index={topItemIndex}
+          width={proxyMiniListWidth}
+          errorIndexes={[]}
+          onSelect={navigateToGroup}
+        />
+      )}
 
       {showProxyFilter && (
         <div className="filter-keyword">
