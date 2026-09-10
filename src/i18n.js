@@ -89,6 +89,8 @@ const messages = {
     Appearance: '外观',
     Theme: '主题',
     'Follow System Theme': '跟随系统主题',
+    'Font Family': '字体',
+    'Use System Emoji': '使用系统 Emoji',
     Language: '语言',
   },
   en: {
@@ -174,6 +176,8 @@ const messages = {
     Appearance: 'Appearance',
     Theme: 'Theme',
     'Follow System Theme': 'Follow System Theme',
+    'Font Family': 'Font Family',
+    'Use System Emoji': 'Use System Emoji',
     Language: 'Language',
   },
 }

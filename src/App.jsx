@@ -34,6 +34,8 @@ export default function App() {
   const systemTheme = useSettings((s) => s.systemTheme)
   const demoMode = useSettings((s) => s.demoMode)
   const backend = useSettings((s) => s.backend)
+  const fontFamily = useSettings((s) => s.fontFamily)
+  const useSystemEmoji = useSettings((s) => s.useSystemEmoji)
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
@@ -46,6 +48,16 @@ export default function App() {
     media.addEventListener('change', apply)
     return () => media.removeEventListener('change', apply)
   }, [theme, systemTheme])
+
+  useEffect(() => {
+    // 原版 action setFont: 自定义字体名 + 内置字体栈 (+ TwemojiMozilla)
+    const custom = (fontFamily || '')
+      .split(',')
+      .map((x) => `"${x.trim().replace(/^"|"$/g, '')}"`)
+      .filter((x) => x !== '""')
+    const base = [...custom, '"Microsoft Yahei"', '"PingFang SC"', '"system-ui"', '微软雅黑'].join(', ')
+    document.body.style.fontFamily = useSystemEmoji ? base : base + ', "TwemojiMozilla"'
+  }, [fontFamily, useSystemEmoji])
 
   useEffect(() => {
     let cancelled = false

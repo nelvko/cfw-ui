@@ -17,6 +17,13 @@ const THEME_LABELS = ['Light', 'Dark', '国庆中秋', 'Cyberpunk']
 const LANG_VALUES = ['zh', 'en']
 const LANG_LABELS = ['中文', 'English']
 
+// 原版 fontFamilyPlaceholder: Mac→PingFang SC, Windows→Microsoft Yahei, 其他→system-ui
+const FONT_FAMILY_PLACEHOLDER = /Mac/i.test(navigator.platform)
+  ? 'PingFang SC'
+  : /Win/i.test(navigator.platform)
+    ? 'Microsoft Yahei'
+    : 'system-ui'
+
 export default function Settings() {
   const t = useT()
   const s = useSettings()
@@ -64,6 +71,18 @@ export default function Settings() {
             <div className="item">
               <div>{t('Follow System Theme')}</div>
               <Switch checked={s.systemTheme} onChange={(v) => s.patch({ systemTheme: v })} />
+            </div>
+            <div className="item">
+              <div>{t('Font Family')}</div>
+              <SimpleInput
+                value={s.fontFamily}
+                onChange={(v) => s.patch({ fontFamily: v })}
+                placeholder={FONT_FAMILY_PLACEHOLDER}
+              />
+            </div>
+            <div className="item">
+              <div>{t('Use System Emoji')}</div>
+              <Switch checked={s.useSystemEmoji} onChange={(v) => s.patch({ useSystemEmoji: v })} />
             </div>
             <div className="item">
               <div>{t('Language')}</div>

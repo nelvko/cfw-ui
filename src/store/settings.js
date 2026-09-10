@@ -8,6 +8,8 @@ export const useSettings = create(
       activePage: 'general',
       theme: 'light',
       systemTheme: false,
+      fontFamily: '',
+      useSystemEmoji: false,
       lang: 'zh',
       // 后端
       demoMode: true,
@@ -51,6 +53,8 @@ export const useSettings = create(
         set({
           theme: 'light',
           systemTheme: false,
+          fontFamily: '',
+          useSystemEmoji: false,
           lang: 'zh',
           demoMode: true,
           backend: { host: '127.0.0.1', port: '9090', secret: '' },
