@@ -926,6 +926,10 @@ input.as-text {
 .scroll-view .selected .indicator {
   background-color: var(--proxy-item-selected-border-c);
 }
+/* 原版 .flick[data-v-0729f95b]{opacity:.1} —— 点击导航条定位后组闪烁 */
+.proxy-section.flick {
+  opacity: 0.1;
+}
 
 /* ============ Proxies 右侧 Navigator 导航条 —— 对应 CFW data-v-298f5540 ============ */
 /* 原版 top:105px(25 标题栏 + 80 mode-switcher);Web 版无标题栏, 调整为 80px */

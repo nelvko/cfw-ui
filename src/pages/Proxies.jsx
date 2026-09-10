@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClash } from '../store/clash'
 import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
@@ -28,7 +28,7 @@ function latencyInfo(ms, t) {
   return { text: `${ms} ms`, cls: 'online' }
 }
 
-function GroupSection({ name, filterReg, mode, visible, onToggle }) {
+function GroupSection({ name, filterReg, mode, visible, onToggle, blink }) {
   const t = useT()
   const group = useClash((s) => s.proxies[name])
   const delays = useClash((s) => s.delays)
@@ -42,7 +42,7 @@ function GroupSection({ name, filterReg, mode, visible, onToggle }) {
 
   return (
     <div className="proxy-list">
-      <div className="proxy-section" onClick={onToggle}>
+      <div className={`proxy-section${blink ? ' flick' : ''}`} onClick={onToggle}>
         <div className="proxy-section-name">
           <div className="proxy-section-name-left">{name}</div>
           {group.type && (
@@ -127,6 +127,7 @@ export default function Proxies() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [showSecs, setShowSecs] = useState([])
   const [topItemIndex, setTopItemIndex] = useState(-1)
+  const [blinkIndex, setBlinkIndex] = useState(-1)
   const filterInputRef = useRef(null)
   const scrollRef = useRef(null)
 
@@ -156,6 +157,13 @@ export default function Proxies() {
   const navigatorList = groups.filter((name) => name !== 'GLOBAL')
   const showNavigator = parseInt(proxyMiniListWidth, 10) !== 0
 
+  // 原版 watch groupBlinkIndex: 变化后 300ms 复位(组闪烁)
+  useEffect(() => {
+    if (blinkIndex < 0) return
+    const timer = setTimeout(() => setBlinkIndex(-1), 300)
+    return () => clearTimeout(timer)
+  }, [blinkIndex])
+
   // 原版 handleScroll: [...children,{offsetTop:Infinity}].findIndex(t=>t.offsetTop-120>scrollTop)-1
   const handleScroll = () => {
     const el = scrollRef.current
@@ -166,12 +174,13 @@ export default function Proxies() {
     setTopItemIndex(tops.findIndex((top) => top - 120 > el.scrollTop) - 1)
   }
 
-  // 原版 handleNavigatToGroup: 展开 section + scrollTop = children[e].offsetTop - 120
+  // 原版 handleNavigatToGroup: 展开 section + 组闪烁 + scrollTop = children[e].offsetTop - 120
   const navigateToGroup = (idx) => {
     const name = navigatorList[idx]
     if (name && isRuleLike) {
       setShowSecs((prev) => (prev.includes(name) ? prev : [...prev, name]))
     }
+    setBlinkIndex(idx)
     setTimeout(() => {
       const el = scrollRef.current
       const children = el?.children
@@ -202,7 +211,7 @@ export default function Proxies() {
       </div>
 
       <div className="scroll-view" ref={scrollRef} onScroll={handleScroll}>
-        {groups.map((name) => (
+        {groups.map((name, i) => (
           <GroupSection
             key={name}
             name={name}
@@ -210,6 +219,7 @@ export default function Proxies() {
             mode={mode}
             visible={isVisible(name)}
             onToggle={() => toggleSection(name)}
+            blink={blinkIndex === i}
           />
         ))}
       </div>
