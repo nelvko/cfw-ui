@@ -721,25 +721,85 @@ input.as-text {
   font-size: 20px;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 16px 24px 14px;
-}
-
-/* ============ Rules 页(新加特例: 自己滚动) ============ */
-.rules {
+/* ============ Rules 页(新加特例) —— 复刻原版规则页 data-v-459dde1e ============ */
+#main-rule-view {
   height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
-.rules .table-wrap {
-  flex: 1;
-  min-height: 0;
+#main-rule-view .header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 50px 0 40px;
+  align-items: center;
+  height: 60px;
+  flex-shrink: 0;
+}
+#main-rule-view .title {
+  font-size: 1.1em;
+  margin-bottom: 0;
+}
+#main-rule-view .filter-view {
+  width: 100%;
+  height: 50px;
+  flex-shrink: 0;
+}
+#main-rule-view .filter-view input {
+  margin: 0 40px 10px 40px;
+  cursor: text;
+  width: calc(100% - 80px);
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 5px;
+  font-size: 1.1em;
+  border: 1px solid var(--bc);
+  background: var(--input-bgc);
+  color: var(--fgc);
+}
+#main-rule-view .filter-view input:focus {
+  outline: none;
+}
+#main-rule-view .log-list {
+  flex-grow: 1;
   overflow-y: auto;
+}
+#main-rule-view .log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  width: 100%;
+  border-bottom: 1px solid rgba(50, 50, 50, 0.1);
+}
+#main-rule-view .left {
+  flex-grow: 1;
+  padding-right: 40px;
+  overflow: hidden;
+}
+#main-rule-view .right-main {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+#main-rule-view .url {
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+#main-rule-view .rule-set {
+  color: rgb(255, 94, 0);
+}
+#main-rule-view .right {
+  font-size: 1em;
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: #fff;
+  opacity: 0.8;
+  box-shadow: 0 0 4px 1px rgba(50, 50, 50, 0.2);
+  white-space: nowrap;
 }
 
 /* ============ 代理页 —— 对应 CFW data-v-0729f95b ============ */
