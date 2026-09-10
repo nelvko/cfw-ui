@@ -789,6 +789,10 @@ input.as-text {
   overflow: hidden;
   white-space: nowrap;
 }
+#main-rule-view .rule {
+  font-size: 13px;
+  color: var(--log-item-rule-c);
+}
 #main-rule-view .rule-set {
   color: rgb(255, 94, 0);
 }
