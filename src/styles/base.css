@@ -744,6 +744,7 @@ input.as-text {
 
 /* ============ 代理页 —— 对应 CFW data-v-0729f95b ============ */
 #main-proxy-view {
+  position: relative; /* Web 版适配: 让 .main-proxy-navigator 相对本容器定位, 展开态 right:-10px 溢出被 overflow:hidden 裁剪, 避免横向滚动条 */
   height: 100%;
   display: flex;
   flex-direction: column;
