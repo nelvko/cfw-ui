@@ -31,12 +31,13 @@ Credits 15 项：Clash、ClashX、Quantumult(X)、GeoLite2、twemoji、EnableLoo
 底部彩蛋「独立思考，明辨是非。」是原版作者藏的（absolute mt-[1000px] 藏到视口外不可见，URL 编码后 decode），正常使用不可见，仅读源码/DevTools 可见
 Profiles 页：顶部「Download from a URL」输入 + Download / Update All / Import 三按钮；卡片右侧仅一个图标按钮（远程=refresh Update，本地=code Edit）；右键菜单 14 项（含 Open web page/Edit externally/Diff/QRCode/Parsers/Run script 等）
 主题：4 个 —— light/dark/red/2077，下拉显示 Light / Dark / 国庆中秋 / Cyberpunk，另有 Follow System Theme 开关
+字体机制（已还原）：原版 body CSS 是 'Noto Sans CJK', sans-serif（初始值），运行时由 action setFont 覆盖为 getter fontFamily 计算的字体栈 —— 用户 fontFamily 前缀 + ', "Microsoft Yahei", "PingFang SC", "system-ui", 微软雅黑' + (useSystemEmoji ? '' : ', "TwemojiMozilla"')。Windows 默认生效字体族 = 微软雅黑族 + TwemojiMozilla（原版未打包 Noto Sans CJK，故 CSS 初始值实际回退 sans-serif）。全站 body font-weight:500（原版硬编码）。Settings→Appearance 有 Font Family(SimpleInput，placeholder 平台相关 Mac→PingFang SC / Win→Microsoft Yahei / 其他→system-ui) + Use System Emoji(SwitchView)。Web 版已完整还原（App.jsx useEffect 应用），字体族与字重均与原版运行时一致。
 Proxies 卡片对齐机制：.proxy-item 与 20 个占位 <i> 都走 inline style 统一宽度 = settings.proxyItemWidth（>=150 生效，默认 290px，非响应式）。CSS 是 flex-wrap + space-around + flex-grow:1，卡片等宽上下左右对齐，末行靠占位 <i> 左对齐；850×603 最小窗口一行 2 个卡片。React 端 CSS 不写死宽度，用 JSX inline style（当前 PROXY_ITEM_WIDTH=290 常量，Settings 的 Proxy Item Width 设置项未实现）
 背景图：red→national_day.png、2077→2077.png，class 为 .cloud .opacicy（position:fixed; bottom:110px; left:calc(50% + 80px); width:40%; opacity:0.2）
 已完成工作
 资源复制：从原版 dist 复制到 public/：favicon.ico、logo.png、logo_reverse.png、logo_reverse_32.png、logo_64_eyes.png、imgs/2077.png、imgs/moon_cake.png、imgs/national_day.png、fonts/codicon.ttf
 节日彩蛋：4 主题配色从原版 .theme-red/.theme-2077 完整提取写入 src/styles/base.css；App.jsx 按主题渲染背景图；index.html 防白闪底色
-Rules 页：调用 fetchRules()，表格展示 type/payload/proxy，带搜索
+Rules 页：完整还原原版隐藏规则页（scoped data-v-459dde1e，原版路由 /home/router 存在但菜单 menuItems 未接入，故隐藏）。标题 "Top 100 matching rules(N)." + Add/Save/Cancel 按钮 + 过滤框(placeholder "fiter by keywords"，原版拼写错误保留) + 列表项(url 18px 黑 + rule 13px 变量灰 + proxy 彩色标签 randomBGC) + north/south/delete 图标（stopPropagation）；新增规则弹窗 RuleAlterView(scoped data-v-eea841c4)。Web 版适配：Save 无内核配置写接口(service.saveRules，demo 模拟成功)，Cancel=放弃未保存修改重新加载，RULE-SET 更新 provider 分支保留未启用
 Profiles 编辑：重写，含右键菜单、远程刷新、本地编辑
 Sidebar：菜单含 Rules、Feedback（无 About）
 i18n：zh/en 双语，scripts/check-i18n.mjs 核对脚本
@@ -45,7 +46,7 @@ smoke.mjs：覆盖各页面 + 4 主题截图，开头 localStorage.clear()
 关键文件
 src/App.jsx —— PAGES 映射 + THEME_BG 背景图 + 主题跟随系统逻辑
 src/styles/base.css —— 4 主题 CSS 变量 + 全部组件样式
-src/store/settings.js —— Zustand persist（theme/systemTheme/lang/demoMode/backend 等字段）
+src/store/settings.js —— Zustand persist（theme/systemTheme/fontFamily/useSystemEmoji/lang/demoMode/backend 等字段）
 src/store/clash.js —— clash 后端状态
 src/service/index.js —— bootstrap/startLive/fetchRules 等 API
 src/service/mock.js —— demo 数据
