@@ -27,5 +27,8 @@ dist-ssr
 # Agent 工作区临时产物
 .psacowork/
 
+# 冒烟测试截图产物
+.smoke/
+
 # 原版 CFW 反编译提取的参考资产（版权敏感，仅本地保留）
 .cfw-extract/
