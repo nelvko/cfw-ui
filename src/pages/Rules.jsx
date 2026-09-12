@@ -1,22 +1,33 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useClash } from '../store/clash'
-import { fetchRules, saveRules } from '../service'
+import { fetchProviders, fetchRules, saveRules } from '../service'
 import RuleAlterView from '../components/RuleAlterView'
 
-// 原版 randomBGC(renderer.js): 同 proxy 名稳定同色(10~109 深色, 白字)
+// 原版 randomBGC(renderer.js): 颜色按 rule **type** 稳定分配(缓存于数组 U), 白字
 const colorCache = new Map()
-function randomBGC(proxy) {
-  if (colorCache.has(proxy)) return colorCache.get(proxy)
-  const r = Math.floor(100 * Math.random() + 10)
-  const g = Math.floor(100 * Math.random() + 10)
-  const b = Math.floor(100 * Math.random() + 10)
-  const style = { backgroundColor: `rgb(${r},${g},${b})` }
-  colorCache.set(proxy, style)
+function randomBGC(type) {
+  if (colorCache.has(type)) return colorCache.get(type)
+  const style = {
+    backgroundColor: `rgb(${Math.floor(100 * Math.random() + 10)},${Math.floor(100 * Math.random() + 10)},${Math.floor(100 * Math.random() + 10)})`,
+  }
+  colorCache.set(type, style)
   return style
+}
+
+// 原版 fromNow(moment): provider.updatedAt 的相对时间
+function fromNow(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000)
+  if (s < 60) return 'a few seconds ago'
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m} minutes ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} hours ago`
+  return `${Math.floor(h / 24)} days ago`
 }
 
 export default function Rules() {
   const [memoryData, setMemoryData] = useState([])
+  const [providers, setProviders] = useState({})
   const [filterKeywords, setFilterKeywords] = useState('')
   const [showAlterModel, setShowAlterModel] = useState(false)
   const [saveBtnText, setSaveBtnText] = useState('Save')
@@ -26,7 +37,11 @@ export default function Rules() {
 
   useEffect(() => {
     fetchRules().then((rules) => setMemoryData(rules.slice(0, 100)))
+    fetchProviders().then(setProviders)
   }, [])
+
+  // 原版 providerOfPayload: providers[payload] || null
+  const providerOfPayload = (payload) => providers[payload] || null
 
   // 原版 mounted: proxyGroups = ["DIRECT","REJECT", ...proxy-groups 名, ...单节点名]
   const proxyGroups = useMemo(() => {
@@ -39,10 +54,16 @@ export default function Rules() {
   }, [groupNames, proxies])
 
   // 原版 loadData 过滤: 空格分词 join("|") 正则, 匹配 proxy/payload/type, 取前 100
+  // 原版对非法正则做了兜底(回退 /.*/), 避免用户输入元字符导致渲染崩溃
   const listData = useMemo(() => {
     const kw = filterKeywords.trim()
     if (!kw) return memoryData.slice(0, 100)
-    const reg = new RegExp(kw.split(/\s+/).join('|'), 'i')
+    let reg
+    try {
+      reg = new RegExp(kw.split(/\s+/).join('|'), 'i')
+    } catch {
+      reg = /.*/
+    }
     return memoryData
       .filter((r) => reg.test(r.proxy) || reg.test(r.payload) || reg.test(r.type))
       .slice(0, 100)
@@ -128,11 +149,25 @@ export default function Rules() {
         {listData.map((r, i) => (
           <div key={i} className="log-item" title={r.payload} onClick={() => handleRuleClick(r)}>
             <div className="left">
-              <div className="url">{r.payload}</div>
-              <div className="rule">{r.type}</div>
+              {/* 原版: RULE-SET 规则的 payload 加 .rule-set 类(橙色) */}
+              <div className={`url${providerOfPayload(r.payload) ? ' rule-set' : ''}`}>{r.payload}</div>
+              <div className="rule">
+                {r.type}
+                {providerOfPayload(r.payload) && (
+                  <div>Rules: {providerOfPayload(r.payload).ruleCount}</div>
+                )}
+                {providerOfPayload(r.payload) && (
+                  <div>Last Updated: {fromNow(providerOfPayload(r.payload).updatedAt)}</div>
+                )}
+                {providerOfPayload(r.payload) && (
+                  <div>
+                    {providerOfPayload(r.payload).vehicleType} {providerOfPayload(r.payload).behavior}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="right-main">
-              <div className="right" style={randomBGC(r.proxy)}>
+              <div className="right" style={randomBGC(r.type)}>
                 {r.proxy}
               </div>
               <span

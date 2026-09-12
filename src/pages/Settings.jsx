@@ -5,6 +5,7 @@ import { useT } from '../hooks/useT'
 import Switch from '../components/Switch'
 import SelectView from '../components/SelectView'
 import SimpleInput from '../components/SimpleInput'
+import InfoIcon from '../components/InfoIcon'
 import { bootstrap } from '../service'
 
 // 原版 Appearance > Theme 的 SelectView(renderer.js @3178564):
@@ -46,12 +47,8 @@ export default function Settings() {
           <div className="btn" onClick={() => s.reset()}>
             Reset All Settings
           </div>
-          <div className="btn clickable btn-force-quit" title="Web 版无退出功能">
-            Force Quit
-          </div>
-          <div className="btn clickable btn-quit" title="Web 版无退出功能">
-            Quit
-          </div>
+          <div className="btn clickable btn-force-quit">Force Quit</div>
+          <div className="btn clickable btn-quit">Quit</div>
         </div>
       </div>
       <div className="content">
@@ -81,6 +78,31 @@ export default function Settings() {
               />
             </div>
             <div className="item">
+              <div className="flex items-center">
+                <div>Title Bar Text</div>
+                <InfoIcon>
+                  <div>Set the text in title bar, some placeholders for replacement:</div>{' '}
+                  <li>
+                    <b>%mode%</b> - Current proxy mode
+                  </li>{' '}
+                  <li>
+                    <b>%systemProxy%</b> - System Proxy status, On or Off
+                  </li>{' '}
+                  <li>
+                    <b>%tun%</b> - TUN Mode status, On or Off
+                  </li>{' '}
+                  <li>
+                    <b>%mixin%</b> - Mixin status, On or Off
+                  </li>
+                </InfoIcon>
+              </div>
+              <SimpleInput
+                value={s.titleBarText}
+                onChange={(v) => s.patch({ titleBarText: v })}
+                placeholder="Text to display in title bar"
+              />
+            </div>
+            <div className="item">
               <div>{t('Use System Emoji')}</div>
               <Switch checked={s.useSystemEmoji} onChange={(v) => s.patch({ useSystemEmoji: v })} />
             </div>
@@ -101,7 +123,7 @@ export default function Settings() {
             <div className="item">
               <div className="flex items-center">
                 <div>Proxy Item Width</div>
-                <span className="hint">Set the display width of each proxy in the Proxies module</span>
+                <InfoIcon>Set the display width of each proxy in the Proxies module</InfoIcon>
               </div>
               <SimpleInput
                 value={s.proxyItemWidth}
@@ -113,7 +135,7 @@ export default function Settings() {
             <div className="item">
               <div className="flex items-center">
                 <div>Mini List Width</div>
-                <span className="hint">Set the width of the minilist in the Proxies module</span>
+                <InfoIcon>Set the width of the minilist in the Proxies module</InfoIcon>
               </div>
               <SimpleInput
                 value={s.proxyMiniListWidth}
@@ -125,9 +147,47 @@ export default function Settings() {
             <div className="item">
               <div className="flex items-center">
                 <div>Show Filter</div>
-                <span className="hint">Set the Proxies module to display the keyword filter icon or not</span>
+                <InfoIcon>Set the Proxies module to display the keyword filter icon or not</InfoIcon>
               </div>
               <Switch checked={s.showProxyFilter} onChange={(v) => s.patch({ showProxyFilter: v })} />
+            </div>
+          </div>
+        </div>
+
+        <div className="main-setting-section">
+          <div className="title">{t('Connections')}</div>
+          <div className="content">
+            <div className="item">
+              <div className="flex items-center">
+                <div>Display Chain Type</div>
+                <InfoIcon>
+                  <div>Set the type of chain displayed in the Connections module:</div>{' '}
+                  <li>
+                    <b>Proxy</b> - Proxy name
+                  </li>{' '}
+                  <li>
+                    <b>Group</b> - Group name
+                  </li>{' '}
+                  <li>
+                    <b>Both</b> - Proxy name and group name
+                  </li>
+                </InfoIcon>
+              </div>
+              <SelectView
+                items={['Proxy', 'Group', 'Both']}
+                value={s.connChainType}
+                onChange={(i) => s.patch({ connChainType: i })}
+              />
+            </div>
+            <div className="item">
+              <div className="flex items-center">
+                <div>Show Process If Present</div>
+                <InfoIcon>Set whether to show Process Name(if present) in Connections module</InfoIcon>
+              </div>
+              <Switch
+                checked={s.connShowProcess}
+                onChange={(v) => s.patch({ connShowProcess: v })}
+              />
             </div>
           </div>
         </div>

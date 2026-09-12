@@ -8,20 +8,19 @@ import SelectView from '../components/SelectView'
 // 与原版 logTypeEmoji 一致
 const EMOJI = { info: '✅', debug: '🪲', warn: '‼️', error: '❌' }
 
-// 与原版 parseStringLog 一致:拆分 msg + key=value 字段
+// 与原版 parseStringLog 一致:提取 msg(首个 key=value 之前的文本) + key=value 字段
 function parseLog(entry) {
-  const { payload = '', type, ts } = entry
-  let msg = ''
-  if (/^([^=]+)( .+=|$)/.test(payload)) msg = RegExp.$1.trim()
+  const { payload = '', type, ts, id } = entry
+  const re = /([^\s]+?)=([^=]+?)(?=\s+[^\s]+?=|$)/g
   const fields = []
-  const re = /([^\s]+?)=([^=]+?)(?= [^\s]+=|$)/g
+  let firstIndex = -1
   let m
   while ((m = re.exec(payload))) {
-    const key = m[1].trim()
-    if (key === 'mode') continue
-    fields.push({ key, value: m[2].trim().replace(/^"|"$/g, '') })
+    if (firstIndex < 0) firstIndex = m.index
+    fields.push({ key: m[1].trim(), value: m[2].trim().replace(/^"|"$/g, '') })
   }
-  return { id: `${ts}-${Math.random().toString(36).slice(2, 7)}`, msg, type, fields, time: fmtTime(ts) }
+  const msg = (firstIndex >= 0 ? payload.slice(0, firstIndex) : payload).trim()
+  return { id: id ?? `${ts}`, msg, type, fields, time: fmtTime(ts) }
 }
 
 export default function Logs() {
@@ -34,8 +33,12 @@ export default function Logs() {
   const [q, setQ] = useState('')
   const [logStyle, setLogStyle] = useState(0)
   const [logLevel, setLogLevel] = useState(0)
+  // 原版 showDetailItemIDs:点击行手动展开/折叠的日志 id
+  const [detailIds, setDetailIds] = useState([])
+  const [menu, setMenu] = useState(null)
 
   const viewRef = useRef(null)
+  const menuRef = useRef(null)
   const followRef = useRef(true)
 
   const onScroll = () => {
@@ -49,7 +52,25 @@ export default function Logs() {
     if (!paused && followRef.current && el) el.scrollTop = el.scrollHeight
   }, [logs, paused])
 
+  useEffect(() => {
+    if (!menu) return
+    const onDocClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenu(null)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [menu])
+
   const parsed = useMemo(() => logs.map(parseLog), [logs])
+
+  const searchReg = useMemo(() => {
+    if (!q) return null
+    try {
+      return new RegExp(q, 'i')
+    } catch {
+      return null
+    }
+  }, [q])
 
   const kw = q.trim().toLowerCase()
   const filtered = parsed
@@ -67,7 +88,28 @@ export default function Logs() {
   const typeCls = (type) => (type === 'debug' ? (darkTheme ? 'debug' : 'debugdark') : type)
 
   const addrOf = (e) => e.fields.find((f) => f.key === 'rAddr')?.value || ''
-  const showDetails = logStyle === 1 || q !== ''
+  // 原版 isShowDetails: Detailed 样式 / 搜索中 / 手动展开
+  const showDetails = (e) => logStyle === 1 || q !== '' || detailIds.includes(e.id)
+
+  const toggleDetail = (id) => {
+    setDetailIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  // 原版 handleItemRightClick: 关闭自动滚动 + 弹出复制 rAddr 菜单
+  const onRightClick = (ev, e) => {
+    ev.preventDefault()
+    followRef.current = false
+    setMenu({ x: ev.clientX, y: ev.clientY, addr: addrOf(e) })
+  }
+
+  const copyAddr = (addr) => {
+    try {
+      navigator.clipboard?.writeText(addr)
+    } catch {
+      /* ignore */
+    }
+    setMenu(null)
+  }
 
   return (
     <div className="main-log-view">
@@ -81,6 +123,7 @@ export default function Logs() {
             className="search-box"
             type="text"
             placeholder="Search"
+            title={searchReg ? String(searchReg) : ''}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -113,9 +156,15 @@ export default function Logs() {
         )}
         {filtered.map((e) => {
           const addr = addrOf(e)
-          const fields = showDetails ? e.fields.filter((f) => f.key !== 'rAddr') : []
+          const details = showDetails(e)
+          const fields = details ? e.fields.filter((f) => f.key !== 'rAddr') : []
           return (
-            <div key={e.id} className="log-item">
+            <div
+              key={e.id}
+              className="log-item"
+              onClick={() => toggleDetail(e.id)}
+              onContextMenu={(ev) => onRightClick(ev, e)}
+            >
               <div className="log-item-body">
                 <div className="log-row">
                   <div className={`log-msg ${typeCls(e.type)}`}>
@@ -125,7 +174,7 @@ export default function Logs() {
                 </div>
                 {addr && (
                   <div className="log-addr">
-                    <span className="addr-arrow">▲</span>
+                    <span className={`addr-arrow${details ? ' open' : ''}`}>▲</span>
                     {addr}
                   </div>
                 )}
@@ -133,8 +182,9 @@ export default function Logs() {
                   <div className="log-fields">
                     {fields.map((f) => (
                       <div key={f.key} className="log-field">
-                        <span className="log-field-key">{f.key}</span>
-                        <span>{f.value}</span>
+                        <div className="log-field-key">{f.key === 'lAddr' ? 'FROM' : f.key.toUpperCase()}</div>
+                        <span>⇢</span>
+                        <div className="log-field-val">{f.value}</div>
                       </div>
                     ))}
                   </div>
@@ -144,6 +194,16 @@ export default function Logs() {
           )
         })}
       </div>
+
+      {menu && (
+        <div ref={menuRef} className="ctx-menu" style={{ left: menu.x, top: menu.y }}>
+          <div className="ctx-item ctx-item-disabled">{menu.addr || 'Unknown'}</div>
+          <div className="ctx-item" onClick={() => copyAddr(menu.addr)}>
+            <span className="material-icons">content_copy</span>
+            <span>Copy</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
