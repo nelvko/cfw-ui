@@ -3,11 +3,6 @@ const MB = KB << 10
 const GB = MB << 10
 
 // 移植自老项目 hooks/formatSpeed.js
-export function fmtSpeed(bytes) {
-  const { num, unit } = fmtSpeedParts(bytes)
-  return `${num} ${unit}`
-}
-
 export function fmtSpeedParts(bytes) {
   let num
   let unit
@@ -45,17 +40,6 @@ export function fmtBytes(bytes) {
     unit = 'GB'
   }
   return `${num} ${unit}`
-}
-
-export function fmtDuration(startISO) {
-  const ms = Date.now() - new Date(startISO).getTime()
-  if (ms < 0 || Number.isNaN(ms)) return '-'
-  const s = Math.floor(ms / 1000)
-  const m = Math.floor(s / 60)
-  const h = Math.floor(m / 60)
-  if (h > 0) return `${h}h${m % 60}m${s % 60}s`
-  if (m > 0) return `${m}m${s % 60}s`
-  return `${s}s`
 }
 
 export function fmtTime(ts) {

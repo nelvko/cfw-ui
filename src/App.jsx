@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import Sidebar from './components/Sidebar'
+import StatusBar from './components/StatusBar'
 import { useSettings } from './store/settings'
 import { bootstrap, startLive, stopLive } from './service'
 import General from './pages/General'
@@ -61,11 +62,15 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false
-    bootstrap().then(() => {
-      if (!cancelled) startLive()
-    })
+    // 防抖:后端地址逐字输入时不至于每字符重建一次 WS
+    const timer = setTimeout(() => {
+      bootstrap().then(() => {
+        if (!cancelled) startLive()
+      })
+    }, 300)
     return () => {
       cancelled = true
+      clearTimeout(timer)
       stopLive()
     }
   }, [demoMode, backend.host, backend.port, backend.secret])
@@ -76,10 +81,13 @@ export default function App() {
   return (
     <div className="app">
       {bg && <img className="cloud opacicy" src={bg} alt="" />}
-      <Sidebar />
-      <main className="content">
-        <Page />
-      </main>
+      <StatusBar />
+      <div className="app-body">
+        <Sidebar />
+        <main className="content">
+          <Page />
+        </main>
+      </div>
     </div>
   )
 }

@@ -15,7 +15,8 @@ for (const d of ['src/pages', 'src/components']) {
 }
 for (const f of files) {
   const s = readFileSync(f, 'utf8')
-  for (const m of s.matchAll(/t\('([^']+)'\)/g)) used.add(m[1])
+  // 负向断言避免把 setSaveBtnText('Done') 之类的尾缀误当成 t('...')
+  for (const m of s.matchAll(/(?<![A-Za-z0-9_$])t\('([^']+)'\)/g)) used.add(m[1])
 }
 
 const missing = [...used].filter((k) => !defs.has(k))
