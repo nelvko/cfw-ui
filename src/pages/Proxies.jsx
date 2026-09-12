@@ -4,6 +4,7 @@ import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
 import { selectProxy, testGroupDelay, updateMode } from '../service'
 import Navigator from '../components/Navigator'
+import Hint from '../components/Hint'
 
 // 顺序与 CFW 0.20.39 mode-switcher 一致:Global / Rule / Direct / Script
 const MODES = [
@@ -28,7 +29,19 @@ function latencyInfo(ms, t) {
   return { text: `${ms} ms`, cls: 'online' }
 }
 
-function GroupSection({ name, filterReg, mode, visible, onToggle, blink }) {
+function GroupSection({
+  name,
+  filterReg,
+  mode,
+  visible,
+  onToggle,
+  blink,
+  index,
+  showSelected,
+  hideTimeout,
+  onSwitchHideTimeout,
+  onScrollToSelected,
+}) {
   const t = useT()
   const group = useClash((s) => s.proxies[name])
   const delays = useClash((s) => s.delays)
@@ -36,7 +49,9 @@ function GroupSection({ name, filterReg, mode, visible, onToggle, blink }) {
   const proxyItemWidth = useSettings((s) => s.proxyItemWidth)
   if (!group) return null
 
-  const nodes = group.all?.filter((node) => filterReg.test(node)) ?? []
+  // 原版: hideTimeoutSecNames 命中的组隐藏超时节点(delay===0)
+  const nodes =
+    group.all?.filter((node) => filterReg.test(node) && (!hideTimeout || delays[node] !== 0)) ?? []
   const selectable = group.type === 'Selector'
   const itemWidth = proxyItemWidthPx(proxyItemWidth)
 
@@ -54,28 +69,45 @@ function GroupSection({ name, filterReg, mode, visible, onToggle, blink }) {
           {group.now && <div className="proxy-hint">{group.now}</div>}
         </div>
         <div className="proxy-section-right">
-          {visible && (
-            <span className="sec-icon clickable" title="Scroll to selected proxy">
+          {showSelected && (
+            <Hint
+              className="sec-icon clickable"
+              hint="Scroll to selected proxy"
+              position="top"
+              onClick={(e) => {
+                e.stopPropagation()
+                onScrollToSelected(index)
+              }}
+            >
               <span className="material-icons">travel_explore</span>
-            </span>
+            </Hint>
           )}
-          <span className="sec-icon clickable" title="Show/Hide timed-out proxies">
-            <span className="material-icons">report</span>
-          </span>
-          <span
+          <Hint
             className="sec-icon clickable"
-            title="Test latency"
+            hint="Show/Hide timed-out proxies"
+            position="top"
+            onClick={(e) => {
+              e.stopPropagation()
+              onSwitchHideTimeout(name)
+            }}
+          >
+            <span className="material-icons">{hideTimeout ? 'report_off' : 'report'}</span>
+          </Hint>
+          <Hint
+            className="sec-icon clickable"
+            hint="Test latency"
+            position="top"
             onClick={(e) => {
               e.stopPropagation()
               testGroupDelay(name)
             }}
           >
             <span className="material-icons">network_check</span>
-          </span>
+          </Hint>
           {['rule', 'script'].includes(mode) && (
-            <span className="sec-icon clickable" title="Show/hide proxies">
+            <Hint className="sec-icon clickable" hint="Show/hide proxies" position="left">
               <span className="material-icons">{visible ? 'visibility' : 'visibility_off'}</span>
-            </span>
+            </Hint>
           )}
         </div>
       </div>
@@ -122,12 +154,15 @@ export default function Proxies() {
   const groups = mode === 'global' ? ['GLOBAL'] : groupNames
   const showProxyFilter = useSettings((s) => s.showProxyFilter)
   const proxyMiniListWidth = useSettings((s) => s.proxyMiniListWidth)
+  const proxyShowSecIdxs = useSettings((s) => s.proxyShowSecIdxs)
 
   const [filterKeyword, setFilterKeyword] = useState('')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [showSecs, setShowSecs] = useState([])
   const [topItemIndex, setTopItemIndex] = useState(-1)
   const [blinkIndex, setBlinkIndex] = useState(-1)
+  // 原版 hideTimeoutSecNames(组件内临时 state): 命中组隐藏超时节点
+  const [hideTimeoutSecNames, setHideTimeoutSecNames] = useState([])
   const filterInputRef = useRef(null)
   const scrollRef = useRef(null)
 
@@ -174,11 +209,14 @@ export default function Proxies() {
     setTopItemIndex(tops.findIndex((top) => top - 120 > el.scrollTop) - 1)
   }
 
-  // 原版 handleNavigatToGroup: 展开 section + 组闪烁 + scrollTop = children[e].offsetTop - 120
+  // 原版 handleNavigatToGroup: 展开 section + 记入 showSecIdxs + 组闪烁 + scrollTop = children[e].offsetTop - 120
   const navigateToGroup = (idx) => {
     const name = navigatorList[idx]
     if (name && isRuleLike) {
       setShowSecs((prev) => (prev.includes(name) ? prev : [...prev, name]))
+    }
+    if (!proxyShowSecIdxs.includes(idx)) {
+      useSettings.getState().patch({ proxyShowSecIdxs: [...proxyShowSecIdxs, idx] })
     }
     setBlinkIndex(idx)
     setTimeout(() => {
@@ -192,20 +230,54 @@ export default function Proxies() {
     }, 0)
   }
 
+  // 原版 switchHideTimeout: 切换某组是否隐藏超时节点
+  const switchHideTimeout = (name) => {
+    setHideTimeoutSecNames((prev) =>
+      prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name],
+    )
+  }
+
+  // 原版 scrollToSelected(e): 组闪烁 + 若选中节点不在可视区则滚到 offsetTop-160
+  const scrollToSelected = (idx) => {
+    setBlinkIndex(idx)
+    setTimeout(() => {
+      const el = scrollRef.current
+      const section = el?.children?.[idx]
+      if (!el || !section) return
+      const items = section.querySelectorAll('.proxy-item')
+      let selected = null
+      for (const it of items) {
+        if (it.classList.contains('selected')) {
+          selected = it
+          break
+        }
+      }
+      if (!selected) return
+      const base = el.getBoundingClientRect().top
+      const top = selected.getBoundingClientRect().top - base + el.scrollTop
+      const target = top - 160
+      if (target < el.scrollTop || target > el.scrollTop + el.clientHeight - 200) {
+        el.scrollTop = target
+      }
+    }, 0)
+  }
+
   return (
     <div id="main-proxy-view">
       <div id="main-mode-switcher">
         <div className="btns">
           {MODES.map(([value, key, icon, hint]) => (
-            <div
+            <Hint
               key={value}
-              className={`btn clickable ${mode === value ? 'selected' : 'normal'}`}
-              title={t(hint)}
+              className={`gap-x-2 clickable btn ${mode === value ? 'selected' : 'normal'}`}
+              style={{ flexDirection: 'row' }}
+              hint={t(hint)}
+              position="bottom"
               onClick={() => updateMode(value)}
             >
               <span>{t(key)}</span>
-              <span className="material-icons rotate-90">{icon}</span>
-            </div>
+              <div className="material-icons rotate-90">{icon}</div>
+            </Hint>
           ))}
         </div>
       </div>
@@ -220,6 +292,11 @@ export default function Proxies() {
             visible={isVisible(name)}
             onToggle={() => toggleSection(name)}
             blink={blinkIndex === i}
+            index={i}
+            showSelected={proxyShowSecIdxs.includes(i)}
+            hideTimeout={hideTimeoutSecNames.includes(name)}
+            onSwitchHideTimeout={switchHideTimeout}
+            onScrollToSelected={scrollToSelected}
           />
         ))}
       </div>

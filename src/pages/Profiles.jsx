@@ -3,6 +3,7 @@ import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
 import { importProfile, updateProfileById } from '../service'
 import { fmtBytes, fmtDateTime } from '../utils/format'
+import Hint from '../components/Hint'
 
 const parseDomain = (url) => {
   try {
@@ -123,7 +124,6 @@ export default function Profiles() {
           />
           <span
             className="material-icons clear-icon"
-            title={subUrl ? t('Clear') : t('Paste')}
             onClick={() => (subUrl ? setSubUrl('') : navigator.clipboard?.readText().then((x) => setSubUrl(x)))}
           >
             {subUrl ? 'backspace' : 'content_copy'}
@@ -167,8 +167,8 @@ export default function Profiles() {
               </div>
               <div className="item-info">
                 <div className="item-name">
-                  <div className="item-name-top" title={p.name}>
-                    {p.name}
+                  <div className="item-name-top">
+                    <div title={p.name}>{p.name}</div>
                   </div>
                   <div className="item-name-bottom" title={p.url}>
                     <span className="domain-text">{remote ? parseDomain(p.url) : 'Local'}</span>
@@ -187,27 +187,29 @@ export default function Profiles() {
                 </div>
                 <div className="item-actions">
                   {remote ? (
-                    <span
-                      className={`material-icons${updatingId === p.id ? ' rotating' : ''}`}
-                      title="Update"
+                    <Hint
+                      className="item-icon"
+                      hint="Update"
                       onClick={(e) => {
                         e.stopPropagation()
                         onUpdate(p)
                       }}
                     >
-                      refresh
-                    </span>
+                      <span className={`material-icons${updatingId === p.id ? ' rotating' : ''}`}>
+                        refresh
+                      </span>
+                    </Hint>
                   ) : (
-                    <span
-                      className="material-icons"
-                      title="Edit"
+                    <Hint
+                      className="item-icon"
+                      hint="Edit"
                       onClick={(e) => {
                         e.stopPropagation()
                         setEditing({ ...p, name: p.name, url: p.url })
                       }}
                     >
-                      code
-                    </span>
+                      <span className="material-icons">code</span>
+                    </Hint>
                   )}
                 </div>
               </div>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useClash } from '../store/clash'
+import { useSettings } from '../store/settings'
 import { useT } from '../hooks/useT'
+import Hint from '../components/Hint'
 import { closeAllConnections, closeConnection } from '../service'
 
 // 原版 6 个排序标签(hint 文案与图标对)
@@ -45,22 +47,36 @@ function fromNow(iso) {
 
 const upperFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
+// 原版 connectionProcess: 取 processPath 的文件名
+function connectionProcess(c) {
+  const p = c.metadata?.processPath || ''
+  if (!p) return ''
+  return p.split(/[\\/]/).pop() || ''
+}
+
 export default function Connections() {
   const t = useT()
   const connections = useClash((s) => s.connections)
   const totals = useClash((s) => s.totals)
+  const connChainType = useSettings((s) => s.connChainType)
+  const connShowProcess = useSettings((s) => s.connShowProcess)
   const [q, setQ] = useState('')
   const [label, setLabel] = useState(null)
   const [reverse, setReverse] = useState(false)
   const [paused, setPaused] = useState(false)
+  const [detail, setDetail] = useState(null)
 
   const kw = q.trim().toLowerCase()
-  const filtered = connections.filter(
-    (c) =>
-      !kw ||
-      (c.metadata.host || '').toLowerCase().includes(kw) ||
-      (c.chains || []).join(' ').toLowerCase().includes(kw) ||
-      (c.rule || '').toLowerCase().includes(kw),
+  const filtered = useMemo(
+    () =>
+      connections.filter(
+        (c) =>
+          !kw ||
+          (c.metadata.host || '').toLowerCase().includes(kw) ||
+          (c.chains || []).join(' ').toLowerCase().includes(kw) ||
+          (c.rule || '').toLowerCase().includes(kw),
+      ),
+    [connections, kw],
   )
 
   const ordered = useMemo(() => {
@@ -90,10 +106,17 @@ export default function Connections() {
     }
   }
 
-  // 原版默认 connChainType=0(Proxy):仅显示端点 chains[0]
-  const endpointOf = (c) => {
-    const ch = c.chains || []
-    return ch.length >= 1 ? ch[0] : ''
+  // 原版 connectionEndpoint: connChainType ∈ {0,2} 时取 chains[0]
+  const connectionEndpoint = (c) => {
+    const chains = c.chains || []
+    return [0, 2].includes(connChainType) && chains.length >= 1 ? chains[0] : ''
+  }
+
+  // 原版 connectionGroup: connChainType===2 且仅 1 段时为空, 否则 connChainType ∈ {1,2} 取末段
+  const connectionGroup = (c) => {
+    const chains = c.chains || []
+    if (connChainType === 2 && chains.length === 1) return ''
+    return [1, 2].includes(connChainType) && chains.length >= 1 ? chains[chains.length - 1] : ''
   }
 
   return (
@@ -126,10 +149,10 @@ export default function Connections() {
       <div className="control-view">
         <div className="labels">
           {LABELS.map((l) => (
-            <div
+            <Hint
               key={l.key}
               className={`label${label === l.key ? (reverse ? ' label-selected-reverse' : ' label-selected') : ''}`}
-              title={l.hint}
+              hint={l.hint}
               onClick={() => selectLabel(l.key)}
             >
               <div className="label-icons">
@@ -139,7 +162,7 @@ export default function Connections() {
                   </span>
                 ))}
               </div>
-            </div>
+            </Hint>
           ))}
           <div className="flex-grow" />
           <div
@@ -156,7 +179,11 @@ export default function Connections() {
 
       <div className="scroll-view">
         {ordered.map((c) => (
-          <div key={c.id} className={`conn-item${c.closed ? ' conn-item-closed' : ''}`}>
+          <div
+            key={c.id}
+            className={`conn-item${c.closed ? ' conn-item-closed' : ''}`}
+            onClick={() => setDetail(c)}
+          >
             <div>
               <div className="conn-item-top">
                 <div className="conn-host">
@@ -166,13 +193,23 @@ export default function Connections() {
               <div className="conn-labels">
                 <div className="conn1">{c.metadata.network.toUpperCase()}</div>
                 <div className="conn2">{c.metadata.type}</div>
-                {endpointOf(c) && <div className="conn4">{endpointOf(c)}</div>}
+                {connShowProcess && connectionProcess(c) && (
+                  <div className="conn7">{connectionProcess(c)}</div>
+                )}
+                {connectionGroup(c) && <div className="conn3">{connectionGroup(c)}</div>}
+                {connectionEndpoint(c) && <div className="conn4">{connectionEndpoint(c)}</div>}
                 <div className="conn5">{upperFirst(fromNow(c.start))}</div>
                 {calcSpeedText(c) && <div className="conn6">{calcSpeedText(c)}</div>}
               </div>
             </div>
             {!c.closed && !paused && (
-              <div className="close-btn" onClick={() => closeConnection(c.id)}>
+              <div
+                className="close-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  closeConnection(c.id)
+                }}
+              >
                 <span className="material-icons">block</span>
               </div>
             )}
@@ -180,6 +217,59 @@ export default function Connections() {
         ))}
         {ordered.length === 0 && <div className="empty-tip">{t('No Connections')}</div>}
       </div>
+
+      {detail && (
+        <div className="mask" onMouseDown={() => setDetail(null)}>
+          <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modal-title">Connection</div>
+            <div className="modal-body">
+              <div className="detail-row">
+                <span>Host</span>
+                <span>
+                  {detail.metadata.host || detail.metadata.destinationIP}:{detail.metadata.destinationPort}
+                </span>
+              </div>
+              <div className="detail-row">
+                <span>Network</span>
+                <span>{detail.metadata.network.toUpperCase()}</span>
+              </div>
+              <div className="detail-row">
+                <span>Type</span>
+                <span>{detail.metadata.type}</span>
+              </div>
+              {detail.rule && (
+                <div className="detail-row">
+                  <span>Rule</span>
+                  <span>{detail.rule}</span>
+                </div>
+              )}
+              {(detail.chains || []).length > 0 && (
+                <div className="detail-row">
+                  <span>Chains</span>
+                  <span>{detail.chains.join(' → ')}</span>
+                </div>
+              )}
+              {connectionProcess(detail) && (
+                <div className="detail-row">
+                  <span>Process</span>
+                  <span>{connectionProcess(detail)}</span>
+                </div>
+              )}
+              <div className="detail-row">
+                <span>Traffic</span>
+                <span>
+                  ↑{traffic(detail.upload)} ↓{traffic(detail.download)}
+                </span>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn" onClick={() => setDetail(null)}>
+                {t('Cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
