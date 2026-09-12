@@ -21,9 +21,28 @@ function applyProxies(data) {
   useClash.getState().patch({ proxies, groupNames, delays })
 }
 
+// 演示模式种子订阅(仅注入一次, 让 demo 下 Profiles 页有卡片可展示)
+const DEMO_PROFILES = [
+  { name: 'config.yaml', url: '', used: 0, total: 0, days: 0 },
+  { name: 'airport', url: 'https://sub.example.com/clash.yaml', used: 42 * (1 << 30), total: 200 * (1 << 30), days: 0 },
+  { name: 'backup', url: 'https://backup.example.com/clash.yaml', used: 3 * (1 << 30), total: 100 * (1 << 30), days: 5 },
+]
+function seedDemoProfiles() {
+  const st = useSettings.getState()
+  if (st.profilesSeeded) return
+  useSettings.getState().patch({ profilesSeeded: true })
+  if (st.profiles.length > 0) return
+  for (const p of DEMO_PROFILES) {
+    useSettings.getState().addProfile({ id: crypto.randomUUID(), name: p.name, url: p.url, used: p.used, total: p.total, updatedAt: Date.now() - p.days * 86400000 })
+  }
+  const first = useSettings.getState().profiles[0]
+  if (first) useSettings.getState().setActiveProfile(first.id)
+}
+
 // 启动时拉取版本 / 配置 / 代理,失败则标记未连接
 export async function bootstrap() {
   try {
+    if (isDemo()) seedDemoProfiles()
     const [version, configs, data] = isDemo()
       ? await Promise.all([mock.getVersion(), mock.getConfigs(), mock.getProxies()])
       : await Promise.all([realApi.getVersion(), realApi.getConfigs(), realApi.getProxies()])
@@ -138,6 +157,30 @@ export async function fetchRules() {
   } catch {
     return []
   }
+}
+
+// RULE-SET 规则的 provider 元信息(clash /providers/rules)
+export async function fetchProviders() {
+  try {
+    const data = isDemo() ? await mock.getProviders() : await realApi.getProviders()
+    return data.providers ?? {}
+  } catch {
+    return {}
+  }
+}
+
+// 网卡列表(对应原版 InterfacesView 的 os.networkInterfaces()):
+// 该能力由 Electron 主进程提供, 浏览器沙箱无法读取系统网卡,
+// 因此演示模式返回内置样例, 真实模式返回空数组。
+export async function getInterfaces() {
+  if (isDemo()) {
+    try {
+      return await mock.getInterfaces()
+    } catch {
+      return []
+    }
+  }
+  return []
 }
 
 // 原版 applyRules 写本地 profile yaml; Web 版无内核配置写接口, demo 模式模拟成功

@@ -3,39 +3,44 @@ import { useSettings } from '../store/settings'
 import { useClash } from '../store/clash'
 import { useT } from '../hooks/useT'
 import Switch from '../components/Switch'
+import Hint from '../components/Hint'
+import InfoIcon from '../components/InfoIcon'
+import InterfacesView from '../components/InterfacesView'
 import { syncConfigs, updateLogLevel } from '../service'
 
 // 与原版 handleEditLogLevel 的 $select items 顺序一致(降序)
 const LEVELS = ['silent', 'error', 'warning', 'info', 'debug']
-const DESK = 'Desktop Only'
-
-// 与原版 InfoIcon 一致:info 图标,16px,opacity 0.7
-function InfoIcon({ text }) {
-  return (
-    <span className="info-icon-main" title={text}>
-      <span className="material-icons info-icon-text">info</span>
-    </span>
-  )
-}
-
-// 与原版 Hint 一致:可操作设置图标,24x24,hover 背景
-function HintIcon({ icon, title, onClick, style, className = 'tun-settings-icon' }) {
-  return (
-    <span className={`material-icons ${className}`.trim()} title={title} onClick={onClick} style={style}>
-      {icon}
-    </span>
-  )
-}
 
 function Gitem({ label, info, icons = [], children }) {
   return (
     <div className="gitem">
       <div className="item-left">
         <div>{label}</div>
-        {info && <InfoIcon text={info} />}
-        {icons.map((ic) => (
-          <HintIcon key={ic.icon} icon={ic.icon} title={ic.title} onClick={ic.onClick} style={ic.style} />
-        ))}
+        {info && <InfoIcon>{info}</InfoIcon>}
+        {icons.map((ic) =>
+          ic.title ? (
+            // 原版把尺寸类挂在 Hint 根元素上, 只留纯图标 span 作为子节点
+            <Hint
+              key={ic.icon}
+              className={ic.className ?? 'tun-settings-icon'}
+              hint={ic.title}
+              position={ic.position}
+              style={ic.style}
+              onClick={ic.onClick}
+            >
+              <span className="material-icons">{ic.icon}</span>
+            </Hint>
+          ) : (
+            <span
+              key={ic.icon}
+              className={`material-icons ${ic.className ?? ''}`.trim()}
+              style={ic.style}
+              onClick={ic.onClick}
+            >
+              {ic.icon}
+            </span>
+          ),
+        )}
       </div>
       <div className="item-right">{children}</div>
     </div>
@@ -49,6 +54,7 @@ export default function General() {
   const [editingPort, setEditingPort] = useState(false)
   const [portDraft, setPortDraft] = useState('')
   const [editingLogLevel, setEditingLogLevel] = useState(false)
+  const [interfacesVisible, setInterfacesVisible] = useState(false)
 
   const toggle = (key, configField) => (val) => {
     s.patch({ [key]: val })
@@ -96,7 +102,7 @@ export default function General() {
       <div className="general-header">
         <img src="/logo2.png" alt="Clash" />
         <div className="general-title">
-          <div className="title-name" title={t('Copy Version')} onClick={copyVersion}>
+          <div className="title-name" onClick={copyVersion}>
             Clash for Web
           </div>
           <div className="version" onClick={openRelease}>
@@ -107,17 +113,18 @@ export default function General() {
 
       <div className="general-content">
         <Gitem label={t('Port')}>
-          <span className="material-icons control-icon" title={DESK}>
-            terminal
-          </span>
-          <span
-            className="material-icons control-icon"
-            title="random mixed port"
-            style={{ color: s.randomMixedPort ? '#41b883' : '#b3b3b3' }}
-            onClick={toggleRandomPort}
-          >
-            {s.randomMixedPort ? 'sync' : 'sync_disabled'}
-          </span>
+          <Hint hint="terminal" className="mr-2">
+            <span className="material-icons control-icon">terminal</span>
+          </Hint>
+          <Hint hint="random mixed port">
+            <span
+              className="material-icons control-icon"
+              style={{ color: s.randomMixedPort ? '#41b883' : '#b3b3b3' }}
+              onClick={toggleRandomPort}
+            >
+              {s.randomMixedPort ? 'sync' : 'sync_disabled'}
+            </span>
+          </Hint>
           <span className="clickable" onClick={openEditPort}>
             {s.ports.mixed}
           </span>
@@ -125,8 +132,23 @@ export default function General() {
 
         <Gitem
           label={t('Allow LAN')}
-          info="Turn on to listen on all interfaces by default, or else only listen on 127.0.0.1."
-          icons={[{ icon: 'device_hub', title: 'network interfaces' }]}
+          info={
+            <>
+              Turn on to listen on all interfaces by default, or else only listen on 127.0.0.1. You
+              can change the Bind Address on the right side to specify a particular interface.{' '}
+              <a href="https://github.com/Dreamacro/clash/pull/2818" target="_blank" rel="noreferrer">
+                Inbounds
+              </a>
+            </>
+          }
+          icons={[
+            {
+              icon: 'device_hub',
+              title: 'network interfaces',
+              position: 'right',
+              onClick: () => setInterfacesVisible(true),
+            },
+          ]}
         >
           <Switch checked={s.allowLan} onChange={toggle('allowLan', 'allow-lan')} />
         </Gitem>
@@ -144,33 +166,35 @@ export default function General() {
         <Gitem
           label={t('Clash Core')}
           icons={[
-            { icon: 'gpp_maybe', title: 'add firewall rules(for Allow LAN and system stack)' },
-            { icon: 'memory', title: 'Preview the final configuration file that was submitted to Clash Core' },
-            { icon: 'dns', title: 'Resolve a host using Clash core' },
-            { icon: 'play_arrow', title: 'Test script using by Script mode' },
+            {
+              icon: 'gpp_maybe',
+              title: 'add firewall rules(for Allow LAN and system stack)',
+              position: 'right',
+            },
+            {
+              icon: 'memory',
+              title: 'Preview the final configuration file that was submitted to Clash Core',
+              position: 'right',
+            },
+            { icon: 'dns', title: 'Resolve a host using Clash core', position: 'right' },
+            { icon: 'play_arrow', title: 'Test script using by Script mode', position: 'right' },
           ]}
         >
-          <span className="clickable" title={t('Copy Version')} onClick={copyVersion}>
+          <span className="clickable" onClick={copyVersion}>
             {version || '-'} ({s.backend.port})
           </span>
         </Gitem>
 
         <Gitem label={t('Home Directory')}>
-          <span className="clickable" title={DESK}>
-            {t('Open Folder')}
-          </span>
+          <span className="clickable">{t('Open Folder')}</span>
         </Gitem>
 
         <Gitem label={t('UWP Loopback')}>
-          <span className="clickable" title={DESK}>
-            {t('Launch Helper')}
-          </span>
+          <span className="clickable">{t('Launch Helper')}</span>
         </Gitem>
 
         <Gitem label={t('TAP Device')}>
-          <span className="clickable" title={DESK}>
-            {t('Manage')}
-          </span>
+          <span className="clickable">{t('Manage')}</span>
         </Gitem>
 
         <Gitem
@@ -178,29 +202,33 @@ export default function General() {
           icons={[
             {
               icon: 'public',
-              title: DESK,
               className: '',
               style: { color: '#b3b3b3', fontSize: '18px', marginLeft: '5px', marginTop: '2px' },
             },
           ]}
         >
-          <span className="clickable" title={DESK}>
-            {t('Manage')}
-          </span>
+          <span className="clickable">{t('Manage')}</span>
         </Gitem>
 
         <Gitem
           label={t('Tun Mode')}
           info="To enable this mode, please install Service Mode first!"
-          icons={[{ icon: 'settings', title: 'Settings' }]}
+          icons={[{ icon: 'settings', title: 'Settings', position: 'right' }]}
         >
           <Switch checked={s.tunMode} onChange={toggle('tunMode')} />
         </Gitem>
 
         <Gitem
           label={t('Mixin')}
-          info="Mixin allows you to overwrite the original configuration file."
-          icons={[{ icon: 'settings', title: 'Edit Mixin content' }]}
+          info={
+            <>
+              Mixin allows you to overwrite the original configuration file.{' '}
+              <a href="https://docs.cfw.lbyczf.com/contents/mixin.html" target="_blank" rel="noreferrer">
+                Docs
+              </a>
+            </>
+          }
+          icons={[{ icon: 'settings', title: 'Edit Mixin content', position: 'right' }]}
         >
           <Switch checked={s.mixin} onChange={toggle('mixin')} />
         </Gitem>
@@ -264,6 +292,8 @@ export default function General() {
           </div>
         </div>
       )}
+
+      {interfacesVisible && <InterfacesView onClose={() => setInterfacesVisible(false)} />}
     </div>
   )
 }
