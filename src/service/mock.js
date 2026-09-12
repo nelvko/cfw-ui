@@ -86,6 +86,8 @@ function buildProxies() {
 const { proxies: MOCK_PROXIES, groupNames: MOCK_GROUP_NAMES } = buildProxies()
 
 const MOCK_RULES = [
+  ['RULE-SET', 'reject', 'REJECT'],
+  ['RULE-SET', 'lan-cidr', 'DIRECT'],
   ['DOMAIN-SUFFIX', 'google.com', '🚀 节点选择'],
   ['DOMAIN-SUFFIX', 'youtube.com', '🚀 节点选择'],
   ['DOMAIN-SUFFIX', 'github.com', '🚀 节点选择'],
@@ -104,6 +106,75 @@ const MOCK_RULES = [
   ['GEOIP', 'CN', 'DIRECT'],
   ['MATCH', '', '🐟 漏网之鱼'],
 ].map(([type, payload, proxy], i) => ({ type, payload, proxy, size: 10 + i }))
+
+// 对应 clash /providers/rules:RULE-SET 规则的 provider 元信息
+const MOCK_RULE_PROVIDERS = {
+  reject: {
+    name: 'reject',
+    vehicleType: 'HTTP',
+    behavior: 'domain',
+    ruleCount: 12840,
+    updatedAt: Date.now() - 3600 * 1000,
+  },
+  'lan-cidr': {
+    name: 'lan-cidr',
+    vehicleType: 'File',
+    behavior: 'ipcidr',
+    ruleCount: 12,
+    updatedAt: Date.now() - 2 * 3600 * 1000,
+  },
+}
+
+// 演示用的网卡列表(结构对齐 Node os.networkInterfaces())
+const MOCK_INTERFACES = [
+  {
+    name: 'Loopback',
+    addrs: [
+      {
+        family: 'IPv4',
+        address: '127.0.0.1',
+        netmask: '255.0.0.0',
+        cidr: '127.0.0.1/8',
+        mac: '00:00:00:00:00:00',
+        internal: true,
+      },
+    ],
+  },
+  {
+    name: 'WLAN',
+    addrs: [
+      {
+        family: 'IPv4',
+        address: '192.168.1.102',
+        netmask: '255.255.255.0',
+        cidr: '192.168.1.102/24',
+        mac: '9c:2f:9d:11:aa:3b',
+        internal: false,
+      },
+      {
+        family: 'IPv6',
+        address: 'fe80::1c2d:3f4e:5a6b:7c8d',
+        netmask: 'ffff:ffff:ffff:ffff::',
+        cidr: 'fe80::1c2d:3f4e:5a6b:7c8d/64',
+        mac: '9c:2f:9d:11:aa:3b',
+        internal: false,
+      },
+    ],
+  },
+  {
+    name: 'vEthernet (WSL)',
+    addrs: [
+      {
+        family: 'IPv4',
+        address: '172.24.160.1',
+        netmask: '255.255.240.0',
+        cidr: '172.24.160.1/20',
+        mac: '00:15:5d:0a:1b:2c',
+        internal: false,
+      },
+    ],
+  },
+]
 
 const LOG_HOSTS = [
   'www.google.com:443',
@@ -237,6 +308,15 @@ export const mock = {
 
   async getRules() {
     return { rules: structuredClone(MOCK_RULES) }
+  },
+
+  async getProviders() {
+    return { providers: structuredClone(MOCK_RULE_PROVIDERS) }
+  },
+
+  // 对应原版 os.networkInterfaces():family 用 'IPv4'/'IPv6'
+  async getInterfaces() {
+    return structuredClone(MOCK_INTERFACES)
   },
 
   async saveRules() {

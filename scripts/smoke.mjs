@@ -40,23 +40,27 @@ for (const [label, name] of pages) {
 }
 
 // 主题抽查:深色 / 国庆中秋 / 赛博朋克
-const themeSel = 'select.as-text:has(option[value="dark"])'
-await page.click('li.menu-item:has-text("设置")')
-await page.selectOption(themeSel, 'dark')
-await page.waitForTimeout(400)
+// 原版 Appearance > Theme 是 SelectView 分段按钮(renderer.js @3178564),非原生 <select>,
+// 故点击 .main-select-view .item 切换。
+const chooseTheme = async (label) => {
+  await page.click('li.menu-item:has-text("设置")')
+  await page.waitForTimeout(300)
+  await page.click(`.main-setting-view .main-select-view .item:text-is("${label}")`)
+  await page.waitForTimeout(400)
+}
+
+await chooseTheme('Dark')
 await page.screenshot({ path: `${OUT}/10-dark-settings.png` })
 await page.click('li.menu-item:has-text("代理")')
 await page.waitForTimeout(600)
 await page.screenshot({ path: `${OUT}/11-dark-proxies.png` })
 
-await page.click('li.menu-item:has-text("设置")')
-await page.selectOption(themeSel, 'red')
+await chooseTheme('国庆中秋')
 await page.click('li.menu-item:has-text("代理")')
 await page.waitForTimeout(600)
 await page.screenshot({ path: `${OUT}/12-red-proxies.png` })
 
-await page.click('li.menu-item:has-text("设置")')
-await page.selectOption(themeSel, '2077')
+await chooseTheme('Cyberpunk')
 await page.click('li.menu-item:has-text("代理")')
 await page.waitForTimeout(600)
 await page.screenshot({ path: `${OUT}/13-cyberpunk-proxies.png` })

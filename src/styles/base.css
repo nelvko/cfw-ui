@@ -1,6 +1,22 @@
 @import '@material-design-icons/font/index.css';
 
 /* ============================================================
+   原版 HintView 根元素(全局, scoped 6e240a95)
+   对应 Tailwind: main-hint-view flex flex-col justify-center items-center w-[18px] h-[18px]
+   置于文件最前, 使后续低特异性组件类(.sec-icon/.tun-settings-icon 等)按源码顺序覆盖尺寸
+   ============================================================ */
+.main-hint-view {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+
+/* ============================================================
    主题变量 —— 与 Clash for Windows 0.20.39 renderer.js 提取值一致
    ============================================================ */
 @font-face {
@@ -18,6 +34,9 @@
   --general-title-c: #2c3e50;
   --general-clickable-border-c: rgba(50, 50, 50, 0.2);
   --general-settings-icon-c: #2c3e50;
+  --general-interface-card-bgc: #fff;
+  --general-interface-card-fgc: #17224f;
+  --general-interface-card-quote-bgc: rgb(213, 213, 213);
   --proxy-fake-item-bgc: #e3e3e3;
   --proxy-item-now-fgc: #fff;
   --proxy-item-now-bgc: rgb(146, 146, 146);
@@ -46,6 +65,7 @@
   --profile-list-item-cur-bgc: #464646;
   --feedback-link-c: rgb(1, 159, 245);
   --status-bgc: #ebebeb;
+  --status-close-hover: rgba(50, 50, 50, 0.2);
   --switch-bgc: #c7bfbf;
   --switch-bgc-second: #bdb3b3;
   --menu-fgc: rgb(116, 125, 136);
@@ -68,6 +88,9 @@ html[data-theme='dark'] {
   --general-title-c: rgb(233, 233, 233);
   --general-clickable-border-c: rgb(149, 149, 149);
   --general-settings-icon-c: #c2c8ce;
+  --general-interface-card-bgc: #686675;
+  --general-interface-card-fgc: #fff;
+  --general-interface-card-quote-bgc: #494757;
   --proxy-fake-item-bgc: #32323f;
   --proxy-item-now-fgc: rgb(206, 206, 206);
   --proxy-item-now-bgc: rgb(92, 92, 92);
@@ -96,6 +119,7 @@ html[data-theme='dark'] {
   --profile-list-item-cur-bgc: #5f5f5f;
   --feedback-link-c: rgb(23, 136, 197);
   --status-bgc: #343442;
+  --status-close-hover: rgba(250, 250, 250, 0.2);
   --switch-bgc: #413c3c;
   --switch-bgc-second: #332f2f;
   --menu-fgc: rgb(212, 212, 212);
@@ -119,6 +143,9 @@ html[data-theme='red'] {
   --general-title-c: #b72d29;
   --general-clickable-border-c: #da141e3f;
   --general-settings-icon-c: #c54b36;
+  --general-interface-card-bgc: #c74f55;
+  --general-interface-card-fgc: #fff;
+  --general-interface-card-quote-bgc: #850f15;
   --proxy-fake-item-bgc: #c28f3d;
   --proxy-item-now-fgc: rgb(226, 226, 226);
   --proxy-item-now-bgc: rgb(184, 112, 4);
@@ -147,6 +174,7 @@ html[data-theme='red'] {
   --profile-list-item-cur-bgc: #da141e99;
   --feedback-link-c: #b72d29;
   --status-bgc: #e8a84a;
+  --status-close-hover: rgba(250, 250, 250, 0.2);
   --switch-bgc: #d39126;
   --switch-bgc-second: #be8222;
   --menu-fgc: #da141ecb;
@@ -170,6 +198,9 @@ html[data-theme='2077'] {
   --general-title-c: #f8ed53;
   --general-clickable-border-c: #dde9373f;
   --general-settings-icon-c: #c0e732ef;
+  --general-interface-card-bgc: #0e5668;
+  --general-interface-card-fgc: #fff;
+  --general-interface-card-quote-bgc: #09303a;
   --proxy-fake-item-bgc: #043441;
   --proxy-item-now-fgc: rgb(207, 245, 146);
   --proxy-item-now-bgc: #064453;
@@ -198,6 +229,7 @@ html[data-theme='2077'] {
   --profile-list-item-cur-bgc: #b4aa39;
   --feedback-link-c: #a5dbe9;
   --status-bgc: #fcec0c;
+  --status-close-hover: rgba(250, 250, 250, 0.2);
   --switch-bgc: #837a00;
   --switch-bgc-second: #968c03;
   --menu-fgc: #c79707;
@@ -211,10 +243,43 @@ html[data-theme='2077'] {
 }
 
 /* ============ 基础(基准字号 16px,与 CFW 一致,组件内用 em 缩放) ============ */
+/* 对应原版全局 reset(renderer.js module 45777):
+   * / *::before / *::after 统一禁用文本选择与元素拖拽。
+   光标交由 body 的 cursor:default 继承(箭头),交互组件各自 cursor:pointer,
+   文本输入框再单独恢复 I 形光标。 */
+*,
+*::before,
+*::after {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* 文本输入控件恢复 I 形光标与可选中(原版在各输入框上显式 cursor:text) */
+input:not(
+    :is(
+        [type='checkbox'],
+        [type='radio'],
+        [type='range'],
+        [type='file'],
+        [type='button'],
+        [type='submit'],
+        [type='reset']
+      )
+  ),
+textarea {
+  cursor: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 html,
@@ -230,10 +295,12 @@ body {
   color: var(--fgc);
   background: var(--bgc);
   -webkit-font-smoothing: antialiased;
+  cursor: default;
 }
 
+/* 对齐原版全局 .icon:font-size 18px(原版不存在 .material-icons 类) */
 .material-icons {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
   user-select: none;
 }
@@ -263,16 +330,82 @@ body {
 /* ============ 布局 ============ */
 /* 对齐原版 .wrapper: height:100vh / width:100vw / overflow:hidden, 无 min-width */
 .app {
-  display: flex;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+}
+
+/* 对齐原版 <main>: 顶部状态栏(25px)之下为左右分栏 */
+.app-body {
+  display: flex;
+  justify-content: space-between;
+  height: calc(100vh - 25px);
 }
 
 /* 对齐原版 .right-side: 无 overflow(溢出由 .app 的 overflow:hidden 兜底) */
 .content {
   flex: 1;
   min-width: 0;
+}
+
+/* ============ 顶部状态栏(1:1 对应 CFW StatusBar data-v-65878d23) ============ */
+.status-bar {
+  height: 25px;
+  width: 100vw;
+  background-color: var(--status-bgc);
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+/* 原版:仅 dark 主题标题栏文字为白色 */
+html[data-theme='dark'] .status-bar {
+  color: #fff;
+}
+.status-bar .empty {
+  flex-grow: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.status-bar .empty .bottom {
+  flex-grow: 1;
+  -webkit-app-region: drag;
+}
+/* 原版 .fixed left-1/2 -translate-x-1/2 text-xs whitespace-pre */
+.status-bar .status-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: pre;
+}
+.status-bar .close {
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 100%;
+}
+/* 原版 .icon text-sm */
+.status-bar .close .material-icons {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.status-bar .close:hover {
+  background-color: var(--status-close-hover);
+}
+.status-bar .close.status-close:hover {
+  background-color: #ff5050d7;
+}
+/* 原版 minimize 图标带 -translate-y-1 */
+.status-bar .icon-minimize {
+  transform: translateY(-0.25rem);
 }
 
 /* ============ 侧边栏(结构与数值 1:1 对应 CFW .main-main-menu) ============ */
@@ -357,6 +490,66 @@ body {
 .menu-item.above-active {
   border-bottom-right-radius: 10px;
 }
+/* 原版快捷键序号: 常态 left:-20px(被侧栏裁掉), 触发快捷键时滑到 12px */
+.menu-item .num {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75em;
+  transition: all 0.2s;
+}
+.menu-item .num.show {
+  left: 12px;
+}
+/* 原版排序态(drag-item / ghost-item / shaking1~3) */
+.menu-item.drag-item {
+  background-color: #41b883;
+  color: #fff;
+}
+.menu-item.ghost-item {
+  opacity: 0;
+}
+.menu-item.shaking1,
+.menu-item.shaking2,
+.menu-item.shaking3 {
+  margin: 2px 0;
+  transform-origin: center;
+  animation: menu-shake 400ms infinite;
+}
+.menu-item.shaking2 {
+  animation-delay: 100ms;
+}
+.menu-item.shaking3 {
+  animation-delay: 200ms;
+}
+@keyframes menu-shake {
+  0% { transform: rotate(0deg); }
+  12.5% { transform: rotate(0.5deg); }
+  25% { transform: rotate(1.2deg); }
+  37.5% { transform: rotate(0.5deg); }
+  50% { transform: rotate(0deg); }
+  62.5% { transform: rotate(-0.5deg); }
+  75% { transform: rotate(-1.2deg); }
+  87.5% { transform: rotate(-0.5deg); }
+  100% { transform: rotate(0deg); }
+}
+.sidebar .stop-btn {
+  cursor: pointer;
+  position: absolute;
+  top: 515px;
+  left: 20px;
+  border-radius: 20px;
+  color: #fff;
+  height: 30px;
+  width: 130px;
+  line-height: 30px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: normal;
+  background-color: #d14444;
+  box-shadow: 0 0 15px 1px rgba(49, 49, 49, 0.3);
+}
 
 /* 底部运行时长 #main-run-time-view */
 .running-time {
@@ -383,14 +576,21 @@ body {
   justify-content: center;
   z-index: 2;
 }
+/* 原版 .clash-status-icon 无背景色; 颜色只由状态类提供 */
 .clash-status-icon {
   width: 12px;
   height: 12px;
   border-radius: 10px;
-  background-color: #9e9e9e;
 }
-.clash-status-icon.on {
+/* 原版 statusIcon: CONNECTED→clash-running, DISCONNECTED→clash-stopped */
+.clash-running {
   background-color: #41b883;
+}
+.clash-set-dns {
+  background-color: rgb(231, 217, 26);
+}
+.clash-stopped {
+  background-color: red;
 }
 .clash-status-hint {
   margin-left: 6px;
@@ -400,10 +600,14 @@ body {
 }
 
 /* ============ General 页 .header + .content ============ */
+/* 原版用 space-between; 但 content 有 max-height:600px 上限, 窗口偏高时
+   剩余空间会全堆到 header 与 content 之间, 形成巨大空白。
+   改为 center: content 未达上限时 flex-grow 仍填满(短窗口行为不变),
+   达到上限后多出的空间上下均分, 整块居中。 */
 .main-general-view {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   height: calc(100vh - 25px);
 }
 .general-header {
@@ -492,6 +696,48 @@ body {
   color: var(--general-settings-icon-c);
   opacity: 0.7;
 }
+/* 原版 info-icon 的说明面板(scoped data-v-d4bbbea2):500ms 后固定在图标右侧 20px
+   显示,背景/文字/引用色随主题变化 */
+.info-icon-main .content {
+  position: fixed;
+  background-color: var(--general-interface-card-bgc);
+  color: var(--general-interface-card-fgc);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  overflow: hidden;
+}
+.info-icon-main .content a {
+  color: #8abdf8;
+  text-decoration: none;
+  cursor: pointer;
+}
+.info-icon-main .content .quote {
+  background-color: var(--general-interface-card-quote-bgc);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+.info-icon-main .content li {
+  list-style: inside;
+}
+/* 原版 HintView 的提示气泡(scoped data-v-6e240a95):1000ms 后按 top/bottom/left/right
+   贴边显示,固定黑底白字 */
+.cfw-hint {
+  font-size: 12px;
+  background-color: #242424;
+  padding: 3px 5px;
+  border-radius: 3px;
+  color: #fff;
+  position: fixed;
+  z-index: 1000;
+  white-space: nowrap;
+  line-height: 13px;
+  font-weight: normal;
+  pointer-events: none;
+}
 .tun-settings-icon {
   width: 24px;
   height: 24px;
@@ -527,18 +773,6 @@ body {
 }
 .clickable:hover {
   color: var(--general-settings-icon-c);
-}
-.sec-icon {
-  font-size: 0.85em;
-  color: var(--general-settings-icon-c);
-  cursor: pointer;
-}
-.sec-icon:hover {
-  opacity: 0.75;
-}
-.hint {
-  font-size: 12.5px;
-  color: var(--input-phc);
 }
 
 /* 右对齐下划线输入/下拉 */
@@ -665,9 +899,6 @@ input.as-text {
   box-shadow: 1px 1px 5px 2px rgba(70, 70, 70, 0.1);
   cursor: pointer;
 }
-#main-mode-switcher .btns .btn .material-icons {
-  font-size: 20px;
-}
 #main-mode-switcher .selected {
   color: var(--mode-switcher-selected-fgc);
   background-color: var(--mode-switcher-selected-bgc);
@@ -678,6 +909,13 @@ input.as-text {
 }
 .rotate-90 {
   transform: rotate(90deg);
+}
+/* 原版 Tailwind 工具类: mr-2 = margin-right 8px; gap-x-2 = column-gap 8px(模式切换按钮 Hint) */
+.mr-2 {
+  margin-right: 8px;
+}
+.gap-x-2 {
+  column-gap: 8px;
 }
 
 /* CFW 代理页节点筛选框(固定右下角) —— 对应 data-v-0729f95b */
@@ -718,7 +956,6 @@ input.as-text {
 }
 .filter-keyword div .material-icons {
   color: #fff;
-  font-size: 20px;
 }
 
 /* ============ Rules 页(新加特例) —— 复刻原版规则页 data-v-459dde1e ============ */
@@ -754,9 +991,6 @@ input.as-text {
   padding: 0 10px;
   border-radius: 5px;
   font-size: 1.1em;
-  border: 1px solid var(--bc);
-  background: var(--input-bgc);
-  color: var(--fgc);
 }
 #main-rule-view .filter-view input:focus {
   outline: none;
@@ -764,6 +998,7 @@ input.as-text {
 #main-rule-view .log-list {
   flex-grow: 1;
   overflow-y: auto;
+  padding: 10px 20px;
 }
 #main-rule-view .log-item {
   display: flex;
@@ -771,7 +1006,7 @@ input.as-text {
   align-items: center;
   padding: 5px 20px;
   width: 100%;
-  border-bottom: 1px solid rgba(50, 50, 50, 0.1);
+  border-bottom: 1px solid var(--log-item-border-c);
 }
 #main-rule-view .left {
   flex-grow: 1;
@@ -1050,9 +1285,6 @@ input.as-text {
   background-color: rgba(187, 187, 187, 0.5);
   cursor: pointer;
 }
-.sec-icon .material-icons {
-  font-size: 20px;
-}
 .proxy-items {
   display: flex;
   flex-wrap: wrap;
@@ -1183,80 +1415,6 @@ input.as-text {
   color: var(--proxy-item-latency-offline-c);
 }
 
-/* ============ 配置页 ============ */
-.profile-bar {
-  display: flex;
-  gap: 10px;
-  padding: 16px 24px 18px;
-}
-.profile-bar .input {
-  flex: 1;
-}
-.profile-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 0 24px;
-}
-.profile-card {
-  width: 264px;
-  background: var(--profile-card-bgc);
-  border: 1px solid var(--proxy-item-border-c);
-  border-radius: 5px;
-  padding: 14px;
-  cursor: pointer;
-  position: relative;
-  transition: border-color 0.15s;
-  text-align: left;
-  font-family: inherit;
-  color: var(--fgc);
-}
-.profile-card:hover {
-  border-color: var(--proxy-item-hint-c);
-}
-.profile-card.on {
-  border-color: #41b883;
-  box-shadow: 0 0 0 1px #41b883;
-}
-.profile-name {
-  font-weight: 500;
-  font-size: 15px;
-  padding-right: 56px;
-}
-.profile-meta {
-  font-size: 12px;
-  color: var(--profile-card-hint-c);
-  margin-top: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.usage-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--proxy-item-subs-bgc);
-  margin-top: 12px;
-  overflow: hidden;
-}
-.usage-fill {
-  height: 100%;
-  background: var(--proxy-item-subs-used-bgc);
-  border-radius: 2px;
-}
-.profile-actions {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: flex;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-.profile-card:hover .profile-actions {
-  opacity: 1;
-}
-.profile-actions .icon-btn .material-icons {
-  font-size: 16px;
-}
 .empty-tip {
   color: var(--input-phc);
   font-size: 13px;
@@ -1398,13 +1556,12 @@ input.as-text {
   justify-content: space-between;
   height: 40px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--bc);
 }
 .main-connection-view .labels {
   display: flex;
   align-items: center;
   color: #fff;
-  width: 100%;
+  flex-shrink: 1;
 }
 .main-connection-view .labels .label {
   width: 65px;
@@ -1417,17 +1574,10 @@ input.as-text {
   cursor: pointer;
   background-color: rgba(100, 100, 100, 0.5);
   border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 .main-connection-view .label-icons {
   display: flex;
   gap: 4px;
-}
-.main-connection-view .label-icons .material-icons {
-  font-size: 16px;
 }
 .main-connection-view .labels .label-selected {
   background-color: rgba(14, 184, 65, 0.932);
@@ -1451,6 +1601,21 @@ input.as-text {
   flex-shrink: 0;
   font-size: 14px;
   font-weight: normal;
+}
+/* 原版 Pause 按钮实际用 .close-all-btn + .button-pause/.button-resume 提供底色;
+   下列 .button-control 是原版 CSS 中同样存在但未被引用的规则, 保留以对齐原版 */
+.main-connection-view .button-control {
+  padding: 0 10px;
+  text-align: center;
+  height: 25px;
+  font-weight: normal;
+  line-height: 25px;
+  cursor: pointer;
+  border-radius: 3px;
+  color: #fff;
+  flex-shrink: 0;
+  font-size: 14px;
+  margin-left: 10px;
 }
 .main-connection-view .button-resume {
   background-color: rgba(14, 151, 185, 0.959);
@@ -1487,15 +1652,32 @@ input.as-text {
   border-radius: 15px;
   cursor: pointer;
   opacity: 0.8;
+}
+.main-connection-view .close-btn > span {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
 }
 .main-connection-view .close-btn:hover {
   opacity: 1;
 }
-.main-connection-view .close-btn .material-icons {
-  font-size: 16px;
+.main-connection-view .detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 4px 0;
+  font-size: 14px;
+}
+.main-connection-view .detail-row > span:first-child {
+  color: var(--proxy-item-hint-c);
+  flex-shrink: 0;
+}
+.main-connection-view .detail-row > span:last-child {
+  word-break: break-all;
+  text-align: right;
 }
 .main-connection-view .conn-labels {
   font-size: 11px;
@@ -1512,9 +1694,9 @@ input.as-text {
   border-radius: 3px;
 }
 .main-connection-view .conn1 { background-color: rgba(194, 104, 25, 0.8); }
-.main-connection-view .conn2 { background-color: rgba(193, 131, 16, 0.77); }
-.main-connection-view .conn3 { background-color: rgba(0, 134, 76, 0.79); }
-.main-connection-view .conn4 { background-color: rgba(85, 152, 52, 0.81); }
+.main-connection-view .conn2 { background-color: rgba(193, 131, 16, 0.7725490196); }
+.main-connection-view .conn3 { background-color: rgba(0, 134, 76, 0.7882352941); }
+.main-connection-view .conn4 { background-color: rgba(85, 152, 52, 0.8078431373); }
 .main-connection-view .conn5 { background-color: #428ee4; }
 .main-connection-view .conn6 { background-color: #4c10ae; }
 .main-connection-view .conn7 { background-color: #8b8b00; }
@@ -1622,15 +1804,19 @@ input.as-text {
 .main-log-view .log-list .empty-list div:last-child {
   font-size: 14px;
 }
+/* 行结构 1:1 对应原版 data-v-6acd51f2(原版用 Tailwind 工具类, 此处展开为等效 CSS) */
 .main-log-view .log-item {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   padding: 5px 10px 5px 20px;
   border-bottom: 1px solid var(--log-item-border-c);
+  cursor: pointer;
 }
 .main-log-view .log-item-body {
-  width: 100%;
+  width: 100%; /* 原版 text-sm w-full */
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 .main-log-view .log-row {
   display: flex;
@@ -1638,11 +1824,13 @@ input.as-text {
   width: 100%;
 }
 .main-log-view .log-msg {
-  font-size: 12px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   word-break: break-all;
 }
 .main-log-view .log-time {
-  font-size: 12px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   opacity: 0.6;
   flex-shrink: 0;
   margin-left: 10px;
@@ -1651,26 +1839,41 @@ input.as-text {
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  column-gap: 4px;
 }
+/* 原版 rotate-90; 展开时内联 transform: rotate(180deg) */
 .main-log-view .addr-arrow {
   opacity: 0.4;
   font-size: 10px;
+  display: inline-block;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease-in-out;
+}
+.main-log-view .addr-arrow.open {
+  transform: rotate(180deg);
 }
 .main-log-view .log-fields {
   display: flex;
   flex-wrap: wrap;
   column-gap: 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .main-log-view .log-field {
   display: flex;
-  gap: 2px;
+  column-gap: 2px;
   align-items: baseline;
+  width: fit-content;
 }
 .main-log-view .log-field-key {
+  font-size: 0.75rem;
+  align-items: baseline;
   color: var(--log-item-payload-c);
   flex-shrink: 0;
+}
+.main-log-view .log-field-val {
+  word-break: break-all;
+  max-width: 100%;
+  opacity: 0.8;
 }
 .main-log-view .log-msg.info { color: #13af42; }
 .main-log-view .log-msg.debug { color: rgb(238, 238, 57); }
@@ -2100,6 +2303,13 @@ input.as-text {
 .ctx-item:hover {
   background: var(--setting-item-hover-bgc);
 }
+.ctx-item-disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.ctx-item-disabled:hover {
+  background: none;
+}
 
 /* 弹窗(免责声明 / 编辑) */
 .mask {
@@ -2271,4 +2481,111 @@ input.as-text {
   background-color: var(--general-item-bgc);
   padding: 5px 5px;
   border-radius: 3px;
+}
+
+/* 顶层错误边界兜底视图(Web 版新增, 防渲染期异常白屏) */
+.crash-view {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  background: var(--bgc);
+  color: var(--fgc);
+}
+.crash-title {
+  font-size: 20px;
+  font-weight: 500;
+}
+.crash-msg {
+  max-width: 80vw;
+  max-height: 50vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* 网卡列表(对应原版 InterfacesView, scoped d9b850ea)
+   原版用 Tailwind 工具类 + os.networkInterfaces(), 此处展开为等效 CSS */
+.interfaces-mask {
+  position: fixed;
+  top: 25px;
+  left: 170px;
+  width: calc(100% - 170px);
+  height: calc(100% - 25px);
+  background-color: var(--mask-c);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.interfaces-card {
+  width: 500px;
+  max-height: 500px;
+  border-radius: 5px;
+  background-color: var(--bgc);
+  color: var(--fgc);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.interfaces-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--bc);
+}
+.interfaces-list {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+.interfaces-list::-webkit-scrollbar {
+  width: 16px;
+}
+.interfaces-list::-webkit-scrollbar-thumb {
+  background-color: var(--scroll-bar-bgc);
+  border-radius: 100px;
+  border: 3px solid var(--bgc);
+}
+.if-list {
+  border-radius: 4px;
+  width: 100%;
+}
+.if-list * {
+  user-select: text;
+}
+.if-list > .if-name {
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
+}
+.if-addr {
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+}
+.if-addr-row {
+  display: flex;
+}
+.if-addr-row > .if-addr-label {
+  width: 80px;
+}
+.if-addr.external {
+  color: #13af42;
+}
+.if-addr.internal {
+  color: #d44545;
 }

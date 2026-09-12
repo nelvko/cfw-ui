@@ -82,6 +82,8 @@ const messages = {
     // Settings
     Backend: '后端设置',
     Secret: '密钥',
+    'Display Chain Type': '链路显示类型',
+    'Show Process If Present': '显示进程名',
     'Demo Mode': '演示模式',
     'Demo Mode Sub': '使用内置模拟数据,无需真实内核',
     'Test Connection': '测试连接',
@@ -169,6 +171,8 @@ const messages = {
     'No Rules': 'No rules',
     Backend: 'Backend',
     Secret: 'Secret',
+    'Display Chain Type': 'Display Chain Type',
+    'Show Process If Present': 'Show Process If Present',
     'Demo Mode': 'Demo Mode',
     'Demo Mode Sub': 'Use built-in mock data, no real core required',
     'Test Connection': 'Test Connection',

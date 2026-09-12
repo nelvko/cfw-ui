@@ -19,10 +19,10 @@ export const getDelay = (name, url, timeout) =>
 
 export const getRules = () => api.get('/rules')
 
+export const getProviders = () => api.get('/providers/rules')
+
 export const closeConnection = (id) => api.del(`/connections/${encodeURIComponent(id)}`)
 
 export const closeAllConnections = () => api.del('/connections')
-
-export const flushFakeIp = () => api.post('/cache/fakeip/flush')
 
 export const updateGeo = () => api.post('/geo')
